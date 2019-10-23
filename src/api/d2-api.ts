@@ -56,11 +56,20 @@ export default class D2Api {
         if (D2Api.instances.length === 0) {
             throw "D2Api has not been initialized yet, please make sure you have already called createInstance()";
         }
+
         return [...D2Api.instances];
     }
 
-    public static getInstance(): D2Api {
-        return D2Api.getInstances()[0];
+    public static getInstance(alias?: string): D2Api {
+        const found = _.find(D2Api.instances, ["options.alias", alias])
+        
+        if (D2Api.instances.length === 0) {
+            throw "D2Api has not been initialized yet, please make sure you have already called createInstance()";
+        } else if (alias && !found) {
+            throw "Invalid alias for an existing D2Api instance, please make sure you have created such instance";
+        }
+
+        return found || D2Api.getInstances()[0];
     }
 
     public request<T>(config: AxiosRequestConfig): D2ApiResponse<T> {
