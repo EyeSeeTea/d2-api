@@ -14,26 +14,53 @@ export interface D2ApiOptions {
     baseUrl?: string;
     apiVersion?: number;
     auth?: AxiosBasicCredentials;
+    alias?: string;
 }
 
 type Models = { [ModelName in keyof D2ModelSchemas]: D2ApiModel<ModelName> };
 
 export default class D2Api {
+    private static instances: D2Api[] = [];
     private apiPath: string;
 
+    public readonly options: D2ApiOptions;
     public connection: AxiosInstance;
     public metadata: D2ApiMetadata;
     public models: Models;
 
-    public constructor(options?: D2ApiOptions) {
-        const { baseUrl = "http://localhost:8080", apiVersion, auth } = options || {};
+    private constructor(options?: D2ApiOptions) {
+        const {
+            baseUrl = "http://localhost:8080",
+            apiVersion,
+            auth,
+            alias = `d2-api-${D2Api.instances.length}`,
+        } = options || {};
         this.apiPath = joinPath(baseUrl, "api", apiVersion ? String(apiVersion) : null);
+
+        this.options = { ...options, baseUrl, alias };
         this.connection = prepareConnection(this.apiPath, auth);
         this.metadata = new D2ApiMetadata(this);
         this.models = _(Object.keys(D2ModelEnum))
             .map((modelName: keyof D2ModelSchemas) => [modelName, new D2ApiModel(this, modelName)])
             .fromPairs()
             .value() as Models;
+    }
+
+    public static createInstance(options?: D2ApiOptions): D2Api {
+        const instance = new D2Api(options);
+        D2Api.instances.push(instance);
+        return instance;
+    }
+
+    public static getInstances(): D2Api[] {
+        if (D2Api.instances.length === 0) {
+            throw "D2Api has not been initialized yet, please make sure you have already called createInstance()";
+        }
+        return [...D2Api.instances];
+    }
+
+    public static getInstance(): D2Api {
+        return D2Api.getInstances()[0];
     }
 
     public request<T>(config: AxiosRequestConfig): D2ApiResponse<T> {
