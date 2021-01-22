@@ -53,43 +53,53 @@ const schemaFieldProperties: Array<keyof D2SchemaFieldProperties> = [
     "itemKlass",
 ];
 
-const interfaceFromClass: _.Dictionary<string> = {
-    "org.hisp.dhis.security.acl.Access": "D2Access",
-    "org.hisp.dhis.translation.ObjectTranslation": "D2Translation",
-    "org.hisp.dhis.translation.Translation": "D2Translation",
-    "org.hisp.dhis.common.ObjectStyle": "D2Style",
-    "org.hisp.dhis.common.DimensionalKeywords": "D2DimensionalKeywords",
-    "com.vividsolutions.jts.geom.Geometry": "D2Geometry",
-    "org.hisp.dhis.expression.Expression": "D2Expression",
-    "org.hisp.dhis.period.PeriodType": "string",
-    "org.hisp.dhis.chart.Series": "any",
-    "org.hisp.dhis.attribute.AttributeValue": "D2AttributeValueGeneric<D2Attribute>",
-    "org.hisp.dhis.eventdatavalue.EventDataValue": "any",
-    "org.hisp.dhis.common.DataDimensionItem": "any",
-    "org.hisp.dhis.common.DimensionalObject": "any",
-    "org.hisp.dhis.interpretation.Mention": "any",
-    "org.hisp.dhis.message.Message": "any",
-    "org.hisp.dhis.message.UserMessage": "any",
-    "org.hisp.dhis.period.Period": "any",
-    "org.hisp.dhis.period.RelativePeriods": "any",
-    "org.hisp.dhis.programstagefilter.EventQueryCriteria": "any",
-    "org.hisp.dhis.relationship.RelationshipConstraint": "D2RelationshipConstraint",
-    "org.hisp.dhis.relationship.RelationshipItem": "any",
-    "org.hisp.dhis.render.DeviceRenderTypeMap": "any",
-    "org.hisp.dhis.reporttable.ReportParams": "any",
-    "org.hisp.dhis.sms.command.code.SMSCode": "any",
-    "org.hisp.dhis.sms.command.SMSSpecialCharacter": "any",
-    "org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValue": "any",
-    "org.hisp.dhis.trackedentitycomment.TrackedEntityComment": "any",
-    "org.hisp.dhis.trackedentityfilter.EventFilter": "any",
-    "org.hisp.dhis.trackedentityfilter.FilterPeriod": "any",
-    "org.hisp.dhis.trackedentity.TrackedEntityAttributeDimension": "any",
-    "org.hisp.dhis.trackedentity.TrackedEntityProgramOwner": "any",
-    "org.hisp.dhis.common.DimensionalItemObject": "any",
+const interfaceFromClass: _.Dictionary<{ type: string; hasSchema?: boolean }> = {
+    "org.hisp.dhis.security.acl.Access": { type: "D2Access", hasSchema: true },
+    "org.hisp.dhis.translation.ObjectTranslation": { type: "D2Translation", hasSchema: true },
+    "org.hisp.dhis.translation.Translation": { type: "D2Translation", hasSchema: true },
+    "org.hisp.dhis.common.ObjectStyle": { type: "D2StyleSchema" },
+    "org.hisp.dhis.common.DimensionalKeywords": { type: "D2DimensionalKeywords", hasSchema: true },
+    "com.vividsolutions.jts.geom.Geometry": { type: "D2Geometry", hasSchema: true },
+    "org.hisp.dhis.expression.Expression": { type: "D2Expression", hasSchema: true },
+    "org.hisp.dhis.period.PeriodType": { type: "string" },
+    "org.hisp.dhis.chart.Series": { type: "any" },
+    "org.hisp.dhis.attribute.AttributeValue": { type: "D2AttributeValueGeneric<D2Attribute>" },
+    "org.hisp.dhis.eventdatavalue.EventDataValue": { type: "any" },
+    "org.hisp.dhis.common.DataDimensionItem": { type: "any" },
+    "org.hisp.dhis.common.DimensionalObject": { type: "any" },
+    "org.hisp.dhis.interpretation.Mention": { type: "any" },
+    "org.hisp.dhis.message.Message": { type: "any" },
+    "org.hisp.dhis.message.UserMessage": { type: "any" },
+    "org.hisp.dhis.period.Period": { type: "any" },
+    "org.hisp.dhis.period.RelativePeriods": { type: "any" },
+    "org.hisp.dhis.programstagefilter.EventQueryCriteria": { type: "any" },
+    "org.hisp.dhis.relationship.RelationshipConstraint": {
+        type: "D2RelationshipConstraint",
+        hasSchema: true,
+    },
+    "org.hisp.dhis.relationship.RelationshipItem": { type: "any" },
+    "org.hisp.dhis.render.DeviceRenderTypeMap": { type: "any" },
+    "org.hisp.dhis.reporttable.ReportParams": { type: "any" },
+    "org.hisp.dhis.sms.command.code.SMSCode": { type: "any" },
+    "org.hisp.dhis.sms.command.SMSSpecialCharacter": { type: "any" },
+    "org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValue": { type: "any" },
+    "org.hisp.dhis.trackedentitycomment.TrackedEntityComment": { type: "any" },
+    "org.hisp.dhis.trackedentityfilter.EventFilter": { type: "any" },
+    "org.hisp.dhis.trackedentityfilter.FilterPeriod": { type: "any" },
+    "org.hisp.dhis.trackedentity.TrackedEntityAttributeDimension": { type: "any" },
+    "org.hisp.dhis.trackedentity.TrackedEntityProgramOwner": { type: "any" },
+    "org.hisp.dhis.common.DimensionalItemObject": { type: "any" },
 
-    "java.lang.Object": "object",
-    "java.util.Map": "object",
+    "java.lang.Object": { type: "object" },
+    "java.util.Map": { type: "object" },
 };
+
+const customSchemaItems = _(interfaceFromClass)
+    .values()
+    .filter(obj => !!obj.hasSchema)
+    .uniqBy(obj => obj.type)
+    .map(obj => ({ key: "custom" + obj.type, value: obj.type + "Schema" }))
+    .value();
 
 function getModelName(klass: string, suffix?: string): string {
     const className = _.last(klass.split("."));
@@ -147,13 +157,14 @@ const getType = (schemas: Schemas, property: SchemaProperty, suffix?: string): s
     }
 };
 
-function getInterface(schemas: Schemas, property: SchemaProperty, suffix?: string): string {
+function getInterface(schemas: Schemas, property: SchemaProperty, suffix: string = ""): string {
     const className = _.last(property.klass.split(".")) || "";
 
     if (schemas[className]) {
-        return `D2${className}${suffix || ""}`;
+        return `D2${className}` + suffix;
     } else if (interfaceFromClass[property.klass]) {
-        return interfaceFromClass[property.klass];
+        const { type, hasSchema } = interfaceFromClass[property.klass];
+        return type + (hasSchema ? suffix : "");
     } else {
         console.log(`Unsupported complex type, default to any: ${property.klass}`);
         return "any";
@@ -215,6 +226,12 @@ async function generateSchema(instance: Instance) {
         .value();
     const schemasByClassName = _.keyBy(schemas, schema => _.last(schema.klass.split(".")) || "");
 
+    const allSchemas = _(models)
+        .map(model => ({ key: model.plural, value: `${getModelName(model.klass)}Schema` }))
+        .concat(customSchemaItems)
+        .sortBy(o => o.key)
+        .value();
+
     const modelsDeclaration = `
         /* eslint-disable */
 
@@ -222,7 +239,9 @@ async function generateSchema(instance: Instance) {
             Id, Preset, FieldPresets, D2SchemaProperties,
             D2Access, D2Translation, D2Geometry,  D2Style,
             D2AttributeValueGeneric, D2DimensionalKeywords, D2Expression,
-            D2RelationshipConstraint
+            D2RelationshipConstraint,
+            D2AccessSchema, D2TranslationSchema, D2StyleSchema, D2DimensionalKeywordsSchema,
+            D2GeometrySchema, D2ExpressionSchema, D2RelationshipConstraintSchema
         } from "../schemas/base";
 
         ${schemas
@@ -265,7 +284,7 @@ async function generateSchema(instance: Instance) {
         export type D2Model =
             ${models.map(model => getModelName(model.klass)).join(" | ")}
 
-        export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> =
+        export const models: Partial<Record<keyof D2ModelSchemas, D2SchemaProperties>> =
             ${JSON.stringify(
                 _.keyBy(
                     models.map(model => {
@@ -281,9 +300,7 @@ async function generateSchema(instance: Instance) {
             )}
 
         export type D2ModelSchemas = {
-            ${models
-                .map(model => `${model.plural}: ${getModelName(model.klass)}Schema`)
-                .join(",\n")}
+            ${allSchemas.map(schema => `${schema.key}: ${schema.value}`).join(",\n")}
         }
     `;
 

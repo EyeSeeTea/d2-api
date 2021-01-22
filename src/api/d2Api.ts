@@ -93,7 +93,7 @@ export abstract class D2ApiVersioned<
     }
 
     constructor(
-        private schemaModels: Record<keyof D2ApiDefinition["schemas"], D2SchemaProperties>,
+        private schemaModels: Partial<Record<keyof D2ApiDefinition["schemas"], D2SchemaProperties>>,
         options?: D2ApiOptions
     ) {
         super(options);

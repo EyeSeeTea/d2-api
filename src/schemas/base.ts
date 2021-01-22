@@ -15,14 +15,16 @@ export interface D2Access {
     manage: boolean;
 }
 
-type GetDefaultSchema<Model> = {
+type GetDefaultSchema<Model, Name extends string> = {
+    name: Name;
+    model: Model;
     fields: Model;
     fieldPresets: {
-        $all: keyof Model;
-        $identifiable: FieldPresets["identifiable"];
-        $nameable: FieldPresets["nameable"];
-        $persisted: keyof Model;
-        $owner: keyof Model;
+        $all: Preset<Model, keyof Model>;
+        $identifiable: Preset<Model, FieldPresets["identifiable"]>;
+        $nameable: Preset<Model, FieldPresets["nameable"]>;
+        $persisted: Preset<Model, keyof Model>;
+        $owner: Preset<Model, keyof Model>;
     };
 };
 
@@ -86,12 +88,19 @@ export type D2RelationshipConstraint =
           program: Ref;
       };
 
-export type D2AccessSchema = GetDefaultSchema<D2Access>;
-export type D2TranslationSchema = GetDefaultSchema<D2Translation>;
-export type D2StyleSchema = GetDefaultSchema<D2Style>;
-export type D2DimensionalKeywordsSchema = GetDefaultSchema<D2DimensionalKeywords>;
-export type D2GeometrySchema = GetDefaultSchema<D2Geometry>;
-export type D2ExpressionSchema = GetDefaultSchema<D2Expression>;
+export type D2AccessSchema = GetDefaultSchema<D2Access, "D2Access">;
+export type D2TranslationSchema = GetDefaultSchema<D2Translation, "D2Translation">;
+export type D2StyleSchema = GetDefaultSchema<D2Style, "D2Style">;
+export type D2DimensionalKeywordsSchema = GetDefaultSchema<
+    D2DimensionalKeywords,
+    "D2DimensionalKeywords"
+>;
+export type D2GeometrySchema = GetDefaultSchema<D2Geometry, "D2Geometry">;
+export type D2ExpressionSchema = GetDefaultSchema<D2Expression, "D2Expression">;
+export type D2RelationshipConstraintSchema = GetDefaultSchema<
+    D2RelationshipConstraint,
+    "D2RelationshipConstraint"
+>;
 
 export interface D2Sharing {
     publicAccess: string;
