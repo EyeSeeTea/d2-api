@@ -61,15 +61,10 @@ export class FetchHttpClientRepository implements HttpClientRepository {
         const response: Promise<HttpResponse<Data>> = fetchResponse
             .then(async res => {
                 const headers = getHeadersRecord(res.headers);
-                const encoding = getCharset(headers);
-                const dataIsJson = (headers["content-type"] || "").includes("json");
+                const data = await getResponseData(res, dataType);
 
-                const arrayBuffer = await res.arrayBuffer();
-                const content = iconv.decode(Buffer.from(arrayBuffer), encoding);
-
-                const data = (dataIsJson ? JSON.parse(content) : content) as Data;
                 if (!validateStatus(res.status)) raiseHttpError(options, res, data);
-                return { status: res.status, data, headers };
+                return { status: res.status, data: data as Data, headers };
             })
             .catch(error => {
                 if (error.request) throw error;
@@ -120,4 +115,22 @@ function getCharset(headers: _.Dictionary<string>): string {
 
     const contentTypes = _.fromPairs(contentType.split(";").map(type => type.split("=")));
     return contentTypes["charset"] || "utf-8";
+}
+
+async function getResponseData(res: Response, type: HttpRequest["dataType"]): Promise<unknown> {
+    if (type === "raw") {
+        return res.blob();
+    }
+
+    const headers = getHeadersRecord(res.headers);
+    const encoding = getCharset(headers);
+
+    const arrayBuffer = await res.arrayBuffer();
+    const content = iconv.decode(Buffer.from(arrayBuffer), encoding);
+
+    if ((headers["content-type"] || "").includes("json")) {
+        return JSON.parse(content);
+    }
+
+    return content;
 }
