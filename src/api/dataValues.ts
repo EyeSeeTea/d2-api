@@ -1,5 +1,6 @@
+import _ from "lodash";
 import { Id } from "../schemas";
-import { AsyncPostResponse, D2ApiResponse } from "./common";
+import { AsyncPostResponse, D2ApiResponse, HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 
 export interface DataValueSetsPostRequest {
@@ -127,10 +128,38 @@ export interface DataValueSetsDataValue {
     created: string;
     lastUpdated: string;
     followup: boolean;
+    deleted: boolean;
 }
+
+// https://docs.dhis2.org/en/full/develop/dhis-core-version-master/developer-manual.html#webapi_sending_individual_data_values
+export interface DataValuePostRequest {
+    ou: string;
+    pe: string;
+    de: string;
+    co?: string;
+    cc?: string;
+    cp?: string;
+    ds?: string;
+    value?: string;
+    comment?: string;
+    followUp?: string;
+}
+
+export type DataValuePostResponse = HttpResponse<void>;
 
 export class DataValues {
     constructor(public d2Api: D2ApiGeneric) {}
+
+    post(request: DataValuePostRequest): D2ApiResponse<void> {
+        return this.d2Api
+            .request<DataValuePostResponse>({
+                method: "post",
+                url: "/dataValues",
+                data: new URLSearchParams(_.omitBy(request, _.isUndefined)),
+                dataType: "raw",
+            })
+            .map(_res => undefined);
+    }
 
     getSet(params: DataValueSetsGetRequest): D2ApiResponse<DataValueSetsGetResponse> {
         return this.d2Api
