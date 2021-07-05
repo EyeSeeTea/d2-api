@@ -12,14 +12,15 @@ import { DataStore } from "./dataStore";
 import { DataValues } from "./dataValues";
 import { Email } from "./email";
 import { Events } from "./events";
+import { Expressions } from "./expressions";
 import { Files } from "./files";
+import { Maintenance } from "./maintenance";
 import { MessageConversations } from "./messageConversations";
 import { Metadata } from "./metadata";
 import { Model } from "./model";
 import { Sharing } from "./sharing";
 import { System } from "./system";
 import { D2ApiOptions, D2ApiRequest, IndexedModels } from "./types";
-import { Maintenance } from "./maintenance";
 
 export class D2ApiGeneric {
     public baseUrl: string;
@@ -171,6 +172,11 @@ export abstract class D2ApiVersioned<
     @cache()
     get maintenance() {
         return new Maintenance(this);
+    }
+
+    @cache()
+    get expressions() {
+        return new Expressions(this);
     }
 }
 

@@ -28,6 +28,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
             url,
             params,
             data,
+            bodyType = "json",
             dataType = "json",
             headers: extraHeaders = {},
             validateStatus = validateStatus2xx,
@@ -47,7 +48,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
         const fetchOptions: RequestInit = {
             method,
             signal: controller.signal,
-            body: getBody(dataType, data),
+            body: getBody(bodyType, data),
             headers: { ...baseHeaders, ...authHeaders, ...extraHeaders },
             credentials: auth ? "omit" : ("include" as const),
         };

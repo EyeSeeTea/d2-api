@@ -15,6 +15,7 @@ export interface HttpRequest {
     url: string;
     params?: Record<string, ParamValue | ParamValue[]>;
     data?: unknown;
+    bodyType?: "json" | "raw";
     dataType?: "json" | "raw";
     validateStatus?(status: number): boolean;
     timeout?: number;

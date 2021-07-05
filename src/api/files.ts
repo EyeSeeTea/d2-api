@@ -47,6 +47,7 @@ export class Files {
                 method: "post",
                 url: "/fileResources",
                 data: formData,
+                bodyType: "raw",
                 dataType: "raw",
             })
             .flatMap(({ data }) => {
