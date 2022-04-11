@@ -1,7 +1,86 @@
-import { RequireAtLeastOne } from "../utils/types";
-import { AsyncPostResponse, D2ApiResponse, HttpResponse } from "./common";
+import { AsyncPostResponse, D2ApiResponse, HttpResponse, getFieldsAsString } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { Pager } from "./model";
+import { Selector, SelectedPick } from ".";
+import { Preset, FieldPresets, Id } from "../schemas";
+import { D2Relationship, D2RelationshipSchema } from "../2.36";
+
+export class Events {
+    constructor(public d2Api: D2ApiGeneric) {}
+
+    get<Fields extends D2EventFields>(
+        params: EventsGetRequest<Fields>
+    ): D2ApiResponse<PaginatedEventsGetResponse<Fields>> {
+        return this.d2Api.get<PaginatedEventsGetResponse<Fields>>("/events", {
+            ...params,
+            fields: getFieldsAsString(params.fields),
+            paging: true,
+        });
+    }
+
+    getAll<Fields extends D2EventFields>(
+        params: EventsGetRequest<Fields>
+    ): D2ApiResponse<EventsGetResponse<Fields>> {
+        return this.d2Api.get<EventsGetResponse<Fields>>("/events", {
+            ...params,
+            fields: getFieldsAsString(params.fields),
+            paging: false,
+            page: undefined,
+            pageSize: undefined,
+        });
+    }
+
+    post(
+        params: EventsPostParams,
+        request: EventsPostRequest
+    ): D2ApiResponse<HttpResponse<EventsPostResponse>> {
+        return this.d2Api.post<HttpResponse<EventsPostResponse>>("/events", params, request);
+    }
+
+    postAsync(
+        params: EventsPostParams,
+        request: EventsPostRequest
+    ): D2ApiResponse<AsyncPostResponse<"EVENT_IMPORT">> {
+        return this.d2Api.post<AsyncPostResponse<"EVENT_IMPORT">>(
+            "/events",
+            { ...params, async: true },
+            request
+        );
+    }
+}
+
+export interface D2EventSchema {
+    name: "D2Event";
+    model: D2Event;
+    fields: D2Event & {
+        dataValues: D2EventDataValueSchema[];
+        relationships: D2RelationshipSchema[];
+    };
+    fieldPresets: {
+        $all: Preset<D2Event, keyof D2Event>;
+        $identifiable: Preset<D2Event, FieldPresets["identifiable"]>;
+        $nameable: Preset<D2Event, FieldPresets["nameable"]>;
+        $persisted: Preset<D2Event, never>;
+        $owner: Preset<D2Event, never>;
+    };
+}
+
+export interface D2EventDataValueSchema {
+    name: "D2DataValue";
+    model: DataValue;
+    fields: DataValue;
+    fieldPresets: {
+        $all: Preset<DataValue, keyof DataValue>;
+        $identifiable: Preset<DataValue, FieldPresets["identifiable"]>;
+        $nameable: Preset<DataValue, FieldPresets["nameable"]>;
+        $persisted: Preset<DataValue, keyof DataValue>;
+        $owner: Preset<DataValue, keyof DataValue>;
+    };
+}
+
+type D2EventFields = Selector<D2EventSchema>;
+
+type GetEvent<Fields> = SelectedPick<D2EventSchema, Fields>;
 
 export type EventStatus = "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
 
@@ -84,12 +163,10 @@ export interface EventsPostResponse {
     >;
 }
 
-export type EventsGetRequest = RequireAtLeastOne<
-    EventsGetRequestFilters,
-    "orgUnit" | "program" | "trackedEntityInstance" | "event"
->;
+export type EventsGetRequestFilters<Fields> = EventsGetRequest<Fields>;
 
-export interface EventsGetRequestFilters {
+export interface EventsGetRequest<Fields> {
+    fields: Fields;
     program?: string;
     orgUnit?: string;
     event?: string;
@@ -126,82 +203,61 @@ export interface EventsGetRequestFilters {
     assignedUser?: string;
 }
 
-export interface EventsGetResponse {
-    events: Array<Event>;
+export interface EventsGetResponse<Fields> {
+    events: GetEvent<Fields>[];
 }
 
-export interface PaginatedEventsGetResponse extends EventsGetResponse {
+export interface PaginatedEventsGetResponse<Fields> extends EventsGetResponse<Fields> {
     pager: Pager;
 }
 
-export interface Event {
-    storedBy: string;
-    dueDate: string;
-    program: string;
-    href: string;
-    event: string;
-    programStage: string;
-    orgUnit: string;
-    status: EventStatus;
-    orgUnitName: string;
-    eventDate: string;
+// The two kind of events (capture and tracker) use the same endpoint, so we must define
+// the Event type with some optional properries.
+export interface D2Event {
     attributeCategoryOptions: string;
-    lastUpdated: string;
-    created: string;
+    attributeOptionCombo: Id;
+    created: DateString;
+    createdByUserInfo?: UserInfo;
+    coordinate?: { latitude: number; longitude: number };
+    dataValues: DataValue[];
     deleted: boolean;
-    attributeOptionCombo: string;
-    coordinate?: {
-        latitude: number;
-        longitude: number;
-    };
-    dataValues: Array<{
-        lastUpdated: string;
-        storedBy: string;
-        created: string;
-        dataElement: string;
-        value: string;
-        providedElsewhere: boolean;
-    }>;
+    dueDate: DateString;
+    enrollment?: Id;
+    enrollmentStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    event: Id;
+    eventDate: DateString;
+    followup?: boolean;
+    href: string;
+    lastUpdated: DateString;
+    lastUpdatedByUserInfo?: UserInfo;
+    notes?: string;
+    orgUnit: Id;
+    orgUnitName: string;
+    program: Id;
+    programStage: Id;
+    programType: "WITH_REGISTRATION" | "WITHOUT_REGISTRATION";
+    relationships?: D2Relationship[];
+    status: EventStatus;
+    storedBy: Username;
+    trackedEntityInstance?: Id;
 }
 
-export class Events {
-    constructor(public d2Api: D2ApiGeneric) {}
+type DateString = string;
 
-    get(params: EventsGetRequest): D2ApiResponse<PaginatedEventsGetResponse> {
-        return this.d2Api.get<PaginatedEventsGetResponse>("/events", {
-            ...params,
-            paging: true,
-        });
-    }
+type Username = string;
 
-    getAll(params: EventsGetRequest): D2ApiResponse<EventsGetResponse> {
-        return this.d2Api.get<EventsGetResponse>("/events", {
-            ...params,
-            paging: false,
-            page: undefined,
-            pageSize: undefined,
-        });
-    }
+export interface UserInfo {
+    uid: Id;
+    username: string;
+    firstName: string;
+    surname: string;
+}
 
-    post(
-        params: EventsPostParams,
-        request: EventsPostRequest
-    ): D2ApiResponse<HttpResponse<EventsPostResponse>> {
-        return this.d2Api.post<HttpResponse<EventsPostResponse>>(
-            "/events",
-            { ...params, async: false },
-            request
-        );
-    }
-
-    postAsync(
-        params: EventsPostParams,
-        request: EventsPostRequest
-    ): D2ApiResponse<AsyncPostResponse<"EVENT_IMPORT">> {
-        return this.d2Api.post<AsyncPostResponse<"EVENT_IMPORT">>(
-            "/events",
-            { ...params, async: true },
-            request
-        );
-    }
+export interface DataValue {
+    lastUpdated: string;
+    storedBy: string;
+    created: string;
+    dataElement: string;
+    value: string;
+    providedElsewhere: boolean;
 }

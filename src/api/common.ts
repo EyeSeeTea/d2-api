@@ -76,7 +76,7 @@ function applyFieldTransformers(key: string, value: any) {
     }
 }
 
-function getFieldsAsString(modelFields: FieldsSelector): string {
+export function getFieldsAsString(modelFields: FieldsSelector): string {
     return _(modelFields)
         .map((value0, key0: string) => {
             const { key, value } = applyFieldTransformers(key0, value0);
