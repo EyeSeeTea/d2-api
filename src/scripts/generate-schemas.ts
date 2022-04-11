@@ -61,6 +61,7 @@ const interfaceFromClass: _.Dictionary<string | { type: string; schema: string }
     "org.hisp.dhis.common.ObjectStyle": "D2Style",
     "org.hisp.dhis.common.DimensionalKeywords": "D2DimensionalKeywords",
     "com.vividsolutions.jts.geom.Geometry": "D2Geometry",
+    "org.locationtech.jts.geom.Geometry": "D2Geometry",
     "org.hisp.dhis.expression.Expression": "D2Expression",
     "org.hisp.dhis.period.PeriodType": "string",
     "org.hisp.dhis.chart.Series": "unknown",
@@ -98,6 +99,20 @@ const interfaceFromClass: _.Dictionary<string | { type: string; schema: string }
     "org.hisp.dhis.visualization.Axis": "D2Axis",
     "java.lang.Object": "object",
     "java.util.Map": "object",
+    "java.util.List": "object",
+    "org.hisp.dhis.common.DimensionItemKeywords": "unknown",
+    "org.hisp.dhis.common.ValueTypeOptions": "unknown",
+    "org.hisp.dhis.dashboard.design.ItemConfig": "unknown",
+    "org.hisp.dhis.dashboard.design.Layout": "unknown",
+    "org.hisp.dhis.program.UserInfoSnapshot": "unknown",
+    "org.hisp.dhis.scheduling.JobParameters": "unknown",
+    "org.hisp.dhis.security.apikey.ApiTokenAttribute": "unknown",
+    "org.hisp.dhis.visualization.AxisV2": "unknown",
+    "org.hisp.dhis.visualization.LegendDefinitions": "unknown",
+    "org.hisp.dhis.visualization.OutlierAnalysis": "unknown",
+    "org.hisp.dhis.visualization.Series": "unknown",
+    "org.hisp.dhis.visualization.SeriesKey": "unknown",
+    "org.hisp.dhis.visualization.VisualizationFontStyle": "unknown",
 };
 
 function getModelName(klass: string, suffix?: string): string {
@@ -260,7 +275,7 @@ async function generateSchema(instance: Instance) {
 
         import {
             Id, Ref, Preset, FieldPresets, D2SchemaProperties,
-            D2Access, D2Translation, D2Geometry,  D2Style,
+            D2Access, D2Translation, D2Geometry, D2Style,
             D2DimensionalKeywords, D2Expression,
             D2RelationshipConstraint, D2ReportingParams, D2Axis, Sharing,
             D2ProgramOwner, D2ProgramOwnerSchema,

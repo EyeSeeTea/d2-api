@@ -64,7 +64,8 @@ export type D2Coordinates = [number, number];
 
 export type D2Geometry =
     | { type: "Point"; coordinates: D2Coordinates }
-    | { type: "Polygon"; coordinates: Array<D2Coordinates[]> };
+    | { type: "Polygon"; coordinates: Array<D2Coordinates[]> }
+    | { type: "MultiPolygon"; coordinates: Array<Array<D2Coordinates[]>> };
 
 export interface D2Expression {
     expression: string;
@@ -168,8 +169,16 @@ export interface D2AttributeValueGenericSchema<D2Attribute, D2AttributeSchema> {
 export type FieldPreset = "$all" | "$identifiable" | "$nameable" | "$persisted" | "$owner";
 
 export interface FieldPresets {
-    identifiable: "id" | "name" | "code" | "created" | "lastUpdated";
-    nameable: "id" | "name" | "shortName" | "code" | "description" | "created" | "lastUpdated";
+    identifiable: "id" | "name" | "code" | "created" | "lastUpdated" | "href";
+    nameable:
+        | "id"
+        | "name"
+        | "shortName"
+        | "code"
+        | "description"
+        | "created"
+        | "lastUpdated"
+        | "href";
 }
 
 export type Preset<Model, Properties> = OmitNever<
