@@ -15,6 +15,13 @@ export interface D2Access {
     manage: boolean;
 }
 
+export interface D2AccessWithData extends D2Access {
+    data: {
+        read: boolean;
+        write: boolean;
+    };
+}
+
 type GetDefaultSchema<Model> = {
     fields: Model;
     fieldPresets: {
