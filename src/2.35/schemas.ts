@@ -7,6 +7,7 @@ import {
     FieldPresets,
     D2SchemaProperties,
     D2Access,
+    D2AccessWithData,
     D2Translation,
     D2Geometry,
     D2Style,
@@ -16,6 +17,8 @@ import {
     D2ReportingParams,
     D2Axis,
     Sharing,
+    D2ProgramOwner,
+    D2ProgramOwnerSchema,
     D2AttributeValueGeneric,
     D2AttributeValueGenericSchema,
 } from "../schemas/base";
@@ -288,7 +291,7 @@ export type D2CategoryDimension = {
 };
 
 export type D2CategoryOption = {
-    access: D2Access;
+    access: D2AccessWithData;
     aggregationType:
         | "SUM"
         | "AVERAGE"
@@ -1204,7 +1207,7 @@ export type D2DataInputPeriod = {
 };
 
 export type D2DataSet = {
-    access: D2Access;
+    access: D2AccessWithData;
     aggregationType:
         | "SUM"
         | "AVERAGE"
@@ -2859,7 +2862,7 @@ export type D2PredictorGroup = {
 };
 
 export type D2Program = {
-    access: D2Access;
+    access: D2AccessWithData;
     accessLevel: "OPEN" | "AUDITED" | "PROTECTED" | "CLOSED";
     attributeValues: D2AttributeValueGeneric<D2Attribute>[];
     categoryCombo: D2CategoryCombo;
@@ -2869,9 +2872,11 @@ export type D2Program = {
     dataEntryForm: D2DataEntryForm;
     description: string;
     displayDescription: string;
+    displayEnrollmentDateLabel: string;
     displayFormName: string;
     displayFrontPageList: boolean;
     displayIncidentDate: boolean;
+    displayIncidentDateLabel: string;
     displayName: string;
     displayShortName: string;
     enrollmentDateLabel: string;
@@ -3341,7 +3346,7 @@ export type D2ProgramSection = {
 };
 
 export type D2ProgramStage = {
-    access: D2Access;
+    access: D2AccessWithData;
     allowGenerateNextVisit: boolean;
     attributeValues: D2AttributeValueGeneric<D2Attribute>[];
     autoGenerateEvent: boolean;
@@ -3351,6 +3356,8 @@ export type D2ProgramStage = {
     dataEntryForm: D2DataEntryForm;
     description: string;
     displayDescription: string;
+    displayDueDateLabel: string;
+    displayExecutionDateLabel: string;
     displayFormName: string;
     displayGenerateEventBox: boolean;
     displayName: string;
@@ -3739,7 +3746,7 @@ export type D2Relationship = {
 };
 
 export type D2RelationshipType = {
-    access: D2Access;
+    access: D2AccessWithData;
     attributeValues: D2AttributeValueGeneric<D2Attribute>[];
     bidirectional: boolean;
     code: Id;
@@ -4234,7 +4241,7 @@ export type D2TrackedEntityInstance = {
     name: string;
     organisationUnit: D2OrganisationUnit;
     programInstances: D2ProgramInstance[];
-    programOwners: unknown[];
+    programOwners: D2ProgramOwner[];
     publicAccess: string;
     relationshipItems: unknown[];
     storedBy: string;
@@ -4283,7 +4290,7 @@ export type D2TrackedEntityProgramIndicatorDimension = {
 };
 
 export type D2TrackedEntityType = {
-    access: D2Access;
+    access: D2AccessWithData;
     allowAuditLog: boolean;
     attributeValues: D2AttributeValueGeneric<D2Attribute>[];
     code: Id;
@@ -4600,6 +4607,7 @@ export type D2ValidationRule = {
         | "CATEGORY_OPTION_GROUP";
     displayDescription: string;
     displayFormName: string;
+    displayInstruction: string;
     displayName: string;
     displayShortName: string;
     externalAccess: boolean;
@@ -5357,7 +5365,7 @@ export interface D2CategoryOptionSchema {
     name: "D2CategoryOption";
     model: D2CategoryOption;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         aggregationType:
             | "SUM"
             | "AVERAGE"
@@ -6955,7 +6963,7 @@ export interface D2DataSetSchema {
     name: "D2DataSet";
     model: D2DataSet;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         aggregationType:
             | "SUM"
             | "AVERAGE"
@@ -10401,6 +10409,7 @@ export interface D2PredictorSchema {
             | "output"
             | "lastUpdated"
             | "sampleSkipTest"
+            | "translations"
             | "id"
             | "sequentialSampleCount"
             | "annualSampleCount"
@@ -10421,6 +10430,7 @@ export interface D2PredictorSchema {
             | "output"
             | "lastUpdated"
             | "sampleSkipTest"
+            | "translations"
             | "id"
             | "sequentialSampleCount"
             | "annualSampleCount"
@@ -10501,7 +10511,7 @@ export interface D2ProgramSchema {
     name: "D2Program";
     model: D2Program;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         accessLevel: "OPEN" | "AUDITED" | "PROTECTED" | "CLOSED";
         attributeValues: D2AttributeValueGenericSchema<D2Attribute, D2AttributeSchema>[];
         categoryCombo: D2CategoryComboSchema;
@@ -10511,9 +10521,11 @@ export interface D2ProgramSchema {
         dataEntryForm: D2DataEntryFormSchema;
         description: string;
         displayDescription: string;
+        displayEnrollmentDateLabel: string;
         displayFormName: string;
         displayFrontPageList: boolean;
         displayIncidentDate: boolean;
+        displayIncidentDateLabel: string;
         displayName: string;
         displayShortName: string;
         enrollmentDateLabel: string;
@@ -11497,7 +11509,7 @@ export interface D2ProgramStageSchema {
     name: "D2ProgramStage";
     model: D2ProgramStage;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         allowGenerateNextVisit: boolean;
         attributeValues: D2AttributeValueGenericSchema<D2Attribute, D2AttributeSchema>[];
         autoGenerateEvent: boolean;
@@ -11507,6 +11519,8 @@ export interface D2ProgramStageSchema {
         dataEntryForm: D2DataEntryFormSchema;
         description: string;
         displayDescription: string;
+        displayDueDateLabel: string;
+        displayExecutionDateLabel: string;
         displayFormName: string;
         displayGenerateEventBox: boolean;
         displayName: string;
@@ -12362,7 +12376,7 @@ export interface D2RelationshipTypeSchema {
     name: "D2RelationshipType";
     model: D2RelationshipType;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         attributeValues: D2AttributeValueGenericSchema<D2Attribute, D2AttributeSchema>[];
         bidirectional: boolean;
         code: Id;
@@ -13244,7 +13258,7 @@ export interface D2TrackedEntityInstanceSchema {
         name: string;
         organisationUnit: D2OrganisationUnitSchema;
         programInstances: D2ProgramInstanceSchema[];
-        programOwners: unknown[];
+        programOwners: D2ProgramOwnerSchema[];
         publicAccess: string;
         relationshipItems: unknown[];
         storedBy: string;
@@ -13406,7 +13420,7 @@ export interface D2TrackedEntityTypeSchema {
     name: "D2TrackedEntityType";
     model: D2TrackedEntityType;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         allowAuditLog: boolean;
         attributeValues: D2AttributeValueGenericSchema<D2Attribute, D2AttributeSchema>[];
         code: Id;
@@ -14101,6 +14115,7 @@ export interface D2ValidationRuleSchema {
             | "CATEGORY_OPTION_GROUP";
         displayDescription: string;
         displayFormName: string;
+        displayInstruction: string;
         displayName: string;
         displayShortName: string;
         externalAccess: boolean;
@@ -26081,7 +26096,7 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
         displayName: "Predictor",
         collectionName: "predictors",
         nameableObject: true,
-        translatable: false,
+        translatable: true,
         identifiableObject: true,
         dataShareable: false,
         name: "Predictor",
@@ -26466,6 +26481,7 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 klass: "java.util.Set",
                 itemKlass: "org.hisp.dhis.program.ProgramIndicator",
             },
+            { name: "displayIncidentDateLabel", propertyType: "TEXT", klass: "java.lang.String" },
             {
                 name: "lastUpdated",
                 fieldName: "lastUpdated",
@@ -26546,6 +26562,7 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 propertyType: "INTEGER",
                 klass: "java.lang.Integer",
             },
+            { name: "displayEnrollmentDateLabel", propertyType: "TEXT", klass: "java.lang.String" },
             {
                 name: "maxTeiCountToReturn",
                 fieldName: "maxTeiCountToReturn",
@@ -28701,6 +28718,7 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 propertyType: "TEXT",
                 klass: "java.lang.String",
             },
+            { name: "displayExecutionDateLabel", propertyType: "TEXT", klass: "java.lang.String" },
             {
                 name: "externalAccess",
                 fieldName: "externalAccess",
@@ -28775,6 +28793,7 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 propertyType: "TEXT",
                 klass: "org.hisp.dhis.period.PeriodType",
             },
+            { name: "displayDueDateLabel", propertyType: "TEXT", klass: "java.lang.String" },
             {
                 name: "blockEntryForm",
                 fieldName: "blockEntryForm",
@@ -34284,6 +34303,7 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 propertyType: "DATE",
                 klass: "java.util.Date",
             },
+            { name: "displayInstruction", propertyType: "TEXT", klass: "java.lang.String" },
             {
                 name: "leftSide",
                 fieldName: "leftSide",

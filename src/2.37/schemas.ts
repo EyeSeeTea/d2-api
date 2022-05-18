@@ -7,6 +7,7 @@ import {
     FieldPresets,
     D2SchemaProperties,
     D2Access,
+    D2AccessWithData,
     D2Translation,
     D2Geometry,
     D2Style,
@@ -16,6 +17,8 @@ import {
     D2ReportingParams,
     D2Axis,
     Sharing,
+    D2ProgramOwner,
+    D2ProgramOwnerSchema,
     D2AttributeValueGeneric,
     D2AttributeValueGenericSchema,
 } from "../schemas/base";
@@ -327,11 +330,11 @@ export type D2CategoryCombo = {
 
 export type D2CategoryDimension = {
     category: D2Category;
-    categoryOptions: unknown;
+    categoryOptions: object;
 };
 
 export type D2CategoryOption = {
-    access: D2Access;
+    access: D2AccessWithData;
     aggregationType:
         | "SUM"
         | "AVERAGE"
@@ -620,7 +623,7 @@ export type D2CategoryOptionGroupSet = {
 
 export type D2CategoryOptionGroupSetDimension = {
     categoryOptionGroupSet: D2CategoryOptionGroupSet;
-    categoryOptionGroups: unknown;
+    categoryOptionGroups: object;
 };
 
 export type D2Constant = {
@@ -1046,7 +1049,7 @@ export type D2DataElementGroupSet = {
 
 export type D2DataElementGroupSetDimension = {
     dataElementGroupSet: D2DataElementGroupSet;
-    dataElementGroups: unknown;
+    dataElementGroups: object;
 };
 
 export type D2DataElementOperand = {
@@ -1151,7 +1154,7 @@ export type D2DataInputPeriod = {
 };
 
 export type D2DataSet = {
-    access: D2Access;
+    access: D2AccessWithData;
     aggregationType:
         | "SUM"
         | "AVERAGE"
@@ -2612,7 +2615,7 @@ export type D2OrganisationUnit = {
     favorite: boolean;
     favorites: string[];
     formName: string;
-    geometry: unknown;
+    geometry: D2Geometry;
     href: string;
     id: Id;
     image: D2FileResource;
@@ -2694,7 +2697,7 @@ export type D2OrganisationUnitGroup = {
     favorites: string[];
     featureType: "NONE" | "MULTI_POLYGON" | "POLYGON" | "POINT" | "SYMBOL";
     formName: string;
-    geometry: unknown;
+    geometry: D2Geometry;
     groupSets: D2OrganisationUnitGroupSet[];
     href: string;
     id: Id;
@@ -2795,7 +2798,7 @@ export type D2OrganisationUnitGroupSet = {
 
 export type D2OrganisationUnitGroupSetDimension = {
     organisationUnitGroupSet: D2OrganisationUnitGroupSet;
-    organisationUnitGroups: unknown;
+    organisationUnitGroups: object;
 };
 
 export type D2OrganisationUnitLevel = {
@@ -2888,7 +2891,7 @@ export type D2PredictorGroup = {
 };
 
 export type D2Program = {
-    access: D2Access;
+    access: D2AccessWithData;
     accessLevel: "OPEN" | "AUDITED" | "PROTECTED" | "CLOSED";
     attributeValues: D2AttributeValue[];
     categoryCombo: D2CategoryCombo;
@@ -3165,7 +3168,7 @@ export type D2ProgramInstance = {
     favorite: boolean;
     favorites: string[];
     followup: boolean;
-    geometry: unknown;
+    geometry: D2Geometry;
     href: string;
     id: Id;
     incidentDate: string;
@@ -3396,7 +3399,7 @@ export type D2ProgramSection = {
 };
 
 export type D2ProgramStage = {
-    access: D2Access;
+    access: D2AccessWithData;
     allowGenerateNextVisit: boolean;
     attributeValues: D2AttributeValue[];
     autoGenerateEvent: boolean;
@@ -3511,7 +3514,7 @@ export type D2ProgramStageInstance = {
     externalAccess: boolean;
     favorite: boolean;
     favorites: string[];
-    geometry: unknown;
+    geometry: D2Geometry;
     href: string;
     id: Id;
     lastUpdated: string;
@@ -3817,7 +3820,7 @@ export type D2Relationship = {
 };
 
 export type D2RelationshipType = {
-    access: D2Access;
+    access: D2AccessWithData;
     attributeValues: D2AttributeValue[];
     bidirectional: boolean;
     code: Id;
@@ -4040,7 +4043,7 @@ export type D2Section = {
 };
 
 export type D2SqlView = {
-    access: D2Access;
+    access: D2AccessWithData;
     attributeValues: D2AttributeValue[];
     cacheStrategy:
         | "NO_CACHE"
@@ -4213,7 +4216,7 @@ export type D2TrackedEntityInstance = {
     externalAccess: boolean;
     favorite: boolean;
     favorites: string[];
-    geometry: unknown;
+    geometry: D2Geometry;
     href: string;
     id: Id;
     inactive: boolean;
@@ -4225,7 +4228,7 @@ export type D2TrackedEntityInstance = {
     organisationUnit: D2OrganisationUnit;
     potentialDuplicate: boolean;
     programInstances: D2ProgramInstance[];
-    programOwners: unknown[];
+    programOwners: D2ProgramOwner[];
     publicAccess: string;
     relationshipItems: unknown[];
     sharing: Sharing;
@@ -4277,7 +4280,7 @@ export type D2TrackedEntityProgramIndicatorDimension = {
 };
 
 export type D2TrackedEntityType = {
-    access: D2Access;
+    access: D2AccessWithData;
     allowAuditLog: boolean;
     attributeValues: D2AttributeValue[];
     code: Id;
@@ -5441,7 +5444,7 @@ export interface D2CategoryComboSchema {
 export interface D2CategoryDimensionSchema {
     name: "D2CategoryDimension";
     model: D2CategoryDimension;
-    fields: { category: D2CategorySchema; categoryOptions: unknown };
+    fields: { category: D2CategorySchema; categoryOptions: object };
     fieldPresets: {
         $all: Preset<D2CategoryDimension, keyof D2CategoryDimension>;
         $identifiable: Preset<D2CategoryDimension, FieldPresets["identifiable"]>;
@@ -5455,7 +5458,7 @@ export interface D2CategoryOptionSchema {
     name: "D2CategoryOption";
     model: D2CategoryOption;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         aggregationType:
             | "SUM"
             | "AVERAGE"
@@ -5916,7 +5919,7 @@ export interface D2CategoryOptionGroupSetDimensionSchema {
     model: D2CategoryOptionGroupSetDimension;
     fields: {
         categoryOptionGroupSet: D2CategoryOptionGroupSetSchema;
-        categoryOptionGroups: unknown;
+        categoryOptionGroups: object;
     };
     fieldPresets: {
         $all: Preset<D2CategoryOptionGroupSetDimension, keyof D2CategoryOptionGroupSetDimension>;
@@ -6737,7 +6740,7 @@ export interface D2DataElementGroupSetSchema {
 export interface D2DataElementGroupSetDimensionSchema {
     name: "D2DataElementGroupSetDimension";
     model: D2DataElementGroupSetDimension;
-    fields: { dataElementGroupSet: D2DataElementGroupSetSchema; dataElementGroups: unknown };
+    fields: { dataElementGroupSet: D2DataElementGroupSetSchema; dataElementGroups: object };
     fieldPresets: {
         $all: Preset<D2DataElementGroupSetDimension, keyof D2DataElementGroupSetDimension>;
         $identifiable: Preset<D2DataElementGroupSetDimension, FieldPresets["identifiable"]>;
@@ -6908,7 +6911,7 @@ export interface D2DataSetSchema {
     name: "D2DataSet";
     model: D2DataSet;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         aggregationType:
             | "SUM"
             | "AVERAGE"
@@ -9901,7 +9904,7 @@ export interface D2OrganisationUnitSchema {
         favorite: boolean;
         favorites: string[];
         formName: string;
-        geometry: unknown;
+        geometry: D2Geometry;
         href: string;
         id: Id;
         image: D2FileResourceSchema;
@@ -10051,7 +10054,7 @@ export interface D2OrganisationUnitGroupSchema {
         favorites: string[];
         featureType: "NONE" | "MULTI_POLYGON" | "POLYGON" | "POINT" | "SYMBOL";
         formName: string;
-        geometry: unknown;
+        geometry: D2Geometry;
         groupSets: D2OrganisationUnitGroupSetSchema[];
         href: string;
         id: Id;
@@ -10245,7 +10248,7 @@ export interface D2OrganisationUnitGroupSetDimensionSchema {
     model: D2OrganisationUnitGroupSetDimension;
     fields: {
         organisationUnitGroupSet: D2OrganisationUnitGroupSetSchema;
-        organisationUnitGroups: unknown;
+        organisationUnitGroups: object;
     };
     fieldPresets: {
         $all: Preset<
@@ -10478,7 +10481,7 @@ export interface D2ProgramSchema {
     name: "D2Program";
     model: D2Program;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         accessLevel: "OPEN" | "AUDITED" | "PROTECTED" | "CLOSED";
         attributeValues: D2AttributeValueSchema[];
         categoryCombo: D2CategoryComboSchema;
@@ -10971,7 +10974,7 @@ export interface D2ProgramInstanceSchema {
         favorite: boolean;
         favorites: string[];
         followup: boolean;
-        geometry: unknown;
+        geometry: D2Geometry;
         href: string;
         id: Id;
         incidentDate: string;
@@ -11496,7 +11499,7 @@ export interface D2ProgramStageSchema {
     name: "D2ProgramStage";
     model: D2ProgramStage;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         allowGenerateNextVisit: boolean;
         attributeValues: D2AttributeValueSchema[];
         autoGenerateEvent: boolean;
@@ -11751,7 +11754,7 @@ export interface D2ProgramStageInstanceSchema {
         externalAccess: boolean;
         favorite: boolean;
         favorites: string[];
-        geometry: unknown;
+        geometry: D2Geometry;
         href: string;
         id: Id;
         lastUpdated: string;
@@ -12378,7 +12381,7 @@ export interface D2RelationshipTypeSchema {
     name: "D2RelationshipType";
     model: D2RelationshipType;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         attributeValues: D2AttributeValueSchema[];
         bidirectional: boolean;
         code: Id;
@@ -12808,7 +12811,7 @@ export interface D2SqlViewSchema {
     name: "D2SqlView";
     model: D2SqlView;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         attributeValues: D2AttributeValueSchema[];
         cacheStrategy:
             | "NO_CACHE"
@@ -13130,7 +13133,7 @@ export interface D2TrackedEntityInstanceSchema {
         externalAccess: boolean;
         favorite: boolean;
         favorites: string[];
-        geometry: unknown;
+        geometry: D2Geometry;
         href: string;
         id: Id;
         inactive: boolean;
@@ -13142,7 +13145,7 @@ export interface D2TrackedEntityInstanceSchema {
         organisationUnit: D2OrganisationUnitSchema;
         potentialDuplicate: boolean;
         programInstances: D2ProgramInstanceSchema[];
-        programOwners: unknown[];
+        programOwners: D2ProgramOwnerSchema[];
         publicAccess: string;
         relationshipItems: unknown[];
         sharing: Sharing;
@@ -13313,7 +13316,7 @@ export interface D2TrackedEntityTypeSchema {
     name: "D2TrackedEntityType";
     model: D2TrackedEntityType;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         allowAuditLog: boolean;
         attributeValues: D2AttributeValueSchema[];
         code: Id;

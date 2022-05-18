@@ -18,4 +18,5 @@ module.exports = {
         "@typescript-eslint/prefer-interface": "off",
         "no-dupe-class-members": "off",
     },
+    env: { node: true, browser: true, es6: true },
 };
