@@ -1,4 +1,4 @@
-import { D2ApiResponse, HttpResponse } from "./common";
+import { D2ApiResponse, HttpResponse, validate2xx, validate404 } from "./common";
 import { HttpResponse as HttpClientResponse } from "../repositories/HttpClientRepository";
 import { D2ApiGeneric } from "./d2Api";
 
@@ -80,14 +80,6 @@ export class DataStore {
             })
             .map(response => (response.status === 404 ? false : response.data.status === "OK"));
     }
-}
-
-function validate2xx(status: number): boolean {
-    return status >= 200 && status < 300;
-}
-
-function validate404(status: number): boolean {
-    return validate2xx(status) || status === 404;
 }
 
 function validateResponse(response: HttpClientResponse<HttpResponse<unknown>>): undefined {

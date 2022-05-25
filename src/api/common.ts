@@ -209,3 +209,11 @@ export type AsyncPostResponse<Type extends TaskCategory> = HttpResponse<{
     jobType: Type;
     relativeNotifierEndpoint: string;
 }>;
+
+export function validate2xx(status: number): boolean {
+    return status >= 200 && status < 300;
+}
+
+export function validate404(status: number): boolean {
+    return validate2xx(status) || status === 404;
+}
