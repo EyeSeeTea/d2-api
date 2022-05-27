@@ -25,6 +25,7 @@ import { System } from "./system";
 import { TrackedEntityInstances } from "./trackedEntityInstances";
 import { D2ApiOptions, D2ApiRequest, IndexedModels } from "./types";
 import { UserLookup } from "./UserLookup";
+import { Tracker } from "./Tracker";
 
 export class D2ApiGeneric {
     public baseUrl: string;
@@ -201,6 +202,11 @@ export abstract class D2ApiVersioned<
     @cache()
     get userLookup() {
         return new UserLookup(this);
+    }
+
+    @cache()
+    get tracker() {
+        return new Tracker(this);
     }
 }
 
