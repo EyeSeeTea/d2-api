@@ -124,16 +124,22 @@ function getModelName(klass: string, suffix?: string): string {
     }
 }
 
-const getType = (schemas: Schemas, property: SchemaProperty, suffix?: string): string => {
+const getType = (
+    schema: Schema,
+    schemas: Schemas,
+    property: SchemaProperty,
+    suffix?: string
+): string => {
     const { propertyType, constants, itemPropertyType, itemKlass } = property;
 
     switch (propertyType) {
         case "REFERENCE":
-            return getInterface(schemas, property, suffix);
+            return getInterface(schema, schemas, property, suffix);
         case "COLLECTION": {
             if (!itemPropertyType || !itemKlass) throw new Error("Missing item info");
 
             const innerType = getType(
+                schema,
                 schemas,
                 {
                     ...property,
@@ -159,7 +165,7 @@ const getType = (schemas: Schemas, property: SchemaProperty, suffix?: string): s
         case "CONSTANT":
             return constants ? joinStr(constants) : "never";
         case "COMPLEX":
-            return getInterface(schemas, property, suffix);
+            return getInterface(schema, schemas, property, suffix);
         case "BOOLEAN":
             return "boolean";
         case "NUMBER":
@@ -171,7 +177,12 @@ const getType = (schemas: Schemas, property: SchemaProperty, suffix?: string): s
     }
 };
 
-function getInterface(schemas: Schemas, property: SchemaProperty, suffix?: string): string {
+function getInterface(
+    schema: Schema,
+    schemas: Schemas,
+    property: SchemaProperty,
+    suffix?: string
+): string {
     const className = _.last(property.klass.split(".")) || "";
 
     if (schemas[className]) {
@@ -179,7 +190,11 @@ function getInterface(schemas: Schemas, property: SchemaProperty, suffix?: strin
     } else if (interfaceFromClass[property.klass]) {
         const value = interfaceFromClass[property.klass];
         if (typeof value === "string") {
-            return value;
+            if (value === "D2Access") {
+                return schema.dataShareable ? "D2AccessWithData" : "D2Access";
+            } else {
+                return value;
+            }
         } else {
             return suffix === "Schema" ? value.schema : value.type;
         }
@@ -195,7 +210,7 @@ function getPropertyName(property: SchemaProperty): string {
     else return value;
 }
 
-/* From 2.35,  userAccess and userGroupAccess schemas have empty fields (why?) */
+/* From 2.35, userAccess and userGroupAccess schemas have empty fields (why?) */
 
 const customModelProperties: _.Dictionary<_.Dictionary<string>> = {
     userAccess: {
@@ -215,7 +230,7 @@ const customModelProperties: _.Dictionary<_.Dictionary<string>> = {
 function getModelProperties(schemas: Schemas, schema: Schema, suffix?: string): string {
     const fromSchema = schema.properties.map(property => [
         getPropertyName(property),
-        getType(schemas, property, suffix),
+        getType(schema, schemas, property, suffix),
     ]);
 
     const fromCustom = _.toPairs(customModelProperties[schema.name] || {});
@@ -275,7 +290,7 @@ async function generateSchema(instance: Instance) {
 
         import {
             Id, Ref, Preset, FieldPresets, D2SchemaProperties,
-            D2Access, D2Translation, D2Geometry, D2Style,
+            D2Access, D2AccessWithData, D2Translation, D2Geometry, D2Style,
             D2DimensionalKeywords, D2Expression,
             D2RelationshipConstraint, D2ReportingParams, D2Axis, Sharing,
             D2ProgramOwner, D2ProgramOwnerSchema,

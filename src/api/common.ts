@@ -17,40 +17,46 @@ export type MetadataPayloadBase<D2ModelSchemas extends D2ModelSchemasBase> = {
 
 type FieldsSelector = object;
 
-export type FilterSingleOperatorBase =
-    | "eq"
-    | "!eq"
-    | "ne"
-    | "like"
-    | "!like"
-    | "$like"
-    | "!$like"
-    | "like$"
-    | "!like$"
-    | "ilike"
-    | "ilike"
-    | "$ilike"
-    | "!$ilike"
-    | "ilike$"
-    | "!ilike$"
-    | "gt"
-    | "ge"
-    | "lt"
-    | "le"
-    | "null"
-    | "!null"
-    | "empty"
-    | "token"
-    | "!token";
+const arrayOperators = ["in", "!in"] as const;
+const unaryOperators = ["null", "!null", "empty"] as const;
+const valueOperators = [
+    "eq",
+    "!eq",
+    "ne",
+    "like",
+    "!like",
+    "$like",
+    "!$like",
+    "like$",
+    "!like$",
+    "ilike",
+    "ilike",
+    "$ilike",
+    "!$ilike",
+    "ilike$",
+    "!ilike$",
+    "gt",
+    "ge",
+    "lt",
+    "le",
+    "token",
+    "!token",
+] as const;
 
-export type FilterCollectionOperatorBase = "in" | "!in";
+export type FilterValueOperator = (typeof valueOperators)[number];
 
-export type FilterValueBase = Partial<
-    Record<FilterSingleOperatorBase, string> & Record<FilterCollectionOperatorBase, string[]>
+export type FilterArrayOperator = (typeof arrayOperators)[number];
+
+export type FilterUnaryOperator = (typeof unaryOperators)[number];
+
+export type FilterValue = Partial<
+    Record<FilterValueOperator, string> &
+        Record<FilterArrayOperator, string[]> &
+        Record<FilterUnaryOperator, null | true>
 >;
 
 export interface FilterBase {
-    [property: string]: FilterValueBase | FilterValueBase[] | undefined;
+    [property: string]: FilterValue | FilterValue[] | undefined;
 }
 
 function applyFieldTransformers(key: string, value: any) {
@@ -101,13 +107,17 @@ function getFilterAsString(filter: FilterBase): string[] {
         _.flatMap(filter, (filterOrFilters, field) =>
             _.flatMap(toArray(filterOrFilters || []), filter =>
                 _.compact(
-                    _.map(filter, (value, op) =>
-                        isEmptyFilterValue(value)
-                            ? null
-                            : op === "in" || op === "!in"
-                            ? `${field}:${op}:[${(value as string[]).join(",")}]`
-                            : `${field}:${op}:${value}`
-                    )
+                    _.map(filter, (value, op) => {
+                        if (_.includes(arrayOperators, op) && value) {
+                            return `${field}:${op}:[${(value as string[]).join(",")}]`;
+                        } else if (_.includes(unaryOperators, op)) {
+                            return `${field}:${op}`;
+                        } else if (_.includes(valueOperators, op) && !isEmptyFilterValue(value)) {
+                            return `${field}:${op}:${value}`;
+                        } else {
+                            return null;
+                        }
+                    })
                 )
             )
         )
@@ -199,3 +209,11 @@ export type AsyncPostResponse<Type extends TaskCategory> = HttpResponse<{
     jobType: Type;
     relativeNotifierEndpoint: string;
 }>;
+
+export function validate2xx(status: number): boolean {
+    return status >= 200 && status < 300;
+}
+
+export function validate404(status: number): boolean {
+    return validate2xx(status) || status === 404;
+}

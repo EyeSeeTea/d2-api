@@ -7,6 +7,7 @@ import {
     FieldPresets,
     D2SchemaProperties,
     D2Access,
+    D2AccessWithData,
     D2Translation,
     D2Geometry,
     D2Style,
@@ -305,7 +306,7 @@ export type D2CategoryDimension = {
 };
 
 export type D2CategoryOption = {
-    access: D2Access;
+    access: D2AccessWithData;
     aggregationType:
         | "SUM"
         | "AVERAGE"
@@ -1256,7 +1257,7 @@ export type D2DataInputPeriod = {
 };
 
 export type D2DataSet = {
-    access: D2Access;
+    access: D2AccessWithData;
     aggregationType:
         | "SUM"
         | "AVERAGE"
@@ -2985,7 +2986,7 @@ export type D2PredictorGroup = {
 };
 
 export type D2Program = {
-    access: D2Access;
+    access: D2AccessWithData;
     accessLevel: "OPEN" | "AUDITED" | "PROTECTED" | "CLOSED";
     attributeValues: D2AttributeValue[];
     categoryCombo: D2CategoryCombo;
@@ -3489,7 +3490,7 @@ export type D2ProgramSection = {
 };
 
 export type D2ProgramStage = {
-    access: D2Access;
+    access: D2AccessWithData;
     allowGenerateNextVisit: boolean;
     attributeValues: D2AttributeValue[];
     autoGenerateEvent: boolean;
@@ -3910,7 +3911,7 @@ export type D2Relationship = {
 };
 
 export type D2RelationshipType = {
-    access: D2Access;
+    access: D2AccessWithData;
     attributeValues: D2AttributeValue[];
     bidirectional: boolean;
     code: Id;
@@ -4240,7 +4241,7 @@ export type D2Section = {
 };
 
 export type D2SqlView = {
-    access: D2Access;
+    access: D2AccessWithData;
     attributeValues: D2AttributeValue[];
     cacheStrategy:
         | "NO_CACHE"
@@ -4474,7 +4475,7 @@ export type D2TrackedEntityProgramIndicatorDimension = {
 };
 
 export type D2TrackedEntityType = {
-    access: D2Access;
+    access: D2AccessWithData;
     allowAuditLog: boolean;
     attributeValues: D2AttributeValue[];
     code: Id;
@@ -5588,7 +5589,7 @@ export interface D2CategoryOptionSchema {
     name: "D2CategoryOption";
     model: D2CategoryOption;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         aggregationType:
             | "SUM"
             | "AVERAGE"
@@ -7184,7 +7185,7 @@ export interface D2DataSetSchema {
     name: "D2DataSet";
     model: D2DataSet;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         aggregationType:
             | "SUM"
             | "AVERAGE"
@@ -10742,7 +10743,7 @@ export interface D2ProgramSchema {
     name: "D2Program";
     model: D2Program;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         accessLevel: "OPEN" | "AUDITED" | "PROTECTED" | "CLOSED";
         attributeValues: D2AttributeValueSchema[];
         categoryCombo: D2CategoryComboSchema;
@@ -11750,7 +11751,7 @@ export interface D2ProgramStageSchema {
     name: "D2ProgramStage";
     model: D2ProgramStage;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         allowGenerateNextVisit: boolean;
         attributeValues: D2AttributeValueSchema[];
         autoGenerateEvent: boolean;
@@ -12632,7 +12633,7 @@ export interface D2RelationshipTypeSchema {
     name: "D2RelationshipType";
     model: D2RelationshipType;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         attributeValues: D2AttributeValueSchema[];
         bidirectional: boolean;
         code: Id;
@@ -13180,7 +13181,7 @@ export interface D2SqlViewSchema {
     name: "D2SqlView";
     model: D2SqlView;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         attributeValues: D2AttributeValueSchema[];
         cacheStrategy:
             | "NO_CACHE"
@@ -13676,7 +13677,7 @@ export interface D2TrackedEntityTypeSchema {
     name: "D2TrackedEntityType";
     model: D2TrackedEntityType;
     fields: {
-        access: D2Access;
+        access: D2AccessWithData;
         allowAuditLog: boolean;
         attributeValues: D2AttributeValueSchema[];
         code: Id;

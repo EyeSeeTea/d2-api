@@ -1,6 +1,6 @@
 import { AxiosHttpClientRepository } from "../data/AxiosHttpClientRepository";
 import { FetchHttpClientRepository } from "../data/FetchHttpClientRepository";
-import { HttpClientRepository } from "../repositories/HttpClientRepository";
+import { HttpClientRepository, HttpRequest } from "../repositories/HttpClientRepository";
 import { D2SchemaProperties } from "../schemas";
 import { cache, defineLazyCachedProperty } from "../utils/cache";
 import { joinPath } from "../utils/connection";
@@ -58,8 +58,8 @@ export class D2ApiGeneric {
         return this.request<T>({ method: "get", url, params });
     }
 
-    public post<T>(url: string, params?: Params, data?: object) {
-        return this.request<T>({ method: "post", url, params, data });
+    public post<T>(url: string, params?: Params, data?: object, request?: Partial<HttpRequest>) {
+        return this.request<T>({ method: "post", url, params, data, ...request });
     }
 
     public put<T>(url: string, params?: Params, data?: object) {

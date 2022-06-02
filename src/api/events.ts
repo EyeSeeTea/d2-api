@@ -1,4 +1,10 @@
-import { AsyncPostResponse, D2ApiResponse, HttpResponse, getFieldsAsString } from "./common";
+import {
+    AsyncPostResponse,
+    D2ApiResponse,
+    HttpResponse,
+    getFieldsAsString,
+    validate2xx,
+} from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { Pager } from "./model";
 import { Selector, SelectedPick } from ".";
@@ -34,7 +40,10 @@ export class Events {
         params: EventsPostParams,
         request: EventsPostRequest
     ): D2ApiResponse<HttpResponse<EventsPostResponse>> {
-        return this.d2Api.post<HttpResponse<EventsPostResponse>>("/events", params, request);
+        return this.d2Api.post<HttpResponse<EventsPostResponse>>("/events", params, request, {
+            // The API returns 409 when there are warning but the POST was performed, so consider it valid
+            validateStatus: status => validate2xx(status) || status == 409,
+        });
     }
 
     postAsync(
@@ -122,7 +131,7 @@ export type IdScheme = string;
 
 export interface EventsPostResponse {
     responseType: "ImportSummaries";
-    status: "ERROR" | "SUCCESS";
+    status: "ERROR" | "SUCCESS" | "WARNING";
     imported: number;
     updated: number;
     deleted: number;
@@ -132,7 +141,7 @@ export interface EventsPostResponse {
     importSummaries?: Array<
         | {
               responseType: "ImportSummary";
-              status: "ERROR";
+              status: "ERROR" | "WARNING";
               reference?: string;
               description: string;
               importOptions: object;
@@ -201,6 +210,7 @@ export interface EventsGetRequest<Fields> {
     includeDeleted?: boolean;
     assignedUserMode?: boolean;
     assignedUser?: string;
+    filter?: string; // <data-element-id>:<operator>:<filter>[:<operator>:<filter>]
 }
 
 export interface EventsGetResponse<Fields> {
