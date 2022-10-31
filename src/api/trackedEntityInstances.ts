@@ -3,6 +3,7 @@ import { PartialBy } from "../utils/types";
 import { Id, Pager } from "./base";
 import { AsyncPostResponse, D2ApiResponse, HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
+import { D2Event, D2EventToPost } from "./events";
 
 export class TrackedEntityInstances {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -62,10 +63,14 @@ interface TrackedEntityInstanceBase {
     programOwners: D2ProgramOwner[];
 }
 
-export type TrackedEntityInstanceToPost = PartialBy<
+type TeiPartial = PartialBy<
     TrackedEntityInstance,
     Exclude<keyof TrackedEntityInstance, "trackedEntityInstance" | "orgUnit">
 >;
+
+export interface TrackedEntityInstanceToPost extends Omit<TeiPartial, "enrollments"> {
+    enrollments: EnrollmentToPost[];
+}
 
 export type TrackedEntityInstance = TeiGeometryNone | TeiGeometryPoint | TeiGeometryPolygon;
 
@@ -115,7 +120,16 @@ export interface Enrollment {
     orgUnit: Id;
     enrollmentDate: string;
     incidentDate: string;
-    events?: Event[];
+    events?: D2Event[];
+}
+
+export interface EnrollmentToPost extends Omit<Enrollment, "events"> {
+    enrollment: Id;
+    program: Id;
+    orgUnit: Id;
+    enrollmentDate: string;
+    incidentDate: string;
+    events?: D2EventToPost[];
 }
 
 export interface AttributeValue {
