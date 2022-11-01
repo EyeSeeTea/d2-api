@@ -267,9 +267,11 @@ const instances: Instance[] = [
     { version: "2.32", url: "https://admin:district@play.dhis2.org/2.32", isDeprecated: true },
     { version: "2.33", url: "https://admin:district@play.dhis2.org/2.33", isDeprecated: true },
     { version: "2.34", url: "https://admin:district@play.dhis2.org/2.34", isDeprecated: true },
-    { version: "2.35", url: "https://admin:district@play.dhis2.org/2.35" },
+    { version: "2.35", url: "https://admin:district@play.dhis2.org/2.35", isDeprecated: true },
     { version: "2.36", url: "https://admin:district@play.dhis2.org/2.36" },
     { version: "2.37", url: "https://admin:district@play.dhis2.org/2.37" },
+    { version: "2.38", url: "https://admin:district@play.dhis2.org/2.38" },
+    { version: "2.39", url: "https://admin:district@play.dhis2.org/2.39" },
 ];
 
 async function generateSchema(instance: Instance) {

@@ -2719,7 +2719,7 @@ export type D2OrganisationUnit = {
     leaf: boolean;
     legendSet: D2LegendSet;
     legendSets: D2LegendSet[];
-    level: number;
+    level: string;
     memberCount: number;
     name: string;
     openingDate: string;
@@ -10177,7 +10177,7 @@ export interface D2OrganisationUnitSchema {
         leaf: boolean;
         legendSet: D2LegendSetSchema;
         legendSets: D2LegendSetSchema[];
-        level: number;
+        level: string;
         memberCount: number;
         name: string;
         openingDate: string;
@@ -25367,7 +25367,12 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 klass: "java.util.Set",
                 itemKlass: "org.hisp.dhis.user.UserGroupAccess",
             },
-            { name: "level", propertyType: "INTEGER", klass: "java.lang.Integer" },
+            {
+                name: "level",
+                fieldName: "hierarchyLevel",
+                propertyType: "TEXT",
+                klass: "java.lang.Integer",
+            },
             {
                 name: "created",
                 fieldName: "created",
