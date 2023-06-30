@@ -8,6 +8,7 @@ export interface FileUploadParameters {
     name: string;
     data: Blob;
     ignoreDocument?: boolean;
+    domain?: string;
 }
 
 interface PartialSaveResponse {
@@ -17,6 +18,8 @@ interface PartialSaveResponse {
         };
     };
 }
+
+const DEFAULT_DOMAIN = "DOCUMENT";
 
 export interface FileUploadResult {
     id: string;
@@ -36,11 +39,11 @@ export class Files {
     }
 
     saveFileResource(params: Omit<FileUploadParameters, "id">): D2ApiResponse<string> {
-        const { name, data } = params;
+        const { name, data, domain } = params;
 
         const formData = new FormData();
         formData.append("file", data, name);
-        formData.append("domain", "DOCUMENT");
+        formData.append("domain", domain || DEFAULT_DOMAIN);
 
         return this.d2Api.apiConnection
             .request<PartialSaveResponse>({
@@ -63,11 +66,11 @@ export class Files {
     }
 
     upload(params: FileUploadParameters): D2ApiResponse<FileUploadResult> {
-        const { id = generateUid(), name, data } = params;
+        const { id = generateUid(), name, data, domain } = params;
 
         const formData = new FormData();
         formData.append("file", data, name);
-        formData.append("domain", "DOCUMENT");
+        formData.append("domain", domain || DEFAULT_DOMAIN);
 
         return this.saveFileResource(params).flatMap(({ data: fileResourceId }) => {
             const document = { id, name, url: fileResourceId };
