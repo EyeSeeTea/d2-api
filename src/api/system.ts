@@ -7,6 +7,7 @@ import { DataValueSetsPostResponse } from "./dataValues";
 import { EventsPostResponse } from "./events";
 import { MetadataResponse } from "./metadata";
 import { TeiPostResponse } from "./trackedEntityInstances";
+import { TrackerPostResponse } from "./tracker";
 
 export class System {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -130,7 +131,9 @@ export type TaskCategory =
     | "SEND_SCHEDULED_MESSAGE"
     | "SMS_SEND"
     | "TEI_IMPORT"
+    | "TRACKER_IMPORT_JOB"
     | "VALIDATION_RESULTS_NOTIFICATION";
+   
 
 export interface TaskSelector {
     category: TaskCategory;
@@ -211,4 +214,5 @@ export type WaitForResponse = {
     EVENT_IMPORT: EventsPostResponse;
     METADATA_IMPORT: MetadataResponse;
     TEI_IMPORT: TeiPostResponse;
+    TRACKER_IMPORT_JOB : TrackerPostResponse;
 };
