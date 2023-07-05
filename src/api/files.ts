@@ -8,8 +8,16 @@ export interface FileUploadParameters {
     name: string;
     data: Blob;
     ignoreDocument?: boolean;
-    domain?: string;
+    domain?: Domain;
 }
+
+type Domain =
+    | "DATA_VALUE"
+    | "PUSH_ANALYSIS"
+    | "DOCUMENT"
+    | "MESSAGE_ATTACHMENT"
+    | "USER_AVATAR"
+    | "ORG_UNIT";
 
 interface PartialSaveResponse {
     response?: {
