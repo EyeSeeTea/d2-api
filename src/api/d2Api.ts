@@ -26,6 +26,7 @@ import { TrackedEntityInstances } from "./trackedEntityInstances";
 import { Tracker } from "./tracker";
 import { D2ApiOptions, D2ApiRequest, IndexedModels } from "./types";
 import { UserLookup } from "./UserLookup";
+import { Tracker } from "./Tracker";
 
 export class D2ApiGeneric {
     public baseUrl: string;
