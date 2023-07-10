@@ -4,7 +4,6 @@ import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets } from "../schemas";
 import { getFieldsAsString } from "./common";
 
-
 export class TrackerEnrollments {
     constructor(public api: D2ApiGeneric) {}
 
@@ -23,8 +22,6 @@ export class TrackerEnrollments {
         });
     }
 }
-
-
 
 type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 export type IsoDate = string;
@@ -101,14 +98,12 @@ type TrackerEnrollmentsParamsBase = {
 type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
-
 export interface TrackerEnrollmentsResponse {
     page: number;
     pageSize: number;
     instances: D2TrackerEnrollment[];
     total?: number; // Only if requested with totalPages=true
 }
-
 
 export interface D2TrackerEnrollmentSchema  {
     name: "D2TrackerEnrollment";

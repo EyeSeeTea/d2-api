@@ -1,6 +1,6 @@
 import { cache } from "../utils/cache";
 import { D2TrackerEnrollment, TrackerEnrollments } from "./trackerEnrollments";
-import { Id, D2ApiResponse } from "./base";
+import { D2ApiResponse } from "./base";
 import { AsyncPostResponse, HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 
