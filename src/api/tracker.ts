@@ -1,9 +1,16 @@
-import { D2ApiResponse } from "./base";
+import { cache } from "../utils/cache";
+import { D2TrackerEnrollment, TrackerEnrollments } from "./trackerEnrollments";
+import { Id, D2ApiResponse } from "./base";
 import { AsyncPostResponse, HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 
 export class Tracker {
     constructor(public d2Api: D2ApiGeneric) {}
+
+    @cache()
+    get enrollments() {
+        return new TrackerEnrollments(this.d2Api);
+    }
 
     post(
         params: TrackerPostParams,
@@ -34,32 +41,9 @@ export interface TrackedEntity {
     orgUnit: string;
     trackedEntity: string;
     trackedEntityType: string;
-    enrollments?: Enrollment[];
+    enrollments?: D2TrackerEnrollment[];
 }
-export interface Enrollment {
-    orgUnit: string;
-    program: string;
-    enrollment: string;
-    trackedEntityType: string;
-    notes: [];
-    relationships: [];
-    attributes: EnrollmentAttribute[];
-    events: EnrollmentEvent[];
-    enrolledAt: string;
-    occurredAt: string;
-}
-export interface EnrollmentAttribute {
-    attribute: string;
-    value: Date | string | number;
-}
-export interface EnrollmentEvent {
-    program: string;
-    event: string;
-    programStage: string;
-    orgUnit: string;
-    dataValues: { dataElement: string; value: string | number }[];
-    occurredAt: string;
-}
+
 export type TrackerPostParams = Partial<{
     async : boolean,
     reportMode : "FULL" |  "ERRORS" | "WARNINGS",
