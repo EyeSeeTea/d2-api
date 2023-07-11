@@ -8,12 +8,6 @@ export class TrackerEnrollments {
     constructor(public api: D2ApiGeneric) {}
 
     get<Fields extends D2TrackerEnrollmentFields>(
-        params: TrackerEnrollmentsParams<Fields>
-    ): CancelableResponse<TrackerEnrollmentsResponse> {
-        return this.api.get<TrackerEnrollmentsResponse>(`/tracker/enrollments`, params);
-    }
-
-    getById<Fields extends D2TrackerEnrollmentFields>(
         params: TrackerEnrollmentParams<Fields>
     ): D2ApiResponse<GetEnrollment<Fields>> {
         return this.api.get<GetEnrollment<Fields>>("/tracker/enrollments", {
@@ -83,7 +77,7 @@ type TrackerEnrollmentsParamsBase = {
     orgUnit: SemiColonDelimitedListOfUid;
     ouMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
     program: Id;
-    programStatus: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    programStatus: ProgramStatus;
     followUp: boolean;
     updatedAfter: IsoDate;
     updatedWithin: IsoDate;
@@ -105,7 +99,7 @@ export interface TrackerEnrollmentsResponse {
     total?: number; // Only if requested with totalPages=true
 }
 
-export interface D2TrackerEnrollmentSchema  {
+export interface D2TrackerEnrollmentSchema {
     name: "D2TrackerEnrollment";
     model: D2TrackerEnrollment;
     fields: D2TrackerEnrollment;
@@ -118,8 +112,8 @@ export interface D2TrackerEnrollmentSchema  {
     };
 }
 
-type GetEnrollment<Fields> = SelectedPick<D2TrackerEnrollmentSchema, Fields> ;
+type GetEnrollment<Fields> = SelectedPick<D2TrackerEnrollmentSchema, Fields>;
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
 
-type TrackerEnrollmentParams<Fields> = { fields: Fields } ;
+type TrackerEnrollmentParams<Fields> = { fields: Fields };

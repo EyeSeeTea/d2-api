@@ -133,7 +133,6 @@ export type TaskCategory =
     | "TEI_IMPORT"
     | "TRACKER_IMPORT_JOB"
     | "VALIDATION_RESULTS_NOTIFICATION";
-   
 
 export interface TaskSelector {
     category: TaskCategory;
@@ -214,5 +213,5 @@ export type WaitForResponse = {
     EVENT_IMPORT: EventsPostResponse;
     METADATA_IMPORT: MetadataResponse;
     TEI_IMPORT: TeiPostResponse;
-    TRACKER_IMPORT_JOB : TrackerPostResponse;
+    TRACKER_IMPORT_JOB: TrackerPostResponse;
 };

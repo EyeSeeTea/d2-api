@@ -34,9 +34,11 @@ export class Tracker {
         );
     }
 }
+
 export interface TrackerPostRequest {
     trackedEntities: TrackedEntity[];
 }
+
 export interface TrackedEntity {
     orgUnit: string;
     trackedEntity: string;
@@ -44,25 +46,26 @@ export interface TrackedEntity {
     enrollments?: D2TrackerEnrollment[];
 }
 
+type SchemeOptions = "UID" | "CODE" | "NAME" | "ATTRIBUTE";
 export type TrackerPostParams = Partial<{
-    async : boolean,
-    reportMode : "FULL" |  "ERRORS" | "WARNINGS",
-    importMode : "VALIDATE" | "COMMIT",
-    idScheme : "UID"| "CODE"| "NAME"| "ATTRIBUTE",
-    dataElementIdScheme : "UID"| "CODE"| "NAME"| "ATTRIBUTE",
-    orgUnitIdScheme : "UID"| "CODE"| "NAME"| "ATTRIBUTE",
-    programIdScheme :  "UID"| "CODE"| "NAME"| "ATTRIBUTE",
-    programStageIdScheme : "UID"| "CODE"| "NAME"| "ATTRIBUTE",
-    categoryOptionComboIdScheme : "UID"| "CODE"| "NAME"| "ATTRIBUTE",
-    categoryOptionIdScheme : "UID"| "CODE"| "NAME"| "ATTRIBUTE",
-    importStrategy : "CREATE" | "UPDATE" | "CREATE_AND_UPDATE" | "DELETE",
-    atomicMode : "ALL" | "OBJECT",
-    flushMode : "AUTO" | "OBJECT",
-    validationMode : "FULL" | "FAIL_FAST" | "SKIP",
-    skipPatternValidation : boolean,
-    skipSideEffects : boolean,
-    skipRuleEngine : boolean
-}>
+    async: boolean;
+    reportMode: "FULL" | "ERRORS" | "WARNINGS";
+    importMode: "VALIDATE" | "COMMIT";
+    idScheme: SchemeOptions;
+    dataElementIdScheme: SchemeOptions;
+    orgUnitIdScheme: SchemeOptions;
+    programIdScheme: SchemeOptions;
+    programStageIdScheme: SchemeOptions;
+    categoryOptionComboIdScheme: SchemeOptions;
+    categoryOptionIdScheme: SchemeOptions;
+    importStrategy: "CREATE" | "UPDATE" | "CREATE_AND_UPDATE" | "DELETE";
+    atomicMode: "ALL" | "OBJECT";
+    flushMode: "AUTO" | "OBJECT";
+    validationMode: "FULL" | "FAIL_FAST" | "SKIP";
+    skipPatternValidation: boolean;
+    skipSideEffects: boolean;
+    skipRuleEngine: boolean;
+}>;
 
 interface ErrorReport {
     message: string;
@@ -70,6 +73,7 @@ interface ErrorReport {
     trackerType: string;
     uid: string;
 }
+
 interface Stats {
     created: number;
     updated: number;
@@ -77,12 +81,14 @@ interface Stats {
     ignored: number;
     total: number;
 }
+
 interface ObjectReports {
     trackerType: "ENROLLMENT" | "TRACKED_ENTITY" | "RELATIONSHIP" | "EVENT";
     uid: string;
     index: number;
     errorReports: ErrorReport[];
 }
+
 interface BundleReport {
     status: "OK";
     typeReportMap: {
@@ -109,14 +115,15 @@ interface BundleReport {
     };
     stats: Stats;
 }
+
 export interface TrackerPostResponse {
-    status: "OK" | "ERROR" | "WARNING",
+    status: "OK" | "ERROR" | "WARNING";
     validationReport: {
         errorReports: ErrorReport[];
         warningReports: ErrorReport[];
     };
     stats: Stats;
     bundleReport: BundleReport;
-    timingsStats: {},
-    message: string
+    timingsStats: {};
+    message: string;
 }
