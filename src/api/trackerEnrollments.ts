@@ -2,22 +2,25 @@ import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets } from "../schemas";
 import { getFieldsAsString } from "./common";
+import _ from "lodash";
 
 export class TrackerEnrollments {
     constructor(public api: D2ApiGeneric) {}
 
     get<Fields extends D2TrackerEnrollmentFields>(
-        params: TrackerEnrollmentParams<Fields>
-    ): D2ApiResponse<GetEnrollment<Fields>> {
-        return this.api.get<GetEnrollment<Fields>>("/tracker/enrollments", {
-            ...params,
+        params: TrackerEnrollmentsParams<Fields>
+    ): D2ApiResponse<TrackerEnrollmentsResponse> {
+        return this.api.get<TrackerEnrollmentsResponse>("/tracker/enrollments", {
+            ..._.omit(params, ["fields"]),
             fields: getFieldsAsString(params.fields),
         });
     }
 }
 
 type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
+
 export type IsoDate = string;
+
 type Username = string;
 
 export interface D2TrackerEnrollment {
@@ -57,15 +60,13 @@ export interface D2TrackerEnrollmentEvent {
     occurredAt: string;
 }
 
-type TrackerEnrollmentsParams<Fields> = Params &
-    Partial<{
-        fields: Fields;
+type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
     }>;
 
-export type Params =
+type Params =
     | (TrackerEnrollmentsParamsBase["orgUnit"] & PartialParams)
     | ({ ouMode: "ALL" } & PartialParams)
     | (Pick<TrackerEnrollmentsParamsBase, "programStatus" | "program"> & PartialParams)
@@ -117,5 +118,3 @@ export interface D2TrackerEnrollmentSchema {
 type GetEnrollment<Fields> = SelectedPick<D2TrackerEnrollmentSchema, Fields>;
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
-
-type TrackerEnrollmentParams<Fields> = { fields: Fields };
