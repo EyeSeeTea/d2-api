@@ -1,5 +1,4 @@
 import { D2ApiGeneric } from "./d2Api";
-import { CancelableResponse } from "../repositories/CancelableResponse";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets } from "../schemas";
 import { getFieldsAsString } from "./common";
@@ -20,6 +19,7 @@ export class TrackerEnrollments {
 type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 export type IsoDate = string;
 type Username = string;
+
 export interface D2TrackerEnrollment {
     enrollment: Id;
     createdAt: IsoDate;
@@ -42,10 +42,12 @@ export interface D2TrackerEnrollment {
     attributes: D2TrackerEnrollmentAttribute[];
     notes: [];
 }
+
 export interface D2TrackerEnrollmentAttribute {
     attribute: string;
     value: Date | string | number;
 }
+
 export interface D2TrackerEnrollmentEvent {
     program: string;
     event: string;
