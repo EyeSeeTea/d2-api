@@ -23,6 +23,7 @@ import { Sharing } from "./sharing";
 import { SqlViews } from "./SqlViews";
 import { System } from "./system";
 import { TrackedEntityInstances } from "./trackedEntityInstances";
+import { Tracker } from "./tracker";
 import { D2ApiOptions, D2ApiRequest, IndexedModels } from "./types";
 import { UserLookup } from "./UserLookup";
 
@@ -201,6 +202,11 @@ export abstract class D2ApiVersioned<
     @cache()
     get userLookup() {
         return new UserLookup(this);
+    }
+
+    @cache()
+    get tracker() {
+        return new Tracker(this);
     }
 }
 
