@@ -3,13 +3,24 @@ import { D2TrackerEnrollment, TrackerEnrollments } from "./trackerEnrollments";
 import { D2ApiResponse } from "./base";
 import { AsyncPostResponse, HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
+import { D2TrackerEvent, TrackerEvents } from "./trackerEvents";
+import { TrackedEntities } from "./trackerTrackedEntities";
+import { D2TrackerTrackedEntity } from "./trackerTrackedEntities";
 
 export class Tracker {
     constructor(public d2Api: D2ApiGeneric) {}
 
     @cache()
+    get trackedEntities() {
+        return new TrackedEntities(this.d2Api);
+    }
+    @cache()
     get enrollments() {
         return new TrackerEnrollments(this.d2Api);
+    }
+    @cache()
+    get events() {
+        return new TrackerEvents(this.d2Api);
     }
 
     post(
@@ -36,14 +47,9 @@ export class Tracker {
 }
 
 export interface TrackerPostRequest {
-    trackedEntities: TrackedEntity[];
-}
-
-export interface TrackedEntity {
-    orgUnit: string;
-    trackedEntity: string;
-    trackedEntityType: string;
+    trackedEntities?: D2TrackerTrackedEntity[];
     enrollments?: D2TrackerEnrollment[];
+    events?: D2TrackerEvent[];
 }
 
 type SchemeOptions = "UID" | "CODE" | "NAME" | "ATTRIBUTE";
