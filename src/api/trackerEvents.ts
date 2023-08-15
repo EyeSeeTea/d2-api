@@ -49,8 +49,13 @@ export interface D2TrackerEvent {
     notes: string;
 }
 
-export interface EventsParams<Fields> {
-    fields: Fields;
+type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
+        totalPages: boolean;
+        page: number;
+        pageSize: number;
+    }>;
+
+interface EventsParamsBase {
     program?: Id;
     programStage?: Id;
     programStatus?: ProgramStatus;
