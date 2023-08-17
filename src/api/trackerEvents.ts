@@ -1,6 +1,6 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse } from "./base";
-import { Preset, FieldPresets } from "../schemas";
+import { Preset, FieldPresets, D2Geometry } from "../schemas";
 import { getFieldsAsString } from "./common";
 import { D2Relationship, D2RelationshipSchema } from "../2.36";
 import { D2EventDataValueSchema, EventStatus, IdScheme } from "./events";
@@ -26,28 +26,42 @@ type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
 type CommaDelimitedListOfDataElementFilter = string;
 
-export interface D2TrackerEvent {
+interface D2TrackerEventBase {
     event: Id;
     status: EventStatus;
     program: Id;
-    programStage: Id;
-    enrollment: Id;
+    programStage?: Id;
+    enrollment?: Id;
     orgUnit: Id;
-    orgUnitName: string;
-    relationships: D2Relationship[];
+    orgUnitName?: string;
+    relationships?: D2Relationship[];
     occurredAt: IsoDate;
-    scheduledAt: IsoDate;
-    storedBy: Username;
-    followup: boolean;
-    deleted: boolean;
-    createdAt: IsoDate;
-    updatedAt: IsoDate;
-    attributeOptionCombo: Id;
-    attributeCategoryOptions: Id;
-    updatedBy: Username;
+    scheduledAt?: IsoDate;
+    storedBy?: Username;
+    followup?: boolean;
+    deleted?: boolean;
+    createdAt?: IsoDate;
+    updatedAt?: IsoDate;
+    attributeOptionCombo?: Id;
+    attributeCategoryOptions?: Id;
+    updatedBy?: Username;
     dataValues: DataValue[];
-    notes: string;
+    notes?: string;
 }
+
+export type D2TrackerEvent = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
+
+interface GeometryPoint {
+    geometry?: Extract<D2Geometry, { type: "Point" }>;
+}
+
+interface GeometryPolygon {
+    geometry?: Extract<D2Geometry, { type: "Polygon" }>;
+}
+
+type TrackedEntityGeometryPoint = D2TrackerEventBase & GeometryPoint;
+
+type TrackedEntityGeometryPolygon = D2TrackerEventBase & GeometryPolygon;
 
 type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
         totalPages: boolean;
@@ -95,13 +109,13 @@ interface EventsParamsBase {
     assignedUser?: CommaDelimitedListOfUid;
 }
 
-interface DataValue {
-    updatedAt: IsoDate;
+export interface DataValue {
+    updatedAt?: IsoDate;
     storedBy?: Username;
-    createdAt: IsoDate;
+    createdAt?: IsoDate;
     dataElement: Id;
     value: string | number | boolean;
-    providedElsewhere: boolean;
+    providedElsewhere?: boolean;
 }
 
 export interface TrackerEventsResponse {

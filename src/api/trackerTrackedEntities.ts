@@ -27,11 +27,11 @@ type CommaDelimitedListOfAttributeFilter = string;
 
 export interface D2TrackerTrackedEntity {
     trackedEntity?: Id;
-    trackedEntityType?: string;
+    trackedEntityType?: Id;
     createdAt?: IsoDate;
     createdAtClient?: IsoDate;
     updatedAt?: IsoDate;
-    orgUnit?: string;
+    orgUnit?: SemiColonDelimitedListOfUid;
     inactive?: boolean;
     deleted?: boolean;
     relationships?: Relationship[];
@@ -66,8 +66,8 @@ export interface Enrollment {
     enrollment: Id;
     program: Id;
     orgUnit: Id;
-    enrollmentDate: string;
-    incidentDate: string;
+    enrollmentDate: IsoDate;
+    incidentDate: IsoDate;
     events?: Event[];
 }
 
@@ -94,12 +94,12 @@ type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partia
     }>;
 
 type Params =
-    | (TrackedEntitiesParamsBase["orgUnit"] & PartialParams)
+    | ({ orgUnit: SemiColonDelimitedListOfUid } & PartialParams)
     | ({ ouMode: "ALL" } & PartialParams)
     | (Pick<TrackedEntitiesParamsBase, "programStatus" | "program"> & PartialParams)
     | (Pick<TrackedEntitiesParamsBase, "followUp" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledAfter"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledBefore"> & PartialParams);
+    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledAfter" | "program"> & PartialParams)
+    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledBefore" | "program"> & PartialParams);
 
 type PartialParams = Partial<TrackedEntitiesParamsBase>;
 

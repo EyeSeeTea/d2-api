@@ -2,6 +2,7 @@ import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets } from "../schemas";
 import { getFieldsAsString } from "./common";
+import { D2TrackerEvent } from "./trackerEvents";
 import _ from "lodash";
 
 export class TrackerEnrollments {
@@ -40,7 +41,7 @@ export interface D2TrackerEnrollment {
     followUp: boolean;
     deleted: boolean;
     storedBy: Username;
-    events: D2TrackerEnrollmentEvent[];
+    events: D2TrackerEvent[];
     relationships: [];
     attributes: D2TrackerEnrollmentAttribute[];
     notes: [];
@@ -49,15 +50,6 @@ export interface D2TrackerEnrollment {
 export interface D2TrackerEnrollmentAttribute {
     attribute: string;
     value: Date | string | number;
-}
-
-export interface D2TrackerEnrollmentEvent {
-    program: string;
-    event: string;
-    programStage: string;
-    orgUnit: string;
-    dataValues: { dataElement: string; value: string | number }[];
-    occurredAt: string;
 }
 
 type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
