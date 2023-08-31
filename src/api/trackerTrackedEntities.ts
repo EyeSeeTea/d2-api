@@ -1,10 +1,9 @@
 import _ from "lodash";
-import { FieldPresets, Preset } from "../schemas";
+import { D2Geometry, FieldPresets, Preset } from "../schemas";
 import { Id, Selector } from "./base";
 import { D2ApiResponse, getFieldsAsString } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { D2TrackerEnrollment } from "./trackerEnrollments";
-import { D2TrackerEvent } from "./trackerEvents";
 
 export class TrackedEntities {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -25,7 +24,7 @@ type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
 
-export interface D2TrackerTrackedEntity {
+interface D2TrackerTrackedEntityBase {
     trackedEntity?: Id;
     trackedEntityType?: Id;
     createdAt?: IsoDate;
@@ -37,12 +36,25 @@ export interface D2TrackerTrackedEntity {
     relationships?: Relationship[];
     attributes?: Attribute[];
     enrollments?: D2TrackerEnrollment[];
-    events?: D2TrackerEvent[];
     programOwners?: ProgramOwner[];
 }
 
+export type D2TrackerTrackedEntity = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
+
+interface GeometryPoint {
+    geometry?: Extract<D2Geometry, { type: "Point" }>;
+}
+
+interface GeometryPolygon {
+    geometry?: Extract<D2Geometry, { type: "Polygon" }>;
+}
+
+type TrackedEntityGeometryPoint = D2TrackerTrackedEntityBase & GeometryPoint;
+
+type TrackedEntityGeometryPolygon = D2TrackerTrackedEntityBase & GeometryPolygon;
+
 interface ProgramOwner {
-    ownerOrgUnit: Id;
+    orgUnit: Id;
     program: Id;
     trackedEntity: Id;
 }
@@ -62,15 +74,6 @@ export interface RelationshipItem {
     event?: { event: Id };
 }
 
-export interface Enrollment {
-    enrollment: Id;
-    program: Id;
-    orgUnit: Id;
-    enrollmentDate: IsoDate;
-    incidentDate: IsoDate;
-    events?: Event[];
-}
-
 export interface AttributeValue {
     attribute: Attribute;
     value: string;
@@ -82,10 +85,6 @@ export interface Attribute {
     valueType?: string;
     value: string;
 }
-
-export type TrackedEntitiesOuRequest =
-    | { ouMode?: "ACCESSIBLE" | "CAPTURE" | "ALL"; ou?: never[] }
-    | { ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS"; ou: Id[] };
 
 type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
@@ -103,11 +102,12 @@ type Params =
 
 type PartialParams = Partial<TrackedEntitiesParamsBase>;
 
-export type TrackedEntitiesParamsBase = TrackedEntitiesOuRequest & {
+export type TrackedEntitiesParamsBase = {
     query: string;
     attribute: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
     orgUnit: SemiColonDelimitedListOfUid;
+    ouMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
     program: Id;
     programStatus: ProgramStatus;
     programStage: Id;
