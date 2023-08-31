@@ -2,8 +2,6 @@ import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse } from "./base";
 import { Preset, FieldPresets, D2Geometry } from "../schemas";
 import { getFieldsAsString } from "./common";
-import { D2Relationship, D2RelationshipSchema } from "../2.36";
-import { D2EventDataValueSchema, EventStatus, IdScheme } from "./events";
 import _ from "lodash";
 
 export class TrackerEvents {
@@ -25,6 +23,14 @@ type Username = string;
 type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
 type CommaDelimitedListOfDataElementFilter = string;
+type UserInfo = {
+    uid: Id;
+    username: string;
+    firstName: string;
+    surname: string;
+};
+type EventStatus = "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
+type IdScheme = string;
 
 interface D2TrackerEventBase {
     event: Id;
@@ -32,9 +38,10 @@ interface D2TrackerEventBase {
     program: Id;
     programStage?: Id;
     enrollment?: Id;
+    enrollmentStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
     orgUnit: Id;
     orgUnitName?: string;
-    relationships?: D2Relationship[];
+    relationships?: [];
     occurredAt: IsoDate;
     scheduledAt?: IsoDate;
     storedBy?: Username;
@@ -42,11 +49,13 @@ interface D2TrackerEventBase {
     deleted?: boolean;
     createdAt?: IsoDate;
     updatedAt?: IsoDate;
+    createdBy?: UserInfo;
     attributeOptionCombo?: Id;
     attributeCategoryOptions?: Id;
-    updatedBy?: Username;
+    updatedBy?: UserInfo;
     dataValues: DataValue[];
-    notes?: string;
+    notes?: string[];
+    trackedEntity?: Id;
 }
 
 export type D2TrackerEvent = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
@@ -109,6 +118,19 @@ interface EventsParamsBase {
     assignedUser?: CommaDelimitedListOfUid;
 }
 
+interface D2EventDataValueSchema {
+    name: "D2DataValue";
+    model: DataValue;
+    fields: DataValue;
+    fieldPresets: {
+        $all: Preset<DataValue, keyof DataValue>;
+        $identifiable: Preset<DataValue, FieldPresets["identifiable"]>;
+        $nameable: Preset<DataValue, FieldPresets["nameable"]>;
+        $persisted: Preset<DataValue, keyof DataValue>;
+        $owner: Preset<DataValue, keyof DataValue>;
+    };
+}
+
 export interface DataValue {
     updatedAt?: IsoDate;
     storedBy?: Username;
@@ -130,7 +152,6 @@ interface D2TrackerEventSchema {
     model: D2TrackerEvent;
     fields: D2TrackerEvent & {
         dataValues: D2EventDataValueSchema[];
-        relationships: D2RelationshipSchema[];
     };
     fieldPresets: {
         $all: Preset<D2TrackerEvent, keyof D2TrackerEvent>;
