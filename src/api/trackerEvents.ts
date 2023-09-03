@@ -54,7 +54,7 @@ interface D2TrackerEventBase {
     attributeCategoryOptions?: Id;
     updatedBy?: UserInfo;
     dataValues: DataValue[];
-    notes?: string[];
+    notes?: [];
     trackedEntity?: Id;
 }
 
