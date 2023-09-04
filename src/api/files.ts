@@ -1,7 +1,15 @@
 import { generateUid } from "../utils/uid";
 import { Id, MetadataResponse } from "./base";
-import { D2ApiResponse } from "./common";
+import { D2ApiResponse, ErrorReport } from "./common";
 import { D2ApiGeneric } from "./d2Api";
+
+interface FileHttpResponse<Response> {
+    httpStatus: "OK" | "Conflict" | "Not Found";
+    httpStatusCode: number;
+    status: "OK" | "ERROR";
+    message?: string;
+    response?: Response;
+}
 
 export interface FileUploadParameters {
     id?: Id;
@@ -23,6 +31,13 @@ export interface FileUploadResult {
     fileResourceId: string;
     response: MetadataResponse;
 }
+
+type FileDeleteResponse = FileHttpResponse<{
+    responseType: "ObjectReport";
+    uid: string;
+    klass: string;
+    errorReports?: ErrorReport[];
+}>;
 
 export class Files {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -76,5 +91,9 @@ export class Files {
                 .post<MetadataResponse>("/metadata", {}, { documents: [document] })
                 .map(({ data }) => ({ id, fileResourceId, response: data }));
         });
+    }
+
+    delete(id: string): D2ApiResponse<FileDeleteResponse> {
+        return this.d2Api.delete<FileDeleteResponse>(`/documents/${id}`);
     }
 }
