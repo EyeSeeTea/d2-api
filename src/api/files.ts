@@ -1,28 +1,8 @@
+import FormData from "form-data";
 import { generateUid } from "../utils/uid";
 import { Id, MetadataResponse } from "./base";
 import { D2ApiResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
-
-export interface FileUploadParameters {
-    id?: Id;
-    name: string;
-    data: Blob;
-    ignoreDocument?: boolean;
-}
-
-interface PartialSaveResponse {
-    response?: {
-        fileResource?: {
-            id?: string;
-        };
-    };
-}
-
-export interface FileUploadResult {
-    id: string;
-    fileResourceId: string;
-    response: MetadataResponse;
-}
 
 export class Files {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -77,4 +57,25 @@ export class Files {
                 .map(({ data }) => ({ id, fileResourceId, response: data }));
         });
     }
+}
+
+export interface FileUploadParameters {
+    id?: Id;
+    name: string;
+    data: Blob | Buffer; // Use Blob for browser, Buffer for node
+    ignoreDocument?: boolean;
+}
+
+interface PartialSaveResponse {
+    response?: {
+        fileResource?: {
+            id?: string;
+        };
+    };
+}
+
+export interface FileUploadResult {
+    id: string;
+    fileResourceId: string;
+    response: MetadataResponse;
 }
