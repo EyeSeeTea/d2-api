@@ -1,7 +1,7 @@
 import { cache } from "../utils/cache";
 import { D2TrackerEnrollment, TrackerEnrollments } from "./trackerEnrollments";
 import { D2ApiResponse } from "./base";
-import { AsyncPostResponse, HttpResponse } from "./common";
+import { AsyncPostResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { D2TrackerEvent, TrackerEvents } from "./trackerEvents";
 import { TrackedEntities } from "./trackerTrackedEntities";
@@ -26,8 +26,8 @@ export class Tracker {
     post(
         params: TrackerPostParams,
         request: TrackerPostRequest
-    ): D2ApiResponse<HttpResponse<TrackerPostResponse>> {
-        return this.d2Api.post<HttpResponse<TrackerPostResponse>>(
+    ): D2ApiResponse<TrackerPostResponse> {
+        return this.d2Api.post<TrackerPostResponse>(
             "/tracker",
             { ...params, async: false },
             request
