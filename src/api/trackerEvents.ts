@@ -15,6 +15,17 @@ export class TrackerEvents {
             fields: getFieldsAsString(params.fields),
         });
     }
+
+    getById<Fields extends D2TrackerEventFields>(
+        id: string,
+        params: EventsParams<Fields>
+    ): D2ApiResponse<D2TrackerEvent> {
+        console.log("params", params);
+        return this.api.get<D2TrackerEvent>(`/tracker/events/${id}`, {
+            ..._.omit(params, ["fields"]),
+            fields: getFieldsAsString(params.fields),
+        });
+    }
 }
 
 type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
