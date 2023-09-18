@@ -20,7 +20,6 @@ export class TrackerEvents {
         id: string,
         params: EventsParams<Fields>
     ): D2ApiResponse<D2TrackerEvent> {
-        console.log("params", params);
         return this.api.get<D2TrackerEvent>(`/tracker/events/${id}`, {
             ..._.omit(params, ["fields"]),
             fields: getFieldsAsString(params.fields),
@@ -98,7 +97,7 @@ interface EventsParamsBase {
     followUp?: boolean;
     trackedEntity?: Id;
     orgUnit?: Id;
-    event?: string;
+    event?: Id;
     ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS";
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
@@ -147,7 +146,7 @@ export interface DataValue {
     storedBy?: Username;
     createdAt?: IsoDate;
     dataElement: Id;
-    value: string | number | boolean;
+    value: string;
     providedElsewhere?: boolean;
 }
 
