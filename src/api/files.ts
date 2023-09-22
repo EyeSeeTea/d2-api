@@ -1,3 +1,4 @@
+import FormData from "form-data";
 import { generateUid } from "../utils/uid";
 import { Id, MetadataResponse } from "./base";
 import { D2ApiResponse, ErrorReport } from "./common";
@@ -14,7 +15,7 @@ interface FileHttpResponse<Response> {
 export interface FileUploadParameters {
     id?: Id;
     name: string;
-    data: Blob;
+    data: Blob | Buffer;
     ignoreDocument?: boolean;
     domain?: Domain;
 }
