@@ -1,8 +1,55 @@
 import FormData from "form-data";
 import { generateUid } from "../utils/uid";
 import { Id, MetadataResponse } from "./base";
-import { D2ApiResponse } from "./common";
+import { D2ApiResponse, ErrorReport } from "./common";
 import { D2ApiGeneric } from "./d2Api";
+
+interface FileHttpResponse<Response> {
+    httpStatus: "OK" | "Conflict" | "Not Found";
+    httpStatusCode: number;
+    status: "OK" | "ERROR";
+    message?: string;
+    response?: Response;
+}
+
+export interface FileUploadParameters {
+    id?: Id;
+    name: string;
+    data: Blob | Buffer;
+    ignoreDocument?: boolean;
+    domain?: Domain;
+}
+
+type Domain =
+    | "DATA_VALUE"
+    | "PUSH_ANALYSIS"
+    | "DOCUMENT"
+    | "MESSAGE_ATTACHMENT"
+    | "USER_AVATAR"
+    | "ORG_UNIT";
+
+interface PartialSaveResponse {
+    response?: {
+        fileResource?: {
+            id?: string;
+        };
+    };
+}
+
+const DEFAULT_DOMAIN = "DOCUMENT";
+
+export interface FileUploadResult {
+    id: string;
+    fileResourceId: string;
+    response: MetadataResponse;
+}
+
+type FileDeleteResponse = FileHttpResponse<{
+    responseType: "ObjectReport";
+    uid: string;
+    klass: string;
+    errorReports?: ErrorReport[];
+}>;
 
 export class Files {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -16,11 +63,11 @@ export class Files {
     }
 
     saveFileResource(params: Omit<FileUploadParameters, "id">): D2ApiResponse<string> {
-        const { name, data } = params;
+        const { name, data, domain } = params;
 
         const formData = new FormData();
         formData.append("file", data, name);
-        formData.append("domain", "DOCUMENT");
+        formData.append("domain", domain || DEFAULT_DOMAIN);
 
         return this.d2Api.apiConnection
             .request<PartialSaveResponse>({
@@ -43,11 +90,11 @@ export class Files {
     }
 
     upload(params: FileUploadParameters): D2ApiResponse<FileUploadResult> {
-        const { id = generateUid(), name, data } = params;
+        const { id = generateUid(), name, data, domain } = params;
 
         const formData = new FormData();
         formData.append("file", data, name);
-        formData.append("domain", "DOCUMENT");
+        formData.append("domain", domain || DEFAULT_DOMAIN);
 
         return this.saveFileResource(params).flatMap(({ data: fileResourceId }) => {
             const document = { id, name, url: fileResourceId };
@@ -57,25 +104,8 @@ export class Files {
                 .map(({ data }) => ({ id, fileResourceId, response: data }));
         });
     }
-}
 
-export interface FileUploadParameters {
-    id?: Id;
-    name: string;
-    data: Blob | Buffer; // Use Blob for browser, Buffer for node
-    ignoreDocument?: boolean;
-}
-
-interface PartialSaveResponse {
-    response?: {
-        fileResource?: {
-            id?: string;
-        };
-    };
-}
-
-export interface FileUploadResult {
-    id: string;
-    fileResourceId: string;
-    response: MetadataResponse;
+    delete(id: string): D2ApiResponse<FileDeleteResponse> {
+        return this.d2Api.delete<FileDeleteResponse>(`/documents/${id}`);
+    }
 }

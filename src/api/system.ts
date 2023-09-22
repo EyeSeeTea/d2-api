@@ -158,6 +158,7 @@ export interface SystemInfo {
     revision: string;
     buildTime: Date;
     serverDate: Date;
+    serverTimeZoneId: string;
     environmentVariable: string;
 
     javaVersion?: string;

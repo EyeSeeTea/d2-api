@@ -93,25 +93,26 @@ type GetEvent<Fields> = SelectedPick<D2EventSchema, Fields>;
 
 export type EventStatus = "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
 
-export interface EventsPostRequest {
-    events: Array<{
-        event?: string;
-        orgUnit: string;
-        program: string;
-        status: EventStatus;
-        eventDate: string;
-        coordinate?: {
-            latitude: number;
-            longitude: number;
-        };
-        attributeOptionCombo?: string;
-        trackedEntityInstance?: string;
-        programStage?: string;
-        dataValues: Array<{
-            dataElement: string;
-            value: string | number | boolean;
-        }>;
+export interface D2EventToPost {
+    event?: string;
+    orgUnit: string;
+    program: string;
+    status: EventStatus;
+    eventDate: string;
+    coordinate?: {
+        latitude: number;
+        longitude: number;
+    };
+    attributeOptionCombo?: string;
+    trackedEntityInstance?: string;
+    programStage?: string;
+    dataValues: Array<{
+        dataElement: string;
+        value: string | number | boolean;
     }>;
+}
+export interface EventsPostRequest {
+    events: D2EventToPost[];
 }
 
 export type EventsPostParams = Partial<{
