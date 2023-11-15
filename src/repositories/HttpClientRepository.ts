@@ -37,7 +37,10 @@ export interface ConstructorOptions {
     baseUrl?: string;
     auth?: Credentials;
     timeout?: number;
+    agent?: Agent;
 }
+
+export type Agent = unknown;
 
 interface HttpErrorOptions {
     request: HttpRequest;
