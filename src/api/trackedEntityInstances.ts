@@ -12,7 +12,7 @@ export class TrackedEntityInstances {
         return this.d2Api.get<PaginatedTeiGetResponse>("/trackedEntityInstances", {
             ...params,
             ou: params.ou ? params.ou.join(";") : undefined,
-            paging: true,
+            skipPaging: false,
         });
     }
 
@@ -20,7 +20,7 @@ export class TrackedEntityInstances {
         return this.d2Api.get<TeiGetResponse>("/trackedEntityInstances", {
             ...params,
             ou: params.ou ? params.ou.join(";") : undefined,
-            paging: false,
+            skipPaging: true,
             page: undefined,
             pageSize: undefined,
         });
