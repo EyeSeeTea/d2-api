@@ -20,7 +20,7 @@ export class Events {
         return this.d2Api.get<PaginatedEventsGetResponse<Fields>>("/events", {
             ...params,
             fields: getFieldsAsString(params.fields),
-            paging: true,
+            skipPaging: false,
         });
     }
 
@@ -30,7 +30,7 @@ export class Events {
         return this.d2Api.get<EventsGetResponse<Fields>>("/events", {
             ...params,
             fields: getFieldsAsString(params.fields),
-            paging: false,
+            skipPaging: true,
             page: undefined,
             pageSize: undefined,
         });
