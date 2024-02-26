@@ -1,4 +1,4 @@
-import { HttpRequest } from "../repositories/HttpClientRepository";
+import { HttpRequest, Agent } from "../repositories/HttpClientRepository";
 import { D2ApiDefinitionBase } from "./common";
 import { Model } from ".";
 
@@ -8,6 +8,7 @@ export interface D2ApiOptions {
     auth?: { username: string; password: string };
     backend?: "xhr" | "fetch";
     timeout?: number;
+    agent?: Agent;
 }
 
 export type IndexedModels<D2ApiDefinition extends D2ApiDefinitionBase> = {

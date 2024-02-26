@@ -39,7 +39,7 @@ type UserInfo = {
     firstName: string;
     surname: string;
 };
-type EventStatus = "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
+type EventStatus = "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
 type IdScheme = string;
 
 interface D2TrackerEventBase {
@@ -99,7 +99,7 @@ interface EventsParamsBase {
     orgUnit?: Id;
     event?: Id;
     ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS";
-    status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
+    status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
     scheduledAfter?: IsoDate;

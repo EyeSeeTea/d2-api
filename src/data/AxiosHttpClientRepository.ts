@@ -43,6 +43,8 @@ export class AxiosHttpClientRepository implements HttpClientRepository {
             paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" }),
             validateStatus: status => status >= 200 && status < 300,
             timeout: options.timeout,
+            httpAgent: options.agent,
+            httpsAgent: options.agent,
         });
     }
 }
