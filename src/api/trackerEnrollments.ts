@@ -56,6 +56,7 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
+        skipPaging: boolean;
     }>;
 
 type Params =

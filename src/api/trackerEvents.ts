@@ -86,6 +86,7 @@ type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
+        skipPaging: boolean;
     }>;
 
 interface EventsParamsBase {

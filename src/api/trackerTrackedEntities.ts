@@ -90,6 +90,7 @@ type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partia
         totalPages: boolean;
         page: number;
         pageSize: number;
+        skipPaging: boolean;
     }>;
 
 type Params =
