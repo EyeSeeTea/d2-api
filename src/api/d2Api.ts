@@ -1,6 +1,10 @@
 import { AxiosHttpClientRepository } from "../data/AxiosHttpClientRepository";
 import { FetchHttpClientRepository } from "../data/FetchHttpClientRepository";
-import { HttpClientRepository, HttpRequest } from "../repositories/HttpClientRepository";
+import {
+    HttpClientRepository,
+    HttpRequest,
+    HttpResponse,
+} from "../repositories/HttpClientRepository";
 import { D2SchemaProperties } from "../schemas";
 import { cache, defineLazyCachedProperty } from "../utils/cache";
 import { joinPath } from "../utils/connection";
@@ -71,11 +75,13 @@ export class D2ApiGeneric {
     }
 
     public post<T>(url: string, params?: Params, data?: object, request?: Partial<HttpRequest>) {
-        return this.request<T>({ method: "post", url, params, data, ...request });
+        return this.request({ method: "post", url, params, data, ...request }).map(res =>
+            unwrap<T>(res)
+        );
     }
 
     public put<T>(url: string, params?: Params, data?: object) {
-        return this.request<T>({ method: "put", url, params, data });
+        return this.request<T>({ method: "put", url, params, data }).map(res => unwrap<T>(res));
     }
 
     public delete<T>(url: string, params?: Params) {
@@ -219,6 +225,19 @@ export abstract class D2ApiVersioned<
     get tracker() {
         return new Tracker(this);
     }
+}
+
+/* Starting at 2.38, some POST/PUT endpoints return a wrapped HTTP response.
+ * See https://github.com/dhis2/dhis2-releases/blob/master/releases/2.38/README.md#api
+ *
+ * Instead of checking the API version, inspect the structure of the response.
+ **/
+function unwrap<T>(res: HttpResponse<unknown>) {
+    const { data } = res;
+
+    return typeof data === "object" && data && "httpStatus" in data && "response" in data
+        ? (data as { response: T }).response
+        : (data as T);
 }
 
 export { D2ApiOptions };
