@@ -1,11 +1,19 @@
 import { cache } from "../utils/cache";
 import { D2TrackerEnrollment, TrackerEnrollments } from "./trackerEnrollments";
 import { D2ApiResponse } from "./base";
-import { AsyncPostResponse } from "./common";
+import { HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { D2TrackerEvent, TrackerEvents } from "./trackerEvents";
 import { TrackedEntities } from "./trackerTrackedEntities";
 import { D2TrackerTrackedEntity } from "./trackerTrackedEntities";
+
+type ResponseTypes = "TrackerJob";
+
+type AsyncTrackerPostResponse = HttpResponse<{
+    responseType: ResponseTypes;
+    id: string;
+    location: string;
+}>;
 
 export class Tracker {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -37,8 +45,8 @@ export class Tracker {
     postAsync(
         params: TrackerPostParams,
         request: TrackerPostRequest
-    ): D2ApiResponse<AsyncPostResponse<"TRACKER_IMPORT_JOB">> {
-        return this.d2Api.post<AsyncPostResponse<"TRACKER_IMPORT_JOB">>(
+    ): D2ApiResponse<AsyncTrackerPostResponse> {
+        return this.d2Api.post<AsyncTrackerPostResponse>(
             "/tracker",
             { ...params, async: true },
             request

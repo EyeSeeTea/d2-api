@@ -1,6 +1,6 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
-import { Preset, FieldPresets } from "../schemas";
+import { Preset, FieldPresets, D2Geometry } from "../schemas";
 import { getFieldsAsString } from "./common";
 import { D2TrackerEvent } from "./trackerEvents";
 import _ from "lodash";
@@ -26,25 +26,27 @@ type Username = string;
 
 export interface D2TrackerEnrollment {
     enrollment: Id;
-    createdAt: IsoDate;
-    createdAtClient: IsoDate;
-    updatedAt: IsoDate;
-    updatedAtClient: IsoDate;
-    trackedEntity?: Id;
+    createdAt?: IsoDate;
+    createdAtClient?: IsoDate;
+    updatedAt?: IsoDate;
+    updatedAtClient?: IsoDate;
+    trackedEntity: Id;
     trackedEntityType?: Id;
     program: Id;
-    status: ProgramStatus;
+    status?: ProgramStatus;
     orgUnit: Id;
-    orgUnitName: string;
+    geometry?: D2Geometry;
     enrolledAt: IsoDate;
-    occurredAt: IsoDate;
-    followUp: boolean;
-    deleted: boolean;
-    storedBy: Username;
-    events: D2TrackerEvent[];
-    relationships: [];
-    attributes: D2TrackerEnrollmentAttribute[];
-    notes: [];
+    occurredAt?: IsoDate;
+    followUp?: boolean;
+    deleted?: boolean;
+    completedAt?: IsoDate;
+    completedBy?: Username;
+    storedBy?: Username;
+    events?: D2TrackerEvent[];
+    relationships?: [];
+    attributes?: D2TrackerEnrollmentAttribute[];
+    notes?: [];
 }
 
 export interface D2TrackerEnrollmentAttribute {

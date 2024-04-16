@@ -42,11 +42,11 @@ interface D2TrackerTrackedEntityBase {
 export type D2TrackerTrackedEntity = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
 
 interface GeometryPoint {
-    geometry?: Extract<D2Geometry, { type: "Point" }>;
+    geometry?: Extract<D2Geometry, { type: "Point" }> | null;
 }
 
 interface GeometryPolygon {
-    geometry?: Extract<D2Geometry, { type: "Polygon" }>;
+    geometry?: Extract<D2Geometry, { type: "Polygon" }> | null;
 }
 
 type TrackedEntityGeometryPoint = D2TrackerTrackedEntityBase & GeometryPoint;
@@ -95,11 +95,7 @@ type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partia
 
 type Params =
     | ({ orgUnit: SemiColonDelimitedListOfUid } & PartialParams)
-    | ({ ouMode: "ALL" } & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "programStatus" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "followUp" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledAfter" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledBefore" | "program"> & PartialParams);
+    | ({ ouMode: "ALL" } & PartialParams);
 
 type PartialParams = Partial<TrackedEntitiesParamsBase>;
 
@@ -121,9 +117,9 @@ export type TrackedEntitiesParamsBase = {
     enrollmentOccurredAfter: IsoDate;
     enrollmentOccurredBefore: IsoDate;
     trackedEntityType: Id;
-    trackedEntity: SemiColonDelimitedListOfUid;
+    trackedEntities: SemiColonDelimitedListOfUid;
     assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
-    assignedUser: SemiColonDelimitedListOfUid;
+    assignedUsers: CommaDelimitedListOfUid;
     eventStatus: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     eventOccurredAfter: IsoDate;
     eventOccurredBefore: IsoDate;
