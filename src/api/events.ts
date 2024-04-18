@@ -1,10 +1,4 @@
-import {
-    AsyncPostResponse,
-    D2ApiResponse,
-    HttpResponse,
-    getFieldsAsString,
-    validate2xx,
-} from "./common";
+import { AsyncPostResponse, D2ApiResponse, getFieldsAsString, validate2xx } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { Pager } from "./model";
 import { Selector, SelectedPick } from ".";
@@ -36,11 +30,8 @@ export class Events {
         });
     }
 
-    post(
-        params: EventsPostParams,
-        request: EventsPostRequest
-    ): D2ApiResponse<HttpResponse<EventsPostResponse>> {
-        return this.d2Api.post<HttpResponse<EventsPostResponse>>("/events", params, request, {
+    post(params: EventsPostParams, request: EventsPostRequest): D2ApiResponse<EventsPostResponse> {
+        return this.d2Api.post<EventsPostResponse>("/events", params, request, {
             // The API returns 409 when there are warning but the POST was performed, so consider it valid
             validateStatus: status => validate2xx(status) || status == 409,
         });
