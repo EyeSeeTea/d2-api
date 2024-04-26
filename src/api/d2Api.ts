@@ -3,7 +3,7 @@ import { FetchHttpClientRepository } from "../data/FetchHttpClientRepository";
 import {
     HttpClientRepository,
     HttpRequest,
-    HttpResponse,
+    HttpClientResponse,
 } from "../repositories/HttpClientRepository";
 import { D2SchemaProperties } from "../schemas";
 import { cache, defineLazyCachedProperty } from "../utils/cache";
@@ -11,7 +11,7 @@ import { joinPath } from "../utils/connection";
 import { Analytics } from "./analytics";
 import { AppHub } from "./appHub";
 import { Audit } from "./audit";
-import { D2ApiDefinitionBase, D2ApiResponse, Params } from "./common";
+import { D2ApiDefinitionBase, D2ApiResponse, Params, HttpResponse } from "./common";
 import { CurrentUser } from "./currentUser";
 import { DataStore } from "./dataStore";
 import { DataValues } from "./dataValues";
@@ -75,13 +75,11 @@ export class D2ApiGeneric {
     }
 
     public post<T>(url: string, params?: Params, data?: object, request?: Partial<HttpRequest>) {
-        return this.request({ method: "post", url, params, data, ...request }).map(res =>
-            unwrap<T>(res)
-        );
+        return this.request<T>({ method: "post", url, params, data, ...request });
     }
 
     public put<T>(url: string, params?: Params, data?: object) {
-        return this.request<T>({ method: "put", url, params, data }).map(res => unwrap<T>(res));
+        return this.request<T>({ method: "put", url, params, data });
     }
 
     public delete<T>(url: string, params?: Params) {
@@ -232,7 +230,7 @@ export abstract class D2ApiVersioned<
  *
  * Instead of checking the API version, inspect the structure of the response.
  **/
-function unwrap<T>(res: HttpResponse<unknown>) {
+export function unwrap<T>(res: HttpClientResponse<T | HttpResponse<T>>): T {
     const { data } = res;
 
     return typeof data === "object" && data && "httpStatus" in data && "response" in data
