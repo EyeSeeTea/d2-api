@@ -155,7 +155,9 @@ export interface TrackerEventsResponse {
     page: number;
     pageSize: number;
     instances: D2TrackerEvent[];
-    total?: number; // Only if requested with totalPages=true
+    // total and pageCount: Only if requested with totalPages=true
+    total?: number;
+    pageCount?: number;
 }
 
 interface D2TrackerEventSchema {

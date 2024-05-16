@@ -131,13 +131,16 @@ export type TrackedEntitiesParamsBase = {
     includeDeleted: boolean;
     includeAllAttributes: boolean;
     potentialDuplicate: boolean;
+    order: CommaDelimitedListOfAttributeFilter;
 };
 
 export interface TrackedEntitiesGetResponse {
     page: number;
     pageSize: number;
     instances: D2TrackerTrackedEntity[];
-    total?: number; // Only if requested with totalPages=true
+    // total and pageCount: Only if requested with totalPages=true
+    total?: number;
+    pageCount?: number;
 }
 
 export interface D2TrackerTrackedEntitySchema {
