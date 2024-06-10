@@ -11,7 +11,6 @@ import {
     D2Geometry,
     D2Style,
     D2DimensionalKeywords,
-    D2Expression,
     D2RelationshipConstraint,
     D2ReportingParams,
     D2Axis,

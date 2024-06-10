@@ -291,7 +291,7 @@ async function generateSchema(instance: Instance) {
         import {
             Id, Ref, Preset, FieldPresets, D2SchemaProperties,
             D2Access, D2AccessWithData, D2Translation, D2Geometry, D2Style,
-            D2DimensionalKeywords, D2Expression,
+            D2DimensionalKeywords, 
             D2RelationshipConstraint, D2ReportingParams, D2Axis, Sharing,
             D2ProgramOwner, D2ProgramOwnerSchema,
             D2AttributeValueGeneric, D2AttributeValueGenericSchema

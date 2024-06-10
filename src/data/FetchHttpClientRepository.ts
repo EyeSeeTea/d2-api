@@ -2,7 +2,7 @@ import AbortController from "abort-controller";
 import MockAdapter from "axios-mock-adapter";
 import btoa from "btoa";
 import iconv from "iconv-lite";
-import fetch from "cross-fetch";
+import "cross-fetch/polyfill";
 import _ from "lodash";
 import qs from "qs";
 import { CancelableResponse } from "../repositories/CancelableResponse";

@@ -24,7 +24,7 @@ export class AxiosHttpClientRepository implements HttpClientRepository {
             return axiosResponse.then(res => ({
                 status: res.status,
                 data: res.data as Data,
-                headers: res.headers,
+                headers: res.headers as HttpResponse<Data>["headers"],
             }));
         };
 
