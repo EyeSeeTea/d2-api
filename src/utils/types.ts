@@ -4,3 +4,5 @@ export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclu
     }[Keys];
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+export type Maybe<T> = T | undefined;

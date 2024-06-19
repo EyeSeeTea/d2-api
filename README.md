@@ -203,7 +203,53 @@ const dataStore = api.dataStore("namespace1");
 dataStore.save("key1", {x: 1, y: 2});
 ```
 
-#### Emails
+### Tracker
+
+Get all tracked entities for an specific program:
+
+```ts
+const data = await api.tracker.trackedEntities
+    .get({
+        fields: {
+            orgUnit: true,
+        },
+        ouMode: "ALL",
+        program: "program_id",
+    })
+    .getData();
+
+console.log(data.instances);
+```
+
+Order tracked entities by field/attribute id
+
+```ts
+const data = await api.tracker.trackedEntities
+    .get({
+        fields: {
+            orgUnit: true,
+        },
+        ouMode: "ALL",
+        program: "program_id",
+        order: [
+            {
+                type: "field",
+                field: "createdAt",
+                direction: "asc",
+            },
+            {
+                type: "id",
+                id: "wMhqqPLb7pP",
+                direction: "desc",
+            },
+        ],
+    })
+    .getData();
+
+console.log(data.instances);
+```
+
+### Emails
 
 Send a test email:
 
