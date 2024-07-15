@@ -82,6 +82,7 @@ export interface AttributeValue {
 
 export interface Attribute {
     attribute: Id;
+    code: string;
     valueType?: string;
     value: string;
 }
