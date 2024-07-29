@@ -74,14 +74,12 @@ export interface RelationshipItem {
     event?: { event: Id };
 }
 
-export interface AttributeValue {
-    attribute: Attribute;
-    value: string;
-    optionId?: Id;
-}
-
 export interface Attribute {
     attribute: Id;
+    code?: string;
+    displayName?: string;
+    createdAt?: IsoDate;
+    updatedAt?: IsoDate;
     valueType?: string;
     value: string;
 }
