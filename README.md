@@ -235,16 +235,8 @@ const data = await api.tracker.trackedEntities
         ouMode: "ALL",
         program: "program_id",
         order: [
-            {
-                type: "field",
-                field: "createdAt",
-                direction: "asc",
-            },
-            {
-                type: "id",
-                id: "wMhqqPLb7pP",
-                direction: "desc",
-            },
+            { type: "field", field: "createdAt", direction: "asc" },
+            { type: "id", id: "wMhqqPLb7pP", direction: "desc" },
         ],
     })
     .getData();
