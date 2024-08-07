@@ -28,7 +28,7 @@ export class TrackedEntities {
             .map(orderTracked => {
                 if (orderTracked.type === "field") {
                     return `${orderTracked.field}:${orderTracked.direction}`;
-                } else if (orderTracked.type === "id") {
+                } else if (orderTracked.type === "trackedEntityAttributeId") {
                     return `${orderTracked.id}:${orderTracked.direction}`;
                 } else {
                     return undefined;
@@ -97,14 +97,12 @@ export interface RelationshipItem {
     event?: { event: Id };
 }
 
-export interface AttributeValue {
-    attribute: Attribute;
-    value: string;
-    optionId?: Id;
-}
-
 export interface Attribute {
     attribute: Id;
+    code?: string;
+    displayName?: string;
+    createdAt?: IsoDate;
+    updatedAt?: IsoDate;
     valueType?: string;
     value: string;
 }
@@ -159,9 +157,9 @@ export type TrackedEntitiesParamsBase = {
 
 export type TrackedOrderBase = {
     direction: "asc" | "desc";
-} & (TrackedOrderFields | TrackedAttributesFields);
+} & (TrackedOrderField | TrackedAttributesFields);
 
-export type TrackedOrderFields = {
+export type TrackedOrderField = {
     type: "field";
     field:
         | "createdAtClient"
@@ -172,7 +170,7 @@ export type TrackedOrderFields = {
         | "updatedAt";
 };
 
-export type TrackedAttributesFields = { type: "id"; id: Id };
+export type TrackedAttributesFields = { type: "trackedEntityAttributeId"; id: Id };
 
 export interface TrackedEntitiesGetResponse {
     page: number;
