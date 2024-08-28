@@ -1,5 +1,7 @@
+import { Id } from "../schemas";
 import { D2ApiResponse, HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
+import { Pager } from "./model";
 
 type Operator = "EQ" | "GT" | "GE" | "LT" | "LE";
 
@@ -43,6 +45,7 @@ export type AnalyticsOptions = {
     order?: "ASC" | "DESC";
     timeField?: string;
     orgUnitField?: string;
+    enrollmentDate?: string;
 };
 
 export type AnalyticsResponse = {
@@ -54,7 +57,11 @@ export type AnalyticsResponse = {
         hidden: boolean;
         meta: boolean;
     }>;
-
+    metaData: {
+        dimensions: Record<string, string[]>;
+        items: Record<string, { name: string; uid?: Id; code?: string; options: any[] }>;
+        pager: Pager;
+    };
     rows: Array<string[]>;
     width: number;
     height: number;
@@ -85,6 +92,17 @@ export class Analytics {
 
     get(options: AnalyticsOptions): D2ApiResponse<AnalyticsResponse> {
         return this.d2Api.get<AnalyticsResponse>("/analytics", options);
+    }
+
+    getEnrollmentsQuery(
+        programId: Id,
+        options: AnalyticsOptions
+    ): D2ApiResponse<AnalyticsResponse> {
+        console.log("OUI");
+        return this.d2Api.get<AnalyticsResponse>(
+            `/analytics/enrollments/query/${programId}`,
+            options
+        );
     }
 
     run(options?: RunAnalyticsOptions): D2ApiResponse<RunAnalyticsResponse> {
