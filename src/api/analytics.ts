@@ -98,7 +98,6 @@ export class Analytics {
         programId: Id,
         options: AnalyticsOptions
     ): D2ApiResponse<AnalyticsResponse> {
-        console.log("OUI");
         return this.d2Api.get<AnalyticsResponse>(
             `/analytics/enrollments/query/${programId}`,
             options
