@@ -156,6 +156,17 @@ const analyticsData = await api.analytics
     .getData();
 ```
 
+#### Get enrollments query
+
+```
+const analyticsData = await api.analytics
+    .getEnrollmentsQuery("Gs69Uw2Mom1", {
+        dimension: ["cYeuwXTCPkU", "fbfJHSPpUQD"],
+        enrollmentDate: "LAST_12_MONTHS,THIS_MONTH",
+    })
+    .getData();
+```
+
 #### Run analytics
 
 ```
