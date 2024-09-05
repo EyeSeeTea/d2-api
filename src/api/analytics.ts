@@ -49,6 +49,9 @@ export type AnalyticsOptions = {
     enrollmentDate?: string;
 };
 
+export type GetEnrollmentsQueryOptions = {
+    programId: Id;
+} & AnalyticsOptions;
 export type AnalyticsResponse = {
     headers: Array<{
         name: "dx" | "dy";
@@ -97,10 +100,11 @@ export class Analytics {
         return this.d2Api.get<AnalyticsResponse>("/analytics", options);
     }
 
-    getEnrollmentsQuery(
-        programId: Id,
-        options: AnalyticsOptions
-    ): D2ApiResponse<AnalyticsResponse> {
+    // https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-240/analytics.html#webapi_enrollment_analytics
+    getEnrollmentsQuery({
+        programId,
+        ...options
+    }: GetEnrollmentsQueryOptions): D2ApiResponse<AnalyticsResponse> {
         return this.d2Api.get<AnalyticsResponse>(
             `/analytics/enrollments/query/${programId}`,
             options
