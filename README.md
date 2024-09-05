@@ -160,8 +160,8 @@ const analyticsData = await api.analytics
 
 ```
 const analyticsData = await api.analytics
-    .getEnrollmentsQuery("Gs69Uw2Mom1", {
-        dimension: ["cYeuwXTCPkU", "fbfJHSPpUQD"],
+    .getEnrollmentsQuery("IpHINAT79UW", {
+        dimension: ["GxdhnY5wmHq", "ou:ImspTQPwCqd"],
         enrollmentDate: "LAST_12_MONTHS,THIS_MONTH",
     })
     .getData();
