@@ -1,4 +1,5 @@
 import { Id } from "../schemas";
+import { EmptyObject } from "../utils/types";
 import { D2ApiResponse, HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { Pager } from "./model";
@@ -57,11 +58,13 @@ export type AnalyticsResponse = {
         hidden: boolean;
         meta: boolean;
     }>;
-    metaData: {
-        dimensions: Record<string, string[]>;
-        items: Record<string, { name: string; uid?: Id; code?: string; options: any[] }>;
-        pager: Pager;
-    };
+    metaData:
+        | EmptyObject
+        | {
+              dimensions: Record<string, string[]>;
+              items: Record<string, { name: string; uid?: Id; code?: string; options: any[] }>;
+              pager?: Pager;
+          };
     rows: Array<string[]>;
     width: number;
     height: number;
