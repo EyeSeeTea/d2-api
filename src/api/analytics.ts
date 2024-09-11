@@ -107,7 +107,7 @@ export class Analytics {
     }: GetEnrollmentsQueryOptions): D2ApiResponse<AnalyticsResponse> {
         return this.d2Api.get<AnalyticsResponse>(
             `/analytics/enrollments/query/${programId}`,
-            options
+            options as AnalyticsOptions
         );
     }
 
