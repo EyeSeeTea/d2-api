@@ -1,17 +1,17 @@
 import _ from "lodash";
 import { D2Geometry, FieldPresets, Preset } from "../schemas";
-import { Id, Selector } from "./base";
+import { Id, Selector, SelectedPick } from "./base";
 import { D2ApiResponse, getFieldsAsString } from "./common";
 import { D2ApiGeneric } from "./d2Api";
-import { D2TrackerEnrollment } from "./trackerEnrollments";
+import { D2TrackerEnrollment, D2TrackerEnrollmentSchema } from "./trackerEnrollments";
 
 export class TrackedEntities {
     constructor(public d2Api: D2ApiGeneric) {}
 
     get<Fields extends D2TrackerTrackedEntityFields>(
         params: TrackerTrackedEntitiesParams<Fields>
-    ): D2ApiResponse<TrackedEntitiesGetResponse> {
-        return this.d2Api.get<TrackedEntitiesGetResponse>("/tracker/trackedEntities", {
+    ): D2ApiResponse<TrackedEntitiesGetResponse<Fields>> {
+        return this.d2Api.get<TrackedEntitiesGetResponse<Fields>>("/tracker/trackedEntities", {
             ..._.omit(params, ["fields"]),
             fields: getFieldsAsString(params.fields),
         });
@@ -25,18 +25,18 @@ type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
 
 interface D2TrackerTrackedEntityBase {
-    trackedEntity?: Id;
-    trackedEntityType?: Id;
-    createdAt?: IsoDate;
-    createdAtClient?: IsoDate;
-    updatedAt?: IsoDate;
-    orgUnit?: SemiColonDelimitedListOfUid;
-    inactive?: boolean;
-    deleted?: boolean;
-    relationships?: Relationship[];
-    attributes?: Attribute[];
-    enrollments?: D2TrackerEnrollment[];
-    programOwners?: ProgramOwner[];
+    trackedEntity: Id;
+    trackedEntityType: Id;
+    createdAt: IsoDate;
+    createdAtClient: IsoDate;
+    updatedAt: IsoDate;
+    orgUnit: SemiColonDelimitedListOfUid;
+    inactive: boolean;
+    deleted: boolean;
+    relationships: Relationship[];
+    attributes: Attribute[];
+    enrollments: D2TrackerEnrollment[];
+    programOwners: ProgramOwner[];
 }
 
 export type D2TrackerTrackedEntity = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
@@ -131,17 +131,19 @@ export type TrackedEntitiesParamsBase = {
     potentialDuplicate: boolean;
 };
 
-export interface TrackedEntitiesGetResponse {
+export interface TrackedEntitiesGetResponse<Fields> {
     page: number;
     pageSize: number;
-    instances: D2TrackerTrackedEntity[];
+    instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[];
     total?: number; // Only if requested with totalPages=true
 }
 
 export interface D2TrackerTrackedEntitySchema {
     name: "D2TrackerTrackedEntity";
     model: D2TrackerTrackedEntity;
-    fields: D2TrackerTrackedEntity;
+    fields: D2TrackerTrackedEntity & {
+        enrollments: D2TrackerEnrollmentSchema[];
+    };
     fieldPresets: {
         $all: Preset<D2TrackerTrackedEntity, keyof D2TrackerTrackedEntity>;
         $identifiable: Preset<D2TrackerTrackedEntity, FieldPresets["identifiable"]>;

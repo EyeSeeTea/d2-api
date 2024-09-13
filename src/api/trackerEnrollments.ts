@@ -2,7 +2,7 @@ import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets } from "../schemas";
 import { getFieldsAsString } from "./common";
-import { D2TrackerEvent } from "./trackerEvents";
+import { D2TrackerEvent, D2TrackerEventSchema } from "./trackerEvents";
 import _ from "lodash";
 
 export class TrackerEnrollments {
@@ -10,8 +10,8 @@ export class TrackerEnrollments {
 
     get<Fields extends D2TrackerEnrollmentFields>(
         params: TrackerEnrollmentsParams<Fields>
-    ): D2ApiResponse<TrackerEnrollmentsResponse> {
-        return this.api.get<TrackerEnrollmentsResponse>("/tracker/enrollments", {
+    ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
+        return this.api.get<TrackerEnrollmentsResponse<Fields>>("/tracker/enrollments", {
             ..._.omit(params, ["fields"]),
             fields: getFieldsAsString(params.fields),
         });
@@ -88,17 +88,19 @@ type TrackerEnrollmentsParamsBase = {
 type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
-export interface TrackerEnrollmentsResponse {
+export interface TrackerEnrollmentsResponse<Fields> {
     page: number;
     pageSize: number;
-    instances: D2TrackerEnrollment[];
+    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
     total?: number; // Only if requested with totalPages=true
 }
 
 export interface D2TrackerEnrollmentSchema {
     name: "D2TrackerEnrollment";
     model: D2TrackerEnrollment;
-    fields: D2TrackerEnrollment;
+    fields: D2TrackerEnrollment & {
+        events: D2TrackerEventSchema[];
+    };
     fieldPresets: {
         $all: Preset<D2TrackerEnrollment, keyof D2TrackerEnrollment>;
         $identifiable: Preset<D2TrackerEnrollment, FieldPresets["identifiable"]>;

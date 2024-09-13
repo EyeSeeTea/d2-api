@@ -1,5 +1,5 @@
 import { D2ApiGeneric } from "./d2Api";
-import { Id, Selector, D2ApiResponse } from "./base";
+import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets, D2Geometry } from "../schemas";
 import { getFieldsAsString } from "./common";
 import _ from "lodash";
@@ -9,8 +9,8 @@ export class TrackerEvents {
 
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
-    ): D2ApiResponse<TrackerEventsResponse> {
-        return this.api.get<TrackerEventsResponse>("/tracker/events", {
+    ): D2ApiResponse<TrackerEventsResponse<Fields>> {
+        return this.api.get<TrackerEventsResponse<Fields>>("/tracker/events", {
             ..._.omit(params, ["fields"]),
             fields: getFieldsAsString(params.fields),
         });
@@ -50,21 +50,21 @@ interface D2TrackerEventBase {
     enrollment?: Id;
     enrollmentStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
     orgUnit: Id;
-    orgUnitName?: string;
-    relationships?: [];
+    orgUnitName: string;
+    relationships: [];
     occurredAt: IsoDate;
-    scheduledAt?: IsoDate;
-    storedBy?: Username;
-    followup?: boolean;
-    deleted?: boolean;
-    createdAt?: IsoDate;
-    updatedAt?: IsoDate;
-    createdBy?: UserInfo;
-    attributeOptionCombo?: Id;
-    attributeCategoryOptions?: Id;
-    updatedBy?: UserInfo;
+    scheduledAt: IsoDate;
+    storedBy: Username;
+    followup: boolean;
+    deleted: boolean;
+    createdAt: IsoDate;
+    updatedAt: IsoDate;
+    createdBy: UserInfo;
+    attributeOptionCombo: Id;
+    attributeCategoryOptions: Id;
+    updatedBy: UserInfo;
     dataValues: DataValue[];
-    notes?: [];
+    notes: [];
     trackedEntity?: Id;
 }
 
@@ -151,14 +151,14 @@ export interface DataValue {
     providedElsewhere?: boolean;
 }
 
-export interface TrackerEventsResponse {
+export interface TrackerEventsResponse<Fields> {
     page: number;
     pageSize: number;
-    instances: D2TrackerEvent[];
+    instances: SelectedPick<D2TrackerEventSchema, Fields>[];
     total?: number; // Only if requested with totalPages=true
 }
 
-interface D2TrackerEventSchema {
+export interface D2TrackerEventSchema {
     name: "D2TrackerEvent";
     model: D2TrackerEvent;
     fields: D2TrackerEvent & {
