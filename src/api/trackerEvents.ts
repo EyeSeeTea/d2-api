@@ -67,19 +67,9 @@ interface D2TrackerEventBase {
     trackedEntity?: Id;
 }
 
-export type D2TrackerEvent = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
-
-interface GeometryPoint {
-    geometry?: Extract<D2Geometry, { type: "Point" }>;
-}
-
-interface GeometryPolygon {
-    geometry?: Extract<D2Geometry, { type: "Polygon" }>;
-}
-
-type TrackedEntityGeometryPoint = D2TrackerEventBase & GeometryPoint;
-
-type TrackedEntityGeometryPolygon = D2TrackerEventBase & GeometryPolygon;
+export type D2TrackerEvent = D2TrackerEventBase & {
+    geometry?: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
+};
 
 export type Note = {
     note: Id;
