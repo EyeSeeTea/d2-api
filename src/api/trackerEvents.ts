@@ -51,7 +51,6 @@ interface D2TrackerEventBase {
     enrollmentStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
     orgUnit: Id;
     orgUnitName: string;
-    relationships: [];
     occurredAt: IsoDate;
     scheduledAt: IsoDate;
     storedBy: Username;
@@ -64,7 +63,7 @@ interface D2TrackerEventBase {
     attributeCategoryOptions: Id;
     updatedBy: UserInfo;
     dataValues: DataValue[];
-    notes: [];
+    notes: Note[];
     trackedEntity?: Id;
 }
 
@@ -82,6 +81,12 @@ type TrackedEntityGeometryPoint = D2TrackerEventBase & GeometryPoint;
 
 type TrackedEntityGeometryPolygon = D2TrackerEventBase & GeometryPolygon;
 
+export type Note = {
+    note: Id;
+    storedAt: IsoDate;
+    storedBy: Username;
+    value: string;
+};
 type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;

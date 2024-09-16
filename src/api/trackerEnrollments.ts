@@ -2,7 +2,7 @@ import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets } from "../schemas";
 import { getFieldsAsString } from "./common";
-import { D2TrackerEvent, D2TrackerEventSchema } from "./trackerEvents";
+import { D2TrackerEvent, D2TrackerEventSchema, Note } from "./trackerEvents";
 import _ from "lodash";
 
 export class TrackerEnrollments {
@@ -42,9 +42,8 @@ export interface D2TrackerEnrollment {
     deleted: boolean;
     storedBy: Username;
     events: D2TrackerEvent[];
-    relationships: [];
     attributes: D2TrackerEnrollmentAttribute[];
-    notes: [];
+    notes: Note[];
 }
 
 export interface D2TrackerEnrollmentAttribute {
