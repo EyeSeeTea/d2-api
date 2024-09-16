@@ -22,7 +22,7 @@ export interface HttpRequest {
     headers?: Record<string, string>;
 }
 
-export interface HttpResponse<Data> {
+export interface HttpClientResponse<Data> {
     status: number;
     data: Data;
     headers: Record<string, string>;
@@ -44,12 +44,12 @@ export type Agent = unknown;
 
 interface HttpErrorOptions {
     request: HttpRequest;
-    response?: HttpResponse<unknown>;
+    response?: HttpClientResponse<unknown>;
 }
 
 export class HttpError extends Error implements HttpErrorOptions {
     request: HttpRequest;
-    response?: HttpResponse<unknown>;
+    response?: HttpClientResponse<unknown>;
 
     constructor(message: string, obj: HttpErrorOptions) {
         super(message);

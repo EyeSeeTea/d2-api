@@ -1,7 +1,6 @@
 import { D2ApiGeneric } from "./d2Api";
 import { D2ApiResponse } from "./common";
 import { PartialBy } from "../utils/types";
-import { HttpResponse } from "../repositories/HttpClientRepository";
 
 /* https://docs.dhis2.org/master/en/developer/html/webapi_sharing.html */
 
@@ -16,11 +15,8 @@ export class Sharing {
         return this.d2Api.get<SharingGetResponse>("/sharing", params);
     }
 
-    post(
-        params: SharingParams,
-        object: SharingObjectUpdate
-    ): D2ApiResponse<HttpResponse<undefined>> {
-        return this.d2Api.post<HttpResponse<undefined>>("/sharing", params, { object });
+    post(params: SharingParams, object: SharingObjectUpdate): D2ApiResponse<void> {
+        return this.d2Api.post<void>("/sharing", params, { object });
     }
 }
 
