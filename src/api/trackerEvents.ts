@@ -3,6 +3,7 @@ import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets, D2Geometry } from "../schemas";
 import { getFieldsAsString } from "./common";
 import _ from "lodash";
+import { RequiredBy } from "../utils/types";
 
 export class TrackerEvents {
     constructor(public api: D2ApiGeneric) {}
@@ -46,9 +47,9 @@ interface D2TrackerEventBase {
     event: Id;
     status: EventStatus;
     program: Id;
-    programStage?: Id;
-    enrollment?: Id;
-    enrollmentStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    programStage: Id;
+    enrollment: Id;
+    enrollmentStatus: "ACTIVE" | "COMPLETED" | "CANCELLED";
     orgUnit: Id;
     orgUnitName: string;
     occurredAt: IsoDate;
@@ -69,6 +70,15 @@ interface D2TrackerEventBase {
 
 export type D2TrackerEvent = D2TrackerEventBase & {
     geometry?: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
+};
+
+type RequiredFieldsOnPost = "event" | "program" | "programStage" | "scheduledAt";
+
+export type D2TrackerEventToPost = Omit<
+    RequiredBy<D2TrackerEvent, RequiredFieldsOnPost>,
+    "dataValues"
+> & {
+    dataValues: Array<{ dataElement: Id; value: string }>;
 };
 
 export type Note = {
@@ -138,9 +148,9 @@ interface D2EventDataValueSchema {
 }
 
 export interface DataValue {
-    updatedAt?: IsoDate;
-    storedBy?: Username;
-    createdAt?: IsoDate;
+    updatedAt: IsoDate;
+    storedBy: Username;
+    createdAt: IsoDate;
     dataElement: Id;
     value: string;
     providedElsewhere?: boolean;

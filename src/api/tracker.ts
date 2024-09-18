@@ -3,7 +3,7 @@ import { D2TrackerEnrollment, TrackerEnrollments } from "./trackerEnrollments";
 import { D2ApiResponse } from "./base";
 import { AsyncPostResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
-import { D2TrackerEvent, TrackerEvents } from "./trackerEvents";
+import { TrackerEvents, D2TrackerEventToPost } from "./trackerEvents";
 import { TrackedEntities } from "./trackerTrackedEntities";
 import { D2TrackerTrackedEntity } from "./trackerTrackedEntities";
 
@@ -49,7 +49,7 @@ export class Tracker {
 export interface TrackerPostRequest {
     trackedEntities?: D2TrackerTrackedEntity[];
     enrollments?: D2TrackerEnrollment[];
-    events?: D2TrackerEvent[];
+    events?: D2TrackerEventToPost[];
 }
 
 type SchemeOptions = "UID" | "CODE" | "NAME" | "ATTRIBUTE";
