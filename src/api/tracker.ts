@@ -1,11 +1,10 @@
 import { cache } from "../utils/cache";
-import { D2TrackerEnrollment, TrackerEnrollments } from "./trackerEnrollments";
+import { TrackerEnrollments, D2TrackerEnrollmentToPost } from "./trackerEnrollments";
 import { D2ApiResponse } from "./base";
 import { AsyncPostResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { TrackerEvents, D2TrackerEventToPost } from "./trackerEvents";
-import { TrackedEntities } from "./trackerTrackedEntities";
-import { D2TrackerTrackedEntity } from "./trackerTrackedEntities";
+import { TrackedEntities, D2TrackedEntityInstanceToPost } from "./trackerTrackedEntities";
 
 export class Tracker {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -47,8 +46,8 @@ export class Tracker {
 }
 
 export interface TrackerPostRequest {
-    trackedEntities?: D2TrackerTrackedEntity[];
-    enrollments?: D2TrackerEnrollment[];
+    trackedEntities?: D2TrackedEntityInstanceToPost[];
+    enrollments?: D2TrackerEnrollmentToPost[];
     events?: D2TrackerEventToPost[];
 }
 

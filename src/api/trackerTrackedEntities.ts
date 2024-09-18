@@ -3,7 +3,12 @@ import { D2Geometry, FieldPresets, Preset } from "../schemas";
 import { Id, Selector, SelectedPick } from "./base";
 import { D2ApiResponse, getFieldsAsString } from "./common";
 import { D2ApiGeneric } from "./d2Api";
-import { D2TrackerEnrollment, D2TrackerEnrollmentSchema } from "./trackerEnrollments";
+import {
+    D2TrackerEnrollment,
+    D2TrackerEnrollmentSchema,
+    D2TrackerEnrollmentToPost,
+} from "./trackerEnrollments";
+import { RequiredBy } from "../utils/types";
 
 export class TrackedEntities {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -30,6 +35,7 @@ interface D2TrackerTrackedEntityBase {
     createdAt: IsoDate;
     createdAtClient: IsoDate;
     updatedAt: IsoDate;
+    updatedAtClient: IsoDate;
     orgUnit: SemiColonDelimitedListOfUid;
     inactive: boolean;
     deleted: boolean;
@@ -40,6 +46,23 @@ interface D2TrackerTrackedEntityBase {
 }
 
 export type D2TrackerTrackedEntity = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
+
+type RequiredFieldsOnPost =
+    | "attributes"
+    | "createdAtClient"
+    | "enrollments"
+    | "orgUnit"
+    | "relationships"
+    | "trackedEntity"
+    | "trackedEntityType"
+    | "updatedAtClient";
+
+export type D2TrackedEntityInstanceToPost = Omit<
+    RequiredBy<D2TrackerTrackedEntity, RequiredFieldsOnPost>,
+    "events"
+> & {
+    enrollments: D2TrackerEnrollmentToPost[];
+};
 
 interface GeometryPoint {
     geometry?: Extract<D2Geometry, { type: "Point" }>;

@@ -78,7 +78,7 @@ export type D2TrackerEventToPost = Omit<
     RequiredBy<D2TrackerEvent, RequiredFieldsOnPost>,
     "dataValues"
 > & {
-    dataValues: Array<{ dataElement: Id; value: string }>;
+    dataValues: Array<RequiredBy<DataValue, "dataElement" | "value">>;
 };
 
 export type Note = {
