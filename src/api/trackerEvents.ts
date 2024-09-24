@@ -104,7 +104,7 @@ interface EventsParamsBase {
     trackedEntity?: Id;
     orgUnit?: Id;
     event?: Id;
-    ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS";
+    ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
