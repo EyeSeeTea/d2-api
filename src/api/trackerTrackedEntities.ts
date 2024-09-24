@@ -90,12 +90,15 @@ export interface RelationshipItem {
 export interface Attribute {
     attribute: Id;
     code?: string;
-    displayName?: string;
-    createdAt?: IsoDate;
-    updatedAt?: IsoDate;
-    valueType?: string;
+    displayName: string;
+    createdAt: IsoDate;
+    updatedAt: IsoDate;
+    storedBy: string;
+    valueType: string;
     value: string;
 }
+
+export type AttributeToPost = Pick<Attribute, "attribute" | "value">;
 
 type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
