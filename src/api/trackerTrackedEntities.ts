@@ -149,15 +149,17 @@ export interface TrackedEntitiesGetResponse<Fields> {
 export interface D2TrackerTrackedEntitySchema {
     name: "D2TrackerTrackedEntity";
     model: D2TrackerTrackedEntity;
-    fields: D2TrackerTrackedEntity & {
+    fields: Omit<D2TrackerTrackedEntity, "enrollments"> & {
         enrollments: D2TrackerEnrollmentSchema[];
     };
     fieldPresets: {
-        $all: Preset<D2TrackerTrackedEntity, keyof D2TrackerTrackedEntity>;
-        $identifiable: Preset<D2TrackerTrackedEntity, FieldPresets["identifiable"]>;
-        $nameable: Preset<D2TrackerTrackedEntity, FieldPresets["nameable"]>;
-        $persisted: Preset<D2TrackerTrackedEntity, never>;
-        $owner: Preset<D2TrackerTrackedEntity, never>;
+        $all: Omit<Preset<D2TrackerTrackedEntity, keyof D2TrackerTrackedEntity>, "enrollments"> & {
+            enrollments: D2TrackerEnrollmentSchema["fieldPresets"]["$all"][];
+        };
+        $identifiable: never;
+        $nameable: never;
+        $persisted: never;
+        $owner: never;
     };
 }
 

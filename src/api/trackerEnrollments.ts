@@ -106,18 +106,18 @@ export interface TrackerEnrollmentsResponse<Fields> {
 export interface D2TrackerEnrollmentSchema {
     name: "D2TrackerEnrollment";
     model: D2TrackerEnrollment;
-    fields: D2TrackerEnrollment & {
+    fields: Omit<D2TrackerEnrollment, "events"> & {
         events: D2TrackerEventSchema[];
     };
     fieldPresets: {
-        $all: Preset<D2TrackerEnrollment, keyof D2TrackerEnrollment>;
-        $identifiable: Preset<D2TrackerEnrollment, FieldPresets["identifiable"]>;
-        $nameable: Preset<D2TrackerEnrollment, FieldPresets["nameable"]>;
-        $persisted: Preset<D2TrackerEnrollment, never>;
-        $owner: Preset<D2TrackerEnrollment, never>;
+        $all: Omit<Preset<D2TrackerEnrollment, keyof D2TrackerEnrollment>, "events"> & {
+            events: D2TrackerEventSchema["fieldPresets"]["$all"][];
+        };
+        $identifiable: never;
+        $nameable: never;
+        $persisted: never;
+        $owner: never;
     };
 }
-
-type GetEnrollment<Fields> = SelectedPick<D2TrackerEnrollmentSchema, Fields>;
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;

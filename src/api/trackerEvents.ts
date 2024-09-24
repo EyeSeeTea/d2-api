@@ -166,13 +166,11 @@ export interface TrackerEventsResponse<Fields> {
 export interface D2TrackerEventSchema {
     name: "D2TrackerEvent";
     model: D2TrackerEvent;
-    fields: D2TrackerEvent & {
-        dataValues: D2EventDataValueSchema[];
-    };
+    fields: D2TrackerEvent;
     fieldPresets: {
         $all: Preset<D2TrackerEvent, keyof D2TrackerEvent>;
-        $identifiable: Preset<D2TrackerEvent, FieldPresets["identifiable"]>;
-        $nameable: Preset<D2TrackerEvent, FieldPresets["nameable"]>;
+        $identifiable: never;
+        $nameable: never;
         $persisted: Preset<D2TrackerEvent, never>;
         $owner: Preset<D2TrackerEvent, never>;
     };
