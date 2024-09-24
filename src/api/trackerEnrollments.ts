@@ -54,8 +54,7 @@ type RequiredFieldsOnPost =
     | "updatedAtClient"
     | "events"
     | "orgUnit"
-    | "program"
-    | "trackedEntity";
+    | "program";
 
 export type D2TrackerEnrollmentToPost = Omit<
     RequiredBy<D2TrackerEnrollment, RequiredFieldsOnPost>,
