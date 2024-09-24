@@ -43,9 +43,10 @@ interface D2TrackerTrackedEntityBase {
     attributes: Attribute[];
     enrollments: D2TrackerEnrollment[];
     programOwners: ProgramOwner[];
+    geometry: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
 }
 
-export type D2TrackerTrackedEntity = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
+export type D2TrackerTrackedEntity = D2TrackerTrackedEntityBase;
 
 type RequiredFieldsOnPost =
     | "attributes"
@@ -59,22 +60,11 @@ type RequiredFieldsOnPost =
 
 export type D2TrackedEntityInstanceToPost = Omit<
     RequiredBy<D2TrackerTrackedEntity, RequiredFieldsOnPost>,
-    "events"
+    "events" | "attributes"
 > & {
     enrollments: D2TrackerEnrollmentToPost[];
+    attributes: AttributeToPost[];
 };
-
-interface GeometryPoint {
-    geometry?: Extract<D2Geometry, { type: "Point" }>;
-}
-
-interface GeometryPolygon {
-    geometry?: Extract<D2Geometry, { type: "Polygon" }>;
-}
-
-type TrackedEntityGeometryPoint = D2TrackerTrackedEntityBase & GeometryPoint;
-
-type TrackedEntityGeometryPolygon = D2TrackerTrackedEntityBase & GeometryPolygon;
 
 interface ProgramOwner {
     orgUnit: Id;
