@@ -104,15 +104,7 @@ type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partia
         skipPaging: boolean;
     }>;
 
-type Params =
-    | ({ orgUnit: SemiColonDelimitedListOfUid } & PartialParams)
-    | ({ ouMode: "ALL" } & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "programStatus" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "followUp" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledAfter" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledBefore" | "program"> & PartialParams);
-
-type PartialParams = Partial<TrackedEntitiesParamsBase>;
+type Params = RequiredBy<TrackedEntitiesParamsBase, "program" | "ouMode">;
 
 export type TrackedEntitiesParamsBase = {
     query: string;

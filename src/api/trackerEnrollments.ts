@@ -75,15 +75,7 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         skipPaging: boolean;
     }>;
 
-type Params =
-    | (TrackerEnrollmentsParamsBase["orgUnit"] & PartialParams)
-    | ({ ouMode: "ALL" } & PartialParams)
-    | (Pick<TrackerEnrollmentsParamsBase, "programStatus" | "program"> & PartialParams)
-    | (Pick<TrackerEnrollmentsParamsBase, "followUp" | "program"> & PartialParams)
-    | (Pick<TrackerEnrollmentsParamsBase, "enrolledAfter"> & PartialParams)
-    | (Pick<TrackerEnrollmentsParamsBase, "enrolledBefore"> & PartialParams);
-
-type PartialParams = Partial<TrackerEnrollmentsParamsBase>;
+type Params = RequiredBy<TrackerEnrollmentsParamsBase, "ouMode">;
 
 type TrackerEnrollmentsParamsBase = {
     orgUnit: SemiColonDelimitedListOfUid;
