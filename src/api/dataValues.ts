@@ -90,6 +90,7 @@ type IdScheme = string;
 export type DataValueSetsGetRequest = {
     dataSet: Id[];
     dataElementGroup?: Id[];
+    dataElement?: Id[];
     period?: string[];
     startDate?: string;
     endDate?: string;
