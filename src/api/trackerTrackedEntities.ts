@@ -4,6 +4,7 @@ import { Id, Selector } from "./base";
 import { D2ApiResponse, getFieldsAsString } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { D2TrackerEnrollment } from "./trackerEnrollments";
+import { Maybe } from "../utils/types";
 
 export class TrackedEntities {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -11,10 +12,32 @@ export class TrackedEntities {
     get<Fields extends D2TrackerTrackedEntityFields>(
         params: TrackerTrackedEntitiesParams<Fields>
     ): D2ApiResponse<TrackedEntitiesGetResponse> {
+        const { fields, order, ...rest } = params;
+        const orderParam = this.buildOrderParams(order);
+        const paramsToRequest = { ...rest, order: orderParam };
         return this.d2Api.get<TrackedEntitiesGetResponse>("/tracker/trackedEntities", {
-            ..._.omit(params, ["fields"]),
-            fields: getFieldsAsString(params.fields),
+            ...paramsToRequest,
+            fields: getFieldsAsString(fields),
         });
+    }
+
+    private buildOrderParams(order: Maybe<TrackedOrderBase[]>): Maybe<string> {
+        if (!order || order.length === 0) return undefined;
+
+        const orderValue = _(order)
+            .map(orderTracked => {
+                if (orderTracked.type === "field") {
+                    return `${orderTracked.field}:${orderTracked.direction}`;
+                } else if (orderTracked.type === "trackedEntityAttributeId") {
+                    return `${orderTracked.id}:${orderTracked.direction}`;
+                } else {
+                    return undefined;
+                }
+            })
+            .compact()
+            .join(",");
+
+        return orderValue;
     }
 }
 
@@ -129,13 +152,33 @@ export type TrackedEntitiesParamsBase = {
     includeDeleted: boolean;
     includeAllAttributes: boolean;
     potentialDuplicate: boolean;
+    order: TrackedOrderBase[];
 };
+
+export type TrackedOrderBase = {
+    direction: "asc" | "desc";
+} & (TrackedOrderField | TrackedAttributesFields);
+
+export type TrackedOrderField = {
+    type: "field";
+    field:
+        | "createdAtClient"
+        | "createdAt"
+        | "enrolledAt"
+        | "inactive"
+        | "trackedEntity"
+        | "updatedAt";
+};
+
+export type TrackedAttributesFields = { type: "trackedEntityAttributeId"; id: Id };
 
 export interface TrackedEntitiesGetResponse {
     page: number;
     pageSize: number;
     instances: D2TrackerTrackedEntity[];
-    total?: number; // Only if requested with totalPages=true
+    // total and pageCount: Only if requested with totalPages=true
+    total?: number;
+    pageCount?: number;
 }
 
 export interface D2TrackerTrackedEntitySchema {

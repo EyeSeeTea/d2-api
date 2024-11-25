@@ -6,13 +6,13 @@ Typescript library for the DHIS2 API.
 
 This task generate the schemas for active API versions from play.dhis2.org instances.
 
-```
+```shell
 $ yarn generate-schemas
 ```
 
 ## Development
 
-```
+```shell
 $ yarn install
 $ yarn build
 $ cd build
@@ -21,13 +21,13 @@ $ yarn link
 
 On your app:
 
-```
+```shell
 $ yarn link d2-api
 ```
 
 ## Publish
 
-```
+```shell
 $ yarn build
 $ yarn publish [--tag beta] [--patch | --minor | --major]
 ```
@@ -38,8 +38,8 @@ $ yarn publish [--tag beta] [--patch | --minor | --major]
 
 An example for 2.32:
 
-```
-import { D2Api } from "d2-api/2.32"
+```ts
+import { D2Api } from "d2-api/2.32";
 
 const api = new D2Api({
     baseUrl: "https://play.dhis2.org/2.30",
@@ -52,7 +52,7 @@ const api = new D2Api({
 
 #### GET (list)
 
-```
+```ts
 const { cancel, response } = api.models.dataSets.get({
     fields: {
         id: true,
@@ -75,7 +75,7 @@ console.log({ cancel, data: (await response).data.objects[0].name });
 
 #### POST (create)
 
-```
+```ts
 const { cancel, response } = api.models.dataSets.post({
     name: "My DataSet",
     periodType: "Monthly",
@@ -84,7 +84,7 @@ const { cancel, response } = api.models.dataSets.post({
 
 #### PUT (update)
 
-```
+```ts
 const { cancel, response } = api.models.dataSets.put({
     id: "Ew82BhPZkpa",
     name: "My DataSet",
@@ -94,7 +94,7 @@ const { cancel, response } = api.models.dataSets.put({
 
 #### DELETE (delete)
 
-```
+```ts
 const { cancel, response } = api.models.dataSets.delete({
     id: "Ew82BhPZkpa",
 });
@@ -104,7 +104,7 @@ const { cancel, response } = api.models.dataSets.delete({
 
 #### GET
 
-```
+```ts
 const { cancel, response } = api.metadata.get({
     dataSets: {
         fields: {
@@ -123,8 +123,8 @@ const { cancel, response } = api.metadata.get({
     categories: {
         fields: {
             $owner: true,
-        }
-    }
+        },
+    },
 });
 
 const { dataSets, categories } = (await response).data;
@@ -132,22 +132,24 @@ const { dataSets, categories } = (await response).data;
 
 #### POST
 
-```
+```ts
 const { cancel, response } = api.metadata.post({
-    dataSets: [{
-        name: "My DataSet",
-        periodType: "Monthly",
-    }],
+    dataSets: [
+        {
+            name: "My DataSet",
+            periodType: "Monthly",
+        },
+    ],
 });
 
-console.log((await response).data)
+console.log((await response).data);
 ```
 
 ### Analytics
 
 #### Get
 
-```
+```ts
 const analyticsData = await api.analytics
     .get({
         dimension: ["dx:fbfJHSPpUQD;cYeuwXTCPkU"],
@@ -169,31 +171,32 @@ const analyticsData = await api.analytics
 
 #### Run analytics
 
-```
+```ts
 const analyticsRunResponse = await api.analytics.run().getData();
 ```
 
 ### Data values
 
-```
+```ts
 const response = await api.dataValues
     .postSet({
         dataSet: "Gs69Uw2Mom1",
         orgUnit: "qYIeuQe9OwF",
         period: "202001",
         attributeOptionCombo: "yi2bV1K4vl6",
-        dataValues: _[
-            {
-                dataElement: "a4bd432446",
-                categoryOptionCombo: "d1bd43245af",
-                value: "1.5",
-            },
-            {
-                dataElement: "1agd43f4q2",
-                categoryOptionCombo: "aFwdq324132",
-                value: "Some comment",
-            }
-        ],
+        dataValues:
+            _[
+                ({
+                    dataElement: "a4bd432446",
+                    categoryOptionCombo: "d1bd43245af",
+                    value: "1.5",
+                },
+                {
+                    dataElement: "1agd43f4q2",
+                    categoryOptionCombo: "aFwdq324132",
+                    value: "Some comment",
+                })
+            ],
     })
     .getData();
 ```
@@ -202,43 +205,85 @@ const response = await api.dataValues
 
 #### Get
 
-```
+```ts
 const dataStore = api.dataStore("namespace1");
 const value = await dataStore.get("key1").getData();
 ```
 
 #### Save
 
-```
+```ts
 const dataStore = api.dataStore("namespace1");
-dataStore.save("key1", {x: 1, y: 2});
+dataStore.save("key1", { x: 1, y: 2 });
 ```
 
-#### Emails
+### Tracker
+
+Get all tracked entities for an specific program:
+
+```ts
+const data = await api.tracker.trackedEntities
+    .get({
+        fields: {
+            orgUnit: true,
+        },
+        ouMode: "ALL",
+        program: "program_id",
+    })
+    .getData();
+
+console.log(data.instances);
+```
+
+Order tracked entities by field/attribute id
+
+```ts
+const data = await api.tracker.trackedEntities
+    .get({
+        fields: {
+            orgUnit: true,
+        },
+        ouMode: "ALL",
+        program: "program_id",
+        order: [
+            { type: "field", field: "createdAt", direction: "asc" },
+            { type: "trackedEntityAttributeId", id: "wMhqqPLb7pP", direction: "desc" },
+        ],
+    })
+    .getData();
+
+console.log(data.instances);
+```
+
+### Emails
 
 Send a test email:
 
-```
+```ts
 await api.email.sendTestMessage().getData();
 ```
 
 Send a system notification:
 
-```
-await api.email.sendSystemNotification({
-    subject: "My subject",
-    text: "My message",
-}).getData();
+```ts
+await api.email
+    .sendSystemNotification({
+        subject: "My subject",
+        text: "My message",
+    })
+    .getData();
 ```
 
 Send a message (requires role `ALL` or `F_SEND_EMAIL`):
 
-```
-await api.email.sendMessage({
-    recipients: ["user@server.org"],
-    subject: "My subject",
-    text: "My message",
-}).getData();
+```ts
+await api.email
+    .sendMessage({
+        recipients: ["user@server.org"],
+        subject: "My subject",
+        text: "My message",
+    })
+    .getData();
 ```
 
 ## Using type helpers
@@ -247,12 +292,12 @@ _d2-api_ exposes some type helpers that you may need in your app. Some examples:
 
 -   `SelectedPick`: Get model from a selector:
 
-```
+```ts
 type PartialUser = SelectedPick<
     D2UserSchema,
     {
         id: true;
-        favorite: true,
+        favorite: true;
     }
 >;
 // type PartialUser = {id: string, favorite: boolean}
@@ -260,7 +305,7 @@ type PartialUser = SelectedPick<
 
 -   `MetadataPick`: Get indexes models from a metadata selector.
 
-```
+```ts
 type Metadata = MetadataPick<{
     users: { fields: { id: true; favorite: true } };
     categories: { fields: { id: true; code: true } };
@@ -270,9 +315,9 @@ type Metadata = MetadataPick<{
 
 ## Testing
 
-```
+```ts
 import { D2Api } from "d2-api/2.32";
-import { getMockApiFromClass } from "d2-api"
+import { getMockApiFromClass } from "d2-api";
 
 const currentUserMock = {
     id: "xE7jOejl9FI",
