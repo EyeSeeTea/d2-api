@@ -165,7 +165,7 @@ export class DataValues {
     getSet(params: DataValueSetsGetRequest): D2ApiResponse<DataValueSetsGetResponse> {
         return this.d2Api
             .get<DataValueSetsGetResponse>("/dataValueSets", params)
-            .map(res => ({ dataValues: [], ...res.data }));
+            .map(res => res.data);
     }
 
     postSet(
