@@ -160,7 +160,9 @@ export interface TrackerEventsResponse<Fields> {
     page: number;
     pageSize: number;
     instances: SelectedPick<D2TrackerEventSchema, Fields>[];
-    total?: number; // Only if requested with totalPages=true
+    // total and pageCount: Only if requested with totalPages=true
+    total?: number;
+    pageCount?: number;
 }
 
 export interface D2TrackerEventSchema {
