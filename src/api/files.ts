@@ -1,8 +1,8 @@
 import FormData from "form-data";
 import { generateUid } from "../utils/uid";
 import { Id, MetadataResponse } from "./base";
-import { D2ApiResponse, ErrorReport } from "./common";
-import { D2ApiGeneric } from "./d2Api";
+import { D2ApiResponse, ErrorReport, HttpResponse } from "./common";
+import { D2ApiGeneric, unwrap } from "./d2Api";
 
 interface FileHttpResponse<Response> {
     httpStatus: "OK" | "Conflict" | "Not Found";
@@ -100,7 +100,12 @@ export class Files {
             const document = { id, name, url: fileResourceId };
 
             return this.d2Api
-                .post<MetadataResponse>("/metadata", {}, { documents: [document] })
+                .post<MetadataResponse | HttpResponse<MetadataResponse>>(
+                    "/metadata",
+                    {},
+                    { documents: [document] }
+                )
+                .map(unwrap)
                 .map(({ data }) => ({ id, fileResourceId, response: data }));
         });
     }

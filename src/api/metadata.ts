@@ -8,8 +8,9 @@ import {
     MetadataPayloadBase,
     Params,
     processFieldsFilterParams,
+    HttpResponse,
 } from "./common";
-import { D2ApiGeneric } from "./d2Api";
+import { D2ApiGeneric, unwrap } from "./d2Api";
 import { GetFields, SelectedPick } from "./inference";
 
 export interface PostOptions {
@@ -103,13 +104,15 @@ export class Metadata<D2ApiDefinition extends D2ApiDefinitionBase> {
         data: Partial<MetadataPayloadBase<D2ApiDefinition["schemas"]>>,
         options: Partial<PostOptions> = {}
     ): D2ApiResponse<MetadataResponse> {
-        return this.d2Api.request({
-            method: "post",
-            url: "/metadata",
-            params: { ...options, async: false } as Params,
-            data,
-            validateStatus: (status: number) => status >= 200 && status < 300,
-        });
+        return this.d2Api
+            .request<MetadataResponse | HttpResponse<MetadataResponse>>({
+                method: "post",
+                url: "/metadata",
+                params: { ...options, async: false } as Params,
+                data,
+                validateStatus: (status: number) => status >= 200 && status < 300,
+            })
+            .map(unwrap);
     }
 
     postAsync(
