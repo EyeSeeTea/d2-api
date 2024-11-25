@@ -6,7 +6,7 @@ import {
     ConstructorOptions,
     HttpClientRepository,
     HttpRequest,
-    HttpResponse,
+    HttpClientResponse,
 } from "../repositories/HttpClientRepository";
 
 export class AxiosHttpClientRepository implements HttpClientRepository {
@@ -19,7 +19,7 @@ export class AxiosHttpClientRepository implements HttpClientRepository {
     request<Data>(options: HttpRequest): CancelableResponse<Data> {
         const { token: cancelToken, cancel } = axios.CancelToken.source();
 
-        const response: () => Promise<HttpResponse<Data>> = () => {
+        const response: () => Promise<HttpClientResponse<Data>> = () => {
             const axiosResponse = this.instance({ ...options, cancelToken });
             return axiosResponse.then(res => ({
                 status: res.status,

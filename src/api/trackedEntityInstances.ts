@@ -2,7 +2,7 @@ import { D2Geometry, D2ProgramOwner } from "../schemas";
 import { PartialBy } from "../utils/types";
 import { Id, Pager } from "./base";
 import { AsyncPostResponse, D2ApiResponse, HttpResponse } from "./common";
-import { D2ApiGeneric } from "./d2Api";
+import { D2ApiGeneric, unwrap } from "./d2Api";
 import { D2Event, D2EventToPost } from "./events";
 
 export class TrackedEntityInstances {
@@ -26,15 +26,14 @@ export class TrackedEntityInstances {
         });
     }
 
-    post(
-        params: TeiPostParams,
-        request: TeiPostRequest
-    ): D2ApiResponse<HttpResponse<TeiPostResponse>> {
-        return this.d2Api.post<HttpResponse<TeiPostResponse>>(
-            "/trackedEntityInstances",
-            { ...params, async: false },
-            request
-        );
+    post(params: TeiPostParams, request: TeiPostRequest): D2ApiResponse<TeiPostResponse> {
+        return this.d2Api
+            .post<TeiPostResponse | HttpResponse<TeiPostResponse>>(
+                "/trackedEntityInstances",
+                { ...params, async: false },
+                request
+            )
+            .map(unwrap);
     }
 
     postAsync(
