@@ -2,16 +2,17 @@ import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets } from "../schemas";
 import { getFieldsAsString } from "./common";
-import { D2TrackerEvent } from "./trackerEvents";
+import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
+import { RequiredBy } from "../utils/types";
 
 export class TrackerEnrollments {
     constructor(public api: D2ApiGeneric) {}
 
     get<Fields extends D2TrackerEnrollmentFields>(
         params: TrackerEnrollmentsParams<Fields>
-    ): D2ApiResponse<TrackerEnrollmentsResponse> {
-        return this.api.get<TrackerEnrollmentsResponse>("/tracker/enrollments", {
+    ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
+        return this.api.get<TrackerEnrollmentsResponse<Fields>>("/tracker/enrollments", {
             ..._.omit(params, ["fields"]),
             fields: getFieldsAsString(params.fields),
         });
@@ -42,10 +43,25 @@ export interface D2TrackerEnrollment {
     deleted: boolean;
     storedBy: Username;
     events: D2TrackerEvent[];
-    relationships: [];
     attributes: D2TrackerEnrollmentAttribute[];
-    notes: [];
+    notes: Note[];
 }
+
+type RequiredFieldsOnPost =
+    | "enrollment"
+    | "enrolledAt"
+    | "createdAtClient"
+    | "updatedAtClient"
+    | "events"
+    | "orgUnit"
+    | "program";
+
+export type D2TrackerEnrollmentToPost = Omit<
+    RequiredBy<D2TrackerEnrollment, RequiredFieldsOnPost>,
+    "events"
+> & {
+    events: D2TrackerEventToPost[];
+};
 
 export interface D2TrackerEnrollmentAttribute {
     attribute: string;
@@ -59,15 +75,7 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         skipPaging: boolean;
     }>;
 
-type Params =
-    | (TrackerEnrollmentsParamsBase["orgUnit"] & PartialParams)
-    | ({ ouMode: "ALL" } & PartialParams)
-    | (Pick<TrackerEnrollmentsParamsBase, "programStatus" | "program"> & PartialParams)
-    | (Pick<TrackerEnrollmentsParamsBase, "followUp" | "program"> & PartialParams)
-    | (Pick<TrackerEnrollmentsParamsBase, "enrolledAfter"> & PartialParams)
-    | (Pick<TrackerEnrollmentsParamsBase, "enrolledBefore"> & PartialParams);
-
-type PartialParams = Partial<TrackerEnrollmentsParamsBase>;
+type Params = RequiredBy<TrackerEnrollmentsParamsBase, "ouMode">;
 
 type TrackerEnrollmentsParamsBase = {
     orgUnit: SemiColonDelimitedListOfUid;
@@ -88,26 +96,28 @@ type TrackerEnrollmentsParamsBase = {
 type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
-export interface TrackerEnrollmentsResponse {
+export interface TrackerEnrollmentsResponse<Fields> {
     page: number;
     pageSize: number;
-    instances: D2TrackerEnrollment[];
+    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
     total?: number; // Only if requested with totalPages=true
 }
 
 export interface D2TrackerEnrollmentSchema {
     name: "D2TrackerEnrollment";
     model: D2TrackerEnrollment;
-    fields: D2TrackerEnrollment;
+    fields: Omit<D2TrackerEnrollment, "events"> & {
+        events: D2TrackerEventSchema[];
+    };
     fieldPresets: {
-        $all: Preset<D2TrackerEnrollment, keyof D2TrackerEnrollment>;
-        $identifiable: Preset<D2TrackerEnrollment, FieldPresets["identifiable"]>;
-        $nameable: Preset<D2TrackerEnrollment, FieldPresets["nameable"]>;
-        $persisted: Preset<D2TrackerEnrollment, never>;
-        $owner: Preset<D2TrackerEnrollment, never>;
+        $all: Omit<Preset<D2TrackerEnrollment, keyof D2TrackerEnrollment>, "events"> & {
+            events: D2TrackerEventSchema["fieldPresets"]["$all"][];
+        };
+        $identifiable: never;
+        $nameable: never;
+        $persisted: never;
+        $owner: never;
     };
 }
-
-type GetEnrollment<Fields> = SelectedPick<D2TrackerEnrollmentSchema, Fields>;
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;

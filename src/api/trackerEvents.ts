@@ -1,16 +1,17 @@
 import { D2ApiGeneric } from "./d2Api";
-import { Id, Selector, D2ApiResponse } from "./base";
+import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, FieldPresets, D2Geometry } from "../schemas";
 import { getFieldsAsString } from "./common";
 import _ from "lodash";
+import { RequiredBy } from "../utils/types";
 
 export class TrackerEvents {
     constructor(public api: D2ApiGeneric) {}
 
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
-    ): D2ApiResponse<TrackerEventsResponse> {
-        return this.api.get<TrackerEventsResponse>("/tracker/events", {
+    ): D2ApiResponse<TrackerEventsResponse<Fields>> {
+        return this.api.get<TrackerEventsResponse<Fields>>("/tracker/events", {
             ..._.omit(params, ["fields"]),
             fields: getFieldsAsString(params.fields),
         });
@@ -46,42 +47,46 @@ interface D2TrackerEventBase {
     event: Id;
     status: EventStatus;
     program: Id;
-    programStage?: Id;
-    enrollment?: Id;
-    enrollmentStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    programStage: Id;
+    enrollment: Id;
+    enrollmentStatus: "ACTIVE" | "COMPLETED" | "CANCELLED";
     orgUnit: Id;
-    orgUnitName?: string;
-    relationships?: [];
+    orgUnitName: string;
     occurredAt: IsoDate;
-    scheduledAt?: IsoDate;
-    storedBy?: Username;
-    followup?: boolean;
-    deleted?: boolean;
-    createdAt?: IsoDate;
-    updatedAt?: IsoDate;
-    createdBy?: UserInfo;
-    attributeOptionCombo?: Id;
-    attributeCategoryOptions?: Id;
-    updatedBy?: UserInfo;
+    scheduledAt: IsoDate;
+    storedBy: Username;
+    followup: boolean;
+    deleted: boolean;
+    createdAt: IsoDate;
+    updatedAt: IsoDate;
+    createdBy: UserInfo;
+    attributeOptionCombo: Id;
+    attributeCategoryOptions: Id;
+    updatedBy: UserInfo;
     dataValues: DataValue[];
-    notes?: [];
+    notes: Note[];
     trackedEntity?: Id;
 }
 
-export type D2TrackerEvent = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
+export type D2TrackerEvent = D2TrackerEventBase & {
+    geometry?: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
+};
 
-interface GeometryPoint {
-    geometry?: Extract<D2Geometry, { type: "Point" }>;
-}
+type RequiredFieldsOnPost = "event" | "program" | "programStage" | "scheduledAt";
 
-interface GeometryPolygon {
-    geometry?: Extract<D2Geometry, { type: "Polygon" }>;
-}
+export type D2TrackerEventToPost = Omit<
+    RequiredBy<D2TrackerEvent, RequiredFieldsOnPost>,
+    "dataValues"
+> & {
+    dataValues: Array<RequiredBy<DataValue, "dataElement" | "value">>;
+};
 
-type TrackedEntityGeometryPoint = D2TrackerEventBase & GeometryPoint;
-
-type TrackedEntityGeometryPolygon = D2TrackerEventBase & GeometryPolygon;
-
+export type Note = {
+    note: Id;
+    storedAt: IsoDate;
+    storedBy: Username;
+    value: string;
+};
 type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
@@ -99,7 +104,7 @@ interface EventsParamsBase {
     trackedEntity?: Id;
     orgUnit?: Id;
     event?: Id;
-    ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS";
+    ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
@@ -143,33 +148,31 @@ interface D2EventDataValueSchema {
 }
 
 export interface DataValue {
-    updatedAt?: IsoDate;
-    storedBy?: Username;
-    createdAt?: IsoDate;
+    updatedAt: IsoDate;
+    storedBy: Username;
+    createdAt: IsoDate;
     dataElement: Id;
     value: string;
     providedElsewhere?: boolean;
 }
 
-export interface TrackerEventsResponse {
+export interface TrackerEventsResponse<Fields> {
     page: number;
     pageSize: number;
-    instances: D2TrackerEvent[];
+    instances: SelectedPick<D2TrackerEventSchema, Fields>[];
     // total and pageCount: Only if requested with totalPages=true
     total?: number;
     pageCount?: number;
 }
 
-interface D2TrackerEventSchema {
+export interface D2TrackerEventSchema {
     name: "D2TrackerEvent";
     model: D2TrackerEvent;
-    fields: D2TrackerEvent & {
-        dataValues: D2EventDataValueSchema[];
-    };
+    fields: D2TrackerEvent;
     fieldPresets: {
         $all: Preset<D2TrackerEvent, keyof D2TrackerEvent>;
-        $identifiable: Preset<D2TrackerEvent, FieldPresets["identifiable"]>;
-        $nameable: Preset<D2TrackerEvent, FieldPresets["nameable"]>;
+        $identifiable: never;
+        $nameable: never;
         $persisted: Preset<D2TrackerEvent, never>;
         $owner: Preset<D2TrackerEvent, never>;
     };
