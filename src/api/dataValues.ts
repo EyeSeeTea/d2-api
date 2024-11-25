@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Id } from "../schemas";
 import { AsyncPostResponse, D2ApiResponse, HttpResponse } from "./common";
-import { D2ApiGeneric } from "./d2Api";
+import { D2ApiGeneric, unwrap } from "./d2Api";
 
 export interface DataValueSetsPostRequest {
     dataSet?: Id;
@@ -90,6 +90,7 @@ type IdScheme = string;
 export type DataValueSetsGetRequest = {
     dataSet: Id[];
     dataElementGroup?: Id[];
+    dataElement?: Id[];
     period?: string[];
     startDate?: string;
     endDate?: string;
@@ -171,21 +172,25 @@ export class DataValues {
         params: DataValueSetsPostParams,
         request: DataValueSetsPostRequest
     ): D2ApiResponse<DataValueSetsPostResponse> {
-        return this.d2Api.post<DataValueSetsPostResponse>(
-            "/dataValueSets",
-            { ...params, async: false },
-            request
-        );
+        return this.d2Api
+            .post<DataValueSetsPostResponse | HttpResponse<DataValueSetsPostResponse>>(
+                "/dataValueSets",
+                { ...params, async: false },
+                request
+            )
+            .map(unwrap);
     }
 
     postSetAsync(
         params: DataValueSetsPostParams,
         request: DataValueSetsPostRequest
-    ): D2ApiResponse<AsyncPostResponse<"DATAVALUE_IMPORT">> {
-        return this.d2Api.post<AsyncPostResponse<"DATAVALUE_IMPORT">>(
+    ): D2ApiResponse<DataValueImport> {
+        return this.d2Api.post<DataValueImport>(
             "/dataValueSets",
             { ...params, async: true },
             request
         );
     }
 }
+
+type DataValueImport = AsyncPostResponse<"DATAVALUE_IMPORT">;

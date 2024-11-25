@@ -1,5 +1,8 @@
+import { Id } from "../schemas";
+import { EmptyObject } from "../utils/types";
 import { D2ApiResponse, HttpResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
+import { Pager } from "./model";
 
 type Operator = "EQ" | "GT" | "GE" | "LT" | "LE";
 
@@ -43,8 +46,12 @@ export type AnalyticsOptions = {
     order?: "ASC" | "DESC";
     timeField?: string;
     orgUnitField?: string;
+    enrollmentDate?: string;
 };
 
+export type GetEnrollmentsQueryOptions = {
+    programId: Id;
+} & AnalyticsOptions;
 export type AnalyticsResponse = {
     headers: Array<{
         name: "dx" | "dy";
@@ -54,7 +61,13 @@ export type AnalyticsResponse = {
         hidden: boolean;
         meta: boolean;
     }>;
-
+    metaData:
+        | EmptyObject
+        | {
+              dimensions: Record<string, string[]>;
+              items: Record<string, { name: string; uid?: Id; code?: string; options: any[] }>;
+              pager?: Pager;
+          };
     rows: Array<string[]>;
     width: number;
     height: number;
@@ -85,6 +98,17 @@ export class Analytics {
 
     get(options: AnalyticsOptions): D2ApiResponse<AnalyticsResponse> {
         return this.d2Api.get<AnalyticsResponse>("/analytics", options);
+    }
+
+    // https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-240/analytics.html#webapi_enrollment_analytics
+    getEnrollmentsQuery({
+        programId,
+        ...options
+    }: GetEnrollmentsQueryOptions): D2ApiResponse<AnalyticsResponse> {
+        return this.d2Api.get<AnalyticsResponse>(
+            `/analytics/enrollments/query/${programId}`,
+            options as AnalyticsOptions
+        );
     }
 
     run(options?: RunAnalyticsOptions): D2ApiResponse<RunAnalyticsResponse> {

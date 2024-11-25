@@ -1,5 +1,5 @@
 import { D2ApiResponse, HttpResponse, validate2xx, validate404 } from "./common";
-import { HttpResponse as HttpClientResponse } from "../repositories/HttpClientRepository";
+import { HttpClientResponse } from "../repositories/HttpClientRepository";
 import { D2ApiGeneric } from "./d2Api";
 
 type UpdateResponse = HttpResponse<undefined>;

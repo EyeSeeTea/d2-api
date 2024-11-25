@@ -1,20 +1,48 @@
 import _ from "lodash";
-import { D2Geometry, FieldPresets, Preset } from "../schemas";
-import { Id, Selector } from "./base";
+import { D2Geometry, Preset } from "../schemas";
+import { Id, Selector, SelectedPick } from "./base";
 import { D2ApiResponse, getFieldsAsString } from "./common";
 import { D2ApiGeneric } from "./d2Api";
-import { D2TrackerEnrollment } from "./trackerEnrollments";
+import {
+    D2TrackerEnrollment,
+    D2TrackerEnrollmentSchema,
+    D2TrackerEnrollmentToPost,
+} from "./trackerEnrollments";
+import { RequiredBy, Maybe } from "../utils/types";
 
 export class TrackedEntities {
     constructor(public d2Api: D2ApiGeneric) {}
 
     get<Fields extends D2TrackerTrackedEntityFields>(
         params: TrackerTrackedEntitiesParams<Fields>
-    ): D2ApiResponse<TrackedEntitiesGetResponse> {
-        return this.d2Api.get<TrackedEntitiesGetResponse>("/tracker/trackedEntities", {
-            ..._.omit(params, ["fields"]),
-            fields: getFieldsAsString(params.fields),
+    ): D2ApiResponse<TrackedEntitiesGetResponse<Fields>> {
+        const { fields, order, ...rest } = params;
+        const orderParam = this.buildOrderParams(order);
+        const paramsToRequest = { ...rest, order: orderParam };
+
+        return this.d2Api.get<TrackedEntitiesGetResponse<Fields>>("/tracker/trackedEntities", {
+            ...paramsToRequest,
+            fields: getFieldsAsString(fields),
         });
+    }
+
+    private buildOrderParams(order: Maybe<TrackedOrderBase[]>): Maybe<string> {
+        if (!order || order.length === 0) return undefined;
+
+        const orderValue = _(order)
+            .map(orderTracked => {
+                if (orderTracked.type === "field") {
+                    return `${orderTracked.field}:${orderTracked.direction}`;
+                } else if (orderTracked.type === "trackedEntityAttributeId") {
+                    return `${orderTracked.id}:${orderTracked.direction}`;
+                } else {
+                    return undefined;
+                }
+            })
+            .compact()
+            .join(",");
+
+        return orderValue;
     }
 }
 
@@ -25,33 +53,41 @@ type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
 
 interface D2TrackerTrackedEntityBase {
-    trackedEntity?: Id;
-    trackedEntityType?: Id;
-    createdAt?: IsoDate;
-    createdAtClient?: IsoDate;
-    updatedAt?: IsoDate;
-    orgUnit?: SemiColonDelimitedListOfUid;
-    inactive?: boolean;
-    deleted?: boolean;
-    relationships?: Relationship[];
-    attributes?: Attribute[];
-    enrollments?: D2TrackerEnrollment[];
-    programOwners?: ProgramOwner[];
+    trackedEntity: Id;
+    trackedEntityType: Id;
+    createdAt: IsoDate;
+    createdAtClient: IsoDate;
+    updatedAt: IsoDate;
+    updatedAtClient: IsoDate;
+    orgUnit: SemiColonDelimitedListOfUid;
+    inactive: boolean;
+    deleted: boolean;
+    relationships: Relationship[];
+    attributes: Attribute[];
+    enrollments: D2TrackerEnrollment[];
+    programOwners: ProgramOwner[];
+    geometry: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
 }
 
-export type D2TrackerTrackedEntity = TrackedEntityGeometryPoint | TrackedEntityGeometryPolygon;
+export type D2TrackerTrackedEntity = D2TrackerTrackedEntityBase;
 
-interface GeometryPoint {
-    geometry?: Extract<D2Geometry, { type: "Point" }>;
-}
+type RequiredFieldsOnPost =
+    | "attributes"
+    | "createdAtClient"
+    | "enrollments"
+    | "orgUnit"
+    | "relationships"
+    | "trackedEntity"
+    | "trackedEntityType"
+    | "updatedAtClient";
 
-interface GeometryPolygon {
-    geometry?: Extract<D2Geometry, { type: "Polygon" }>;
-}
-
-type TrackedEntityGeometryPoint = D2TrackerTrackedEntityBase & GeometryPoint;
-
-type TrackedEntityGeometryPolygon = D2TrackerTrackedEntityBase & GeometryPolygon;
+export type D2TrackedEntityInstanceToPost = Omit<
+    RequiredBy<D2TrackerTrackedEntity, RequiredFieldsOnPost>,
+    "events" | "attributes"
+> & {
+    enrollments: D2TrackerEnrollmentToPost[];
+    attributes: AttributeToPost[];
+};
 
 interface ProgramOwner {
     orgUnit: Id;
@@ -74,17 +110,18 @@ export interface RelationshipItem {
     event?: { event: Id };
 }
 
-export interface AttributeValue {
-    attribute: Attribute;
-    value: string;
-    optionId?: Id;
-}
-
 export interface Attribute {
     attribute: Id;
-    valueType?: string;
+    code?: string;
+    displayName: string;
+    createdAt: IsoDate;
+    updatedAt: IsoDate;
+    storedBy: string;
+    valueType: string;
     value: string;
 }
+
+export type AttributeToPost = Pick<Attribute, "attribute" | "value">;
 
 type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
@@ -93,15 +130,7 @@ type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partia
         skipPaging: boolean;
     }>;
 
-type Params =
-    | ({ orgUnit: SemiColonDelimitedListOfUid } & PartialParams)
-    | ({ ouMode: "ALL" } & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "programStatus" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "followUp" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledAfter" | "program"> & PartialParams)
-    | (Pick<TrackedEntitiesParamsBase, "enrollmentEnrolledBefore" | "program"> & PartialParams);
-
-type PartialParams = Partial<TrackedEntitiesParamsBase>;
+type Params = RequiredBy<TrackedEntitiesParamsBase, "program" | "ouMode">;
 
 export type TrackedEntitiesParamsBase = {
     query: string;
@@ -121,9 +150,9 @@ export type TrackedEntitiesParamsBase = {
     enrollmentOccurredAfter: IsoDate;
     enrollmentOccurredBefore: IsoDate;
     trackedEntityType: Id;
-    trackedEntity: SemiColonDelimitedListOfUid;
+    trackedEntities: SemiColonDelimitedListOfUid;
     assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
-    assignedUser: SemiColonDelimitedListOfUid;
+    assignedUsers: SemiColonDelimitedListOfUid;
     eventStatus: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     eventOccurredAfter: IsoDate;
     eventOccurredBefore: IsoDate;
@@ -131,25 +160,47 @@ export type TrackedEntitiesParamsBase = {
     includeDeleted: boolean;
     includeAllAttributes: boolean;
     potentialDuplicate: boolean;
+    order: TrackedOrderBase[];
 };
 
-export interface TrackedEntitiesGetResponse {
+export type TrackedOrderBase = {
+    direction: "asc" | "desc";
+} & (TrackedOrderField | TrackedAttributesFields);
+
+export type TrackedOrderField = {
+    type: "field";
+    field:
+        | "createdAtClient"
+        | "createdAt"
+        | "enrolledAt"
+        | "inactive"
+        | "trackedEntity"
+        | "updatedAt";
+};
+
+export type TrackedAttributesFields = { type: "trackedEntityAttributeId"; id: Id };
+
+export interface TrackedEntitiesGetResponse<Fields> {
     page: number;
     pageSize: number;
-    instances: D2TrackerTrackedEntity[];
+    instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[];
     total?: number; // Only if requested with totalPages=true
 }
 
 export interface D2TrackerTrackedEntitySchema {
     name: "D2TrackerTrackedEntity";
     model: D2TrackerTrackedEntity;
-    fields: D2TrackerTrackedEntity;
+    fields: Omit<D2TrackerTrackedEntity, "enrollments"> & {
+        enrollments: D2TrackerEnrollmentSchema[];
+    };
     fieldPresets: {
-        $all: Preset<D2TrackerTrackedEntity, keyof D2TrackerTrackedEntity>;
-        $identifiable: Preset<D2TrackerTrackedEntity, FieldPresets["identifiable"]>;
-        $nameable: Preset<D2TrackerTrackedEntity, FieldPresets["nameable"]>;
-        $persisted: Preset<D2TrackerTrackedEntity, never>;
-        $owner: Preset<D2TrackerTrackedEntity, never>;
+        $all: Omit<Preset<D2TrackerTrackedEntity, keyof D2TrackerTrackedEntity>, "enrollments"> & {
+            enrollments: D2TrackerEnrollmentSchema["fieldPresets"]["$all"][];
+        };
+        $identifiable: never;
+        $nameable: never;
+        $persisted: never;
+        $owner: never;
     };
 }
 
