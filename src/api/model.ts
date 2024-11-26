@@ -10,15 +10,15 @@ import {
     PartialPersistedModel,
     processFieldsFilterParams,
 } from "./common";
-import { D2ApiGeneric } from "./d2Api";
+import { D2ApiGeneric, unwrap } from "./d2Api";
 import { D2ModelSchemaBase, GetFields, SelectedPick } from "./inference";
 
-type ModelResponse = HttpResponse<{
+type ModelResponse = {
     responseType: "ObjectReport";
     uid: string;
     klass: string;
     errorReports?: ErrorReport[];
-}>;
+};
 
 export interface Pager {
     page: number;
@@ -112,21 +112,31 @@ export class Model<
         payload: PartialModel<D2ModelSchema["model"]>,
         options?: Partial<UpdateOptions>
     ): D2ApiResponse<ModelResponse> {
-        return this.d2Api.post(this.modelName, (options || {}) as Params, payload as object);
+        return this.d2Api
+            .post<ModelResponse | HttpResponse<ModelResponse>>(
+                this.modelName,
+                (options || {}) as Params,
+                payload as object
+            )
+            .map(unwrap);
     }
 
     put(
         payload: PartialPersistedModel<D2ModelSchema["model"]>,
         options?: Partial<UpdateOptions>
     ): D2ApiResponse<ModelResponse> {
-        return this.d2Api.put(
-            [this.modelName, payload.id].join("/"),
-            (options || {}) as Params,
-            payload
-        );
+        return this.d2Api
+            .put<ModelResponse | HttpResponse<ModelResponse>>(
+                [this.modelName, payload.id].join("/"),
+                (options || {}) as Params,
+                payload
+            )
+            .map(unwrap);
     }
 
     delete(payload: PartialPersistedModel<D2ModelSchema["model"]>): D2ApiResponse<ModelResponse> {
-        return this.d2Api.delete(`/${this.modelName}/${payload.id}`);
+        return this.d2Api
+            .delete<ModelResponse | HttpResponse<ModelResponse>>(`/${this.modelName}/${payload.id}`)
+            .map(unwrap);
     }
 }

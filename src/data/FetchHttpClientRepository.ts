@@ -2,7 +2,7 @@ import AbortController from "abort-controller";
 import MockAdapter from "axios-mock-adapter";
 import btoa from "btoa";
 import iconv from "iconv-lite";
-import "isomorphic-fetch";
+import "cross-fetch/polyfill";
 import _ from "lodash";
 import qs from "qs";
 import { CancelableResponse } from "../repositories/CancelableResponse";
@@ -12,7 +12,7 @@ import {
     HttpClientRepository,
     HttpError,
     HttpRequest,
-    HttpResponse,
+    HttpClientResponse,
 } from "../repositories/HttpClientRepository";
 import { joinPath } from "../utils/connection";
 
@@ -58,7 +58,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
         // Fetch API has no timeout mechanism, implement with a setTimeout + controller.abort
         const timeoutId = timeout ? setTimeout(() => controller.abort(), timeout) : null;
 
-        const response: () => Promise<HttpResponse<Data>> = () => {
+        const response: () => Promise<HttpClientResponse<Data>> = () => {
             const fetchResponse = fetch(fullUrl, fetchOptions);
             return fetchResponse
                 .then(async res => {

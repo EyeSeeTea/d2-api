@@ -7,10 +7,7 @@ import {
     D2SchemaProperties,
     D2Access,
     D2Translation,
-    D2Geometry,
     D2Style,
-    D2AttributeValueGeneric,
-    D2DimensionalKeywords,
     D2Expression,
     D2RelationshipConstraint,
 } from "../schemas/base";
