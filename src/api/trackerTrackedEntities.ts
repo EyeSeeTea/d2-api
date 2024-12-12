@@ -150,7 +150,7 @@ export type TrackedEntitiesParamsBase = {
     enrollmentOccurredAfter: IsoDate;
     enrollmentOccurredBefore: IsoDate;
     trackedEntityType: Id;
-    trackedEntities: SemiColonDelimitedListOfUid;
+    trackedEntity: SemiColonDelimitedListOfUid;
     assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
     assignedUsers: SemiColonDelimitedListOfUid;
     eventStatus: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
