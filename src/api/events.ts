@@ -95,7 +95,7 @@ type D2EventFields = Selector<D2EventSchema>;
 
 type GetEvent<Fields> = SelectedPick<D2EventSchema, Fields>;
 
-export type EventStatus = "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
+export type EventStatus = "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
 
 export interface D2EventToPost {
     event?: string;
@@ -191,7 +191,7 @@ export interface EventsGetRequest<Fields> {
     ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS";
     startDate?: string;
     endDate?: string;
-    status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
+    status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     lastUpdated?: string;
     lastUpdatedStartDate?: string;
     lastUpdatedEndDate?: string;
