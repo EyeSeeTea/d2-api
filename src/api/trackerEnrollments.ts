@@ -47,14 +47,7 @@ export interface D2TrackerEnrollment {
     notes: Note[];
 }
 
-type RequiredFieldsOnPost =
-    | "enrollment"
-    | "enrolledAt"
-    | "createdAtClient"
-    | "updatedAtClient"
-    | "events"
-    | "orgUnit"
-    | "program";
+type RequiredFieldsOnPost = "enrollment" | "enrolledAt" | "events" | "orgUnit" | "program";
 
 export type D2TrackerEnrollmentToPost = Omit<
     RequiredBy<D2TrackerEnrollment, RequiredFieldsOnPost>,
