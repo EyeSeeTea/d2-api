@@ -1,7 +1,7 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
-import { Preset, FieldPresets } from "../schemas";
-import { getFieldsAsString } from "./common";
+import { Preset } from "../schemas";
+import { getFieldsAsString, parseTrackerResponse } from "./common";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
@@ -12,10 +12,18 @@ export class TrackerEnrollments {
     get<Fields extends D2TrackerEnrollmentFields>(
         params: TrackerEnrollmentsParams<Fields>
     ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
-        return this.api.get<TrackerEnrollmentsResponse<Fields>>("/tracker/enrollments", {
-            ..._.omit(params, ["fields"]),
-            fields: getFieldsAsString(params.fields),
-        });
+        return this.api
+            .get<TrackerEnrollmentsResponse<Fields>>("/tracker/enrollments", {
+                ..._.omit(params, ["fields"]),
+                fields: getFieldsAsString(params.fields),
+            })
+            .map(response => {
+                return parseTrackerResponse<
+                    TrackerEnrollmentsResponse<Fields>,
+                    D2TrackerEnrollmentSchema,
+                    Fields
+                >(response, "enrollments");
+            });
     }
 }
 

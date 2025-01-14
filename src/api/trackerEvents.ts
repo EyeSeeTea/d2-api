@@ -1,7 +1,7 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
-import { Preset, FieldPresets, D2Geometry } from "../schemas";
-import { getFieldsAsString } from "./common";
+import { Preset, D2Geometry } from "../schemas";
+import { getFieldsAsString, parseTrackerResponse } from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
 
@@ -11,10 +11,18 @@ export class TrackerEvents {
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
     ): D2ApiResponse<TrackerEventsResponse<Fields>> {
-        return this.api.get<TrackerEventsResponse<Fields>>("/tracker/events", {
-            ..._.omit(params, ["fields"]),
-            fields: getFieldsAsString(params.fields),
-        });
+        return this.api
+            .get<TrackerEventsResponse<Fields>>("/tracker/events", {
+                ..._.omit(params, ["fields"]),
+                fields: getFieldsAsString(params.fields),
+            })
+            .map(response => {
+                return parseTrackerResponse<
+                    TrackerEventsResponse<Fields>,
+                    D2TrackerEventSchema,
+                    Fields
+                >(response, "events");
+            });
     }
 
     getById<Fields extends D2TrackerEventFields>(
@@ -132,19 +140,6 @@ interface EventsParamsBase {
     includeDeleted?: boolean;
     assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
     assignedUser?: CommaDelimitedListOfUid;
-}
-
-interface D2EventDataValueSchema {
-    name: "D2DataValue";
-    model: DataValue;
-    fields: DataValue;
-    fieldPresets: {
-        $all: Preset<DataValue, keyof DataValue>;
-        $identifiable: Preset<DataValue, FieldPresets["identifiable"]>;
-        $nameable: Preset<DataValue, FieldPresets["nameable"]>;
-        $persisted: Preset<DataValue, keyof DataValue>;
-        $owner: Preset<DataValue, keyof DataValue>;
-    };
 }
 
 export interface DataValue {

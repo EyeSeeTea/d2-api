@@ -1,7 +1,8 @@
 import _ from "lodash";
 import { Ref } from "./../schemas/base";
-import { D2ModelSchemaBase, Selector } from "./inference";
+import { D2ModelSchemaBase, Selector, SelectedPick } from "./inference";
 import { TaskCategory } from "./system";
+import { HttpClientResponse } from "../repositories/HttpClientRepository";
 
 export interface GetOptionValue<
     D2ApiDefinition extends D2ApiDefinitionBase,
@@ -217,3 +218,28 @@ export function validate2xx(status: number): boolean {
 export function validate404(status: number): boolean {
     return validate2xx(status) || status === 404;
 }
+
+export function parseTrackerResponse<T, M extends D2ModelSchemaBase, Fields>(
+    response: HttpClientResponse<T>,
+    trackerKey: TrackedKeys
+) {
+    const { data } = (response as unknown) as HttpClientResponse<
+        T & {
+            instances?: SelectedPick<M, Fields>[];
+            trackedEntities?: SelectedPick<M, Fields>[];
+            events?: SelectedPick<M, Fields>[];
+            enrollments?: SelectedPick<M, Fields>[];
+        }
+    >;
+
+    const responseData = _(data)
+        .omit([trackerKey])
+        .value();
+
+    return {
+        ...responseData,
+        instances: data.instances || data[trackerKey],
+    };
+}
+
+type TrackedKeys = "trackedEntities" | "enrollments" | "events";
