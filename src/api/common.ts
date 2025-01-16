@@ -223,7 +223,7 @@ export function parseTrackerResponse<T, M extends D2ModelSchemaBase, Fields>(
     response: HttpClientResponse<T>,
     trackerKey: TrackedKeys
 ) {
-    const { data } = (response as unknown) as HttpClientResponse<
+    const { data } = response as HttpClientResponse<
         T & {
             instances?: SelectedPick<M, Fields>[];
             trackedEntities?: SelectedPick<M, Fields>[];
