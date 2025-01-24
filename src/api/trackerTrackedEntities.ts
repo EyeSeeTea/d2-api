@@ -83,7 +83,7 @@ type RequiredFieldsOnPost =
 
 export type D2TrackedEntityInstanceToPost = Omit<
     RequiredBy<D2TrackerTrackedEntity, RequiredFieldsOnPost>,
-    "events" | "attributes"
+    "enrollments" | "attributes"
 > & {
     enrollments: D2TrackerEnrollmentToPost[];
     attributes: AttributeToPost[];
