@@ -1,7 +1,12 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
-import { getFieldsAsString, parseTrackerResponse } from "./common";
+import {
+    getFieldsAsString,
+    parseTrackerResponse,
+    PublicTrackerResponse,
+    InternalTrackerResponse,
+} from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
 
@@ -10,18 +15,14 @@ export class TrackerEvents {
 
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
-    ): D2ApiResponse<TrackerEventsResponse<Fields>> {
+    ): D2ApiResponse<PublicTrackerResponse<D2TrackerEventSchema, Fields>> {
         return this.api
-            .get<TrackerEventsResponse<Fields>>("/tracker/events", {
+            .get<EventsResponse<Fields>>("/tracker/events", {
                 ..._.omit(params, ["fields"]),
                 fields: getFieldsAsString(params.fields),
             })
             .map(response => {
-                return parseTrackerResponse<
-                    TrackerEventsResponse<Fields>,
-                    D2TrackerEventSchema,
-                    Fields
-                >(response, "events");
+                return parseTrackerResponse(response, "events");
             });
     }
 
@@ -174,3 +175,4 @@ export interface D2TrackerEventSchema {
 }
 
 type D2TrackerEventFields = Selector<D2TrackerEventSchema>;
+type EventsResponse<Fields> = InternalTrackerResponse<D2TrackerEventSchema, Fields, "events">;

@@ -1,7 +1,13 @@
 import _ from "lodash";
 import { D2Geometry, Preset } from "../schemas";
 import { Id, Selector, SelectedPick } from "./base";
-import { D2ApiResponse, getFieldsAsString, parseTrackerResponse } from "./common";
+import {
+    D2ApiResponse,
+    getFieldsAsString,
+    parseTrackerResponse,
+    InternalTrackerResponse,
+    PublicTrackerResponse,
+} from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import {
     D2TrackerEnrollment,
@@ -15,22 +21,19 @@ export class TrackedEntities {
 
     get<Fields extends D2TrackerTrackedEntityFields>(
         params: TrackerTrackedEntitiesParams<Fields>
-    ): D2ApiResponse<TrackedEntitiesGetResponse<Fields>> {
+    ): D2ApiResponse<PublicTrackerResponse<D2TrackerTrackedEntitySchema, Fields>> {
         const { fields, order, ...rest } = params;
         const orderParam = this.buildOrderParams(order);
         const paramsToRequest = { ...rest, order: orderParam };
 
         return this.d2Api
-            .get<TrackedEntitiesGetResponse<Fields>>("/tracker/trackedEntities", {
+            .get<TrackerEntitiesResponse<Fields>>("/tracker/trackedEntities", {
                 ...paramsToRequest,
                 fields: getFieldsAsString(fields),
             })
             .map(response => {
-                return parseTrackerResponse<
-                    TrackedEntitiesGetResponse<Fields>,
-                    D2TrackerTrackedEntitySchema,
-                    Fields
-                >(response, "trackedEntities");
+                console.log("Tracker response", response);
+                return parseTrackerResponse(response, "trackedEntities");
             });
     }
 
@@ -195,7 +198,7 @@ export type TrackedPager = {
     total?: number;
 };
 
-export interface TrackedEntitiesGetResponse<Fields> {
+export interface TrackedEntitiesGetResponse<Fields> extends TrackedPager {
     pager: TrackedPager;
     page: number;
     pageSize: number;
@@ -223,3 +226,9 @@ export interface D2TrackerTrackedEntitySchema {
 }
 
 type D2TrackerTrackedEntityFields = Selector<D2TrackerTrackedEntitySchema>;
+
+type TrackerEntitiesResponse<Fields> = InternalTrackerResponse<
+    D2TrackerTrackedEntitySchema,
+    Fields,
+    "trackedEntities"
+>;
