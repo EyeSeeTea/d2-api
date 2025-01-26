@@ -1,28 +1,28 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
-import {
-    getFieldsAsString,
-    parseTrackerResponse,
-    PublicTrackerResponse,
-    InternalTrackerResponse,
-} from "./common";
+import { getFieldsAsString, parseTrackerPager } from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
+import { TrackedPager } from "./trackerTrackedEntities";
 
 export class TrackerEvents {
     constructor(public api: D2ApiGeneric) {}
 
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
-    ): D2ApiResponse<PublicTrackerResponse<D2TrackerEventSchema, Fields>> {
+    ): D2ApiResponse<TrackerEventsResponse<Fields>> {
         return this.api
             .get<EventsResponse<Fields>>("/tracker/events", {
                 ..._.omit(params, ["fields"]),
                 fields: getFieldsAsString(params.fields),
             })
-            .map(response => {
-                return parseTrackerResponse(response, "events");
+            .map(({ data }) => {
+                return {
+                    ..._.omit(data, "events"),
+                    pager: parseTrackerPager(data),
+                    instances: data.events || data.instances || [],
+                };
             });
     }
 
@@ -152,13 +152,9 @@ export interface DataValue {
     providedElsewhere?: boolean;
 }
 
-export interface TrackerEventsResponse<Fields> {
-    page: number;
-    pageSize: number;
+export interface TrackerEventsResponse<Fields> extends TrackedPager {
+    pager: TrackedPager;
     instances: SelectedPick<D2TrackerEventSchema, Fields>[];
-    // total and pageCount: Only if requested with totalPages=true
-    total?: number;
-    pageCount?: number;
 }
 
 export interface D2TrackerEventSchema {
@@ -175,4 +171,8 @@ export interface D2TrackerEventSchema {
 }
 
 type D2TrackerEventFields = Selector<D2TrackerEventSchema>;
-type EventsResponse<Fields> = InternalTrackerResponse<D2TrackerEventSchema, Fields, "events">;
+
+type EventsResponse<Fields> = Omit<TrackerEventsResponse<Fields>, "instances"> & {
+    instances: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
+    events: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
+};

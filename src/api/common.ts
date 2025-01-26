@@ -1,8 +1,7 @@
 import _ from "lodash";
 import { Ref } from "./../schemas/base";
-import { D2ModelSchemaBase, Selector, SelectedPick } from "./inference";
+import { D2ModelSchemaBase, Selector } from "./inference";
 import { TaskCategory } from "./system";
-import { HttpClientResponse } from "../repositories/HttpClientRepository";
 import { TrackedPager } from "./trackerTrackedEntities";
 
 export interface GetOptionValue<
@@ -220,42 +219,17 @@ export function validate404(status: number): boolean {
     return validate2xx(status) || status === 404;
 }
 
-type TrackedKey = "trackedEntities" | "enrollments" | "events";
+export function parseTrackerPager(data: ParamTracker) {
+    return data.pager
+        ? data.pager
+        : {
+              page: data.page,
+              pageSize: data.pageSize,
+              total: data.total,
+              pageCount: data.pageCount,
+          };
+}
 
-export type InternalTrackerResponse<M extends D2ModelSchemaBase, Fields, Key extends TrackedKey> = {
-    instances?: SelectedPick<M, Fields>[];
+interface ParamTracker extends TrackedPager {
     pager: TrackedPager;
-    page: number;
-    pageSize: number;
-    // Only if requested with totalPages=true
-    total?: number;
-    pageCount?: boolean;
-} & Record<Key, SelectedPick<M, Fields>[] | undefined>;
-
-export type PublicTrackerResponse<M extends D2ModelSchemaBase, Fields> = {
-    instances: SelectedPick<M, Fields>[];
-    pager: TrackedPager;
-};
-
-export function parseTrackerResponse<M extends D2ModelSchemaBase, Fields, Key extends TrackedKey>(
-    response: HttpClientResponse<InternalTrackerResponse<M, Fields, Key>>,
-    trackerKey: Key
-): PublicTrackerResponse<M, Fields> {
-    const { data } = response;
-
-    const pager = data.pager || {
-        page: data.page,
-        pageSize: data.pageSize,
-        total: data.total,
-        pageCount: data.pageCount,
-    };
-
-    return {
-        ..._.omit(data, [trackerKey]),
-        pager,
-        // I tried to use the nullish coalescing operator to avoid the explicit cast
-        // but looks like we cannot use it in this project because babel version is too old
-        // TODO: upgrade babel
-        instances: (data.instances || data[trackerKey] || []) as SelectedPick<M, Fields>[],
-    };
 }
