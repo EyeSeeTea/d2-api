@@ -105,8 +105,8 @@ type TrackerEnrollmentsParamsBase = {
 type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
-export interface TrackerEnrollmentsResponse<Fields> extends TrackedPager {
-    pager: TrackedPager;
+interface TrackerEnrollmentsResponse<Fields> extends TrackedPager {
+    pager?: TrackedPager;
     instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
 }
 

@@ -196,7 +196,7 @@ export type TrackedPager = {
 };
 
 export interface TrackedEntitiesGetResponse<Fields> extends TrackedPager {
-    pager: TrackedPager;
+    pager?: TrackedPager;
     instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[];
 }
 

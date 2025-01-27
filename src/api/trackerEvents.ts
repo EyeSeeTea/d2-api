@@ -153,7 +153,7 @@ export interface DataValue {
 }
 
 export interface TrackerEventsResponse<Fields> extends TrackedPager {
-    pager: TrackedPager;
+    pager?: TrackedPager;
     instances: SelectedPick<D2TrackerEventSchema, Fields>[];
 }
 

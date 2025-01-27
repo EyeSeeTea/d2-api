@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { EmptyObject } from "../utils/types";
 import { Ref } from "./../schemas/base";
 import { D2ModelSchemaBase, Selector } from "./inference";
 import { TaskCategory } from "./system";
@@ -220,16 +221,16 @@ export function validate404(status: number): boolean {
 }
 
 export function parseTrackerPager(data: ParamTracker) {
-    return data.pager
-        ? data.pager
-        : {
-              page: data.page,
-              pageSize: data.pageSize,
-              total: data.total,
-              pageCount: data.pageCount,
-          };
+    return (
+        data.pager || {
+            page: data.page,
+            pageSize: data.pageSize,
+            total: data.total,
+            pageCount: data.pageCount,
+        }
+    );
 }
 
 interface ParamTracker extends TrackedPager {
-    pager: TrackedPager;
+    pager?: TrackedPager;
 }
