@@ -49,12 +49,12 @@ export interface D2TrackerEnrollment {
 
 type RequiredFieldsOnPost =
     | "enrollment"
+    | "trackedEntity"
     | "enrolledAt"
-    | "createdAtClient"
-    | "updatedAtClient"
-    | "events"
+    | "occurredAt"
     | "orgUnit"
-    | "program";
+    | "program"
+    | "events";
 
 export type D2TrackerEnrollmentToPost = Omit<
     RequiredBy<D2TrackerEnrollment, RequiredFieldsOnPost>,
