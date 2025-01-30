@@ -31,8 +31,8 @@ export interface D2TrackerEnrollment {
     createdAtClient: IsoDate;
     updatedAt: IsoDate;
     updatedAtClient: IsoDate;
-    trackedEntity?: Id;
-    trackedEntityType?: Id;
+    trackedEntity: Id;
+    trackedEntityType: Id;
     program: Id;
     status: ProgramStatus;
     orgUnit: Id;
