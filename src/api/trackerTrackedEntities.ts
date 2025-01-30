@@ -72,14 +72,11 @@ interface D2TrackerTrackedEntityBase {
 export type D2TrackerTrackedEntity = D2TrackerTrackedEntityBase;
 
 type RequiredFieldsOnPost =
-    | "attributes"
-    | "createdAtClient"
-    | "enrollments"
     | "orgUnit"
-    | "relationships"
     | "trackedEntity"
     | "trackedEntityType"
-    | "updatedAtClient";
+    | "enrollments"
+    | "attributes";
 
 export type D2TrackedEntityInstanceToPost = Omit<
     RequiredBy<D2TrackerTrackedEntity, RequiredFieldsOnPost>,
