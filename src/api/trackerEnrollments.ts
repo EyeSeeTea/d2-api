@@ -40,8 +40,8 @@ export interface D2TrackerEnrollment {
     createdAtClient: IsoDate;
     updatedAt: IsoDate;
     updatedAtClient: IsoDate;
-    trackedEntity?: Id;
-    trackedEntityType?: Id;
+    trackedEntity: Id;
+    trackedEntityType: Id;
     program: Id;
     status: ProgramStatus;
     orgUnit: Id;
@@ -58,12 +58,12 @@ export interface D2TrackerEnrollment {
 
 type RequiredFieldsOnPost =
     | "enrollment"
+    | "trackedEntity"
     | "enrolledAt"
-    | "createdAtClient"
-    | "updatedAtClient"
-    | "events"
+    | "occurredAt"
     | "orgUnit"
-    | "program";
+    | "program"
+    | "events";
 
 export type D2TrackerEnrollmentToPost = Omit<
     RequiredBy<D2TrackerEnrollment, RequiredFieldsOnPost>,

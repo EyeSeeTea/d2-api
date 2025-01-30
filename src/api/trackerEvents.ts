@@ -81,7 +81,13 @@ export type D2TrackerEvent = D2TrackerEventBase & {
     geometry?: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
 };
 
-type RequiredFieldsOnPost = "event" | "program" | "programStage" | "scheduledAt";
+type RequiredFieldsOnPost =
+    | "event"
+    | "program"
+    | "programStage"
+    | "occurredAt"
+    | "orgUnit"
+    | "dataValues";
 
 export type D2TrackerEventToPost = Omit<
     RequiredBy<D2TrackerEvent, RequiredFieldsOnPost>,
