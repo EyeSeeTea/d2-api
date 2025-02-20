@@ -55,6 +55,7 @@ const schemaFieldProperties: Array<keyof D2SchemaFieldProperties> = [
 ];
 
 const interfaceFromClass: _.Dictionary<string | { type: string; schema: string }> = {
+    "org.hisp.dhis.security.acl.AccessData": "D2AccessData",
     "org.hisp.dhis.security.acl.Access": "D2Access",
     "org.hisp.dhis.translation.ObjectTranslation": "D2Translation",
     "org.hisp.dhis.translation.Translation": "D2Translation",
@@ -130,7 +131,7 @@ const getType = (
     property: SchemaProperty,
     suffix?: string
 ): string => {
-    const { propertyType, constants, itemPropertyType, itemKlass } = property;
+    const { propertyType, constants, itemPropertyType, itemKlass, klass } = property;
 
     switch (propertyType) {
         case "REFERENCE":
@@ -157,7 +158,10 @@ const getType = (
         case "COLOR":
         case "PASSWORD":
         case "DATE":
-            return "string";
+            // This shouldn't be necessary, but we are aware that -at least- one case where a field
+            // (organisationUnit.level) has "propertyType": "TEXT" but "klass": "java.lang.Integer".
+            // So let's also check the prop "klass" to determine the final type.
+            return klass === "java.lang.Integer" ? "number" : "string";
         case "IDENTIFIER":
             return "Id";
         case "INTEGER":
@@ -262,14 +266,7 @@ function joinStr(xs: string[]): string {
 type Instance = { version: string; url: string; isDeprecated?: boolean };
 
 const instances: Instance[] = [
-    { version: "2.30", url: "http://admin:district@localhost:8030", isDeprecated: true },
-    { version: "2.31", url: "http://admin:district@localhost:8031", isDeprecated: true },
-    { version: "2.32", url: "https://admin:district@play.dhis2.org/2.32", isDeprecated: true },
-    { version: "2.33", url: "https://admin:district@play.dhis2.org/2.33", isDeprecated: true },
-    { version: "2.34", url: "https://admin:district@play.dhis2.org/2.34", isDeprecated: true },
-    { version: "2.35", url: "https://admin:district@play.dhis2.org/2.35" },
-    { version: "2.36", url: "https://admin:district@play.dhis2.org/2.36" },
-    { version: "2.37", url: "https://admin:district@play.dhis2.org/2.37" },
+    { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-7" }, //
 ];
 
 async function generateSchema(instance: Instance) {
@@ -285,14 +282,16 @@ async function generateSchema(instance: Instance) {
     const models = schemas.filter(schema => !!schema.href);
     const schemasByClassName = _.keyBy(schemas, schema => _.last(schema.klass.split(".")) || "");
 
+    if (models.length === 0) throw new Error("No models found");
+
     const modelsDeclaration = `
         /* eslint-disable */
 
         import {
             Id, Ref, Preset, FieldPresets, D2SchemaProperties,
-            D2Access, D2AccessWithData, D2Translation, D2Geometry, D2Style,
+            D2AccessData, D2AccessWithData, D2Translation, D2Geometry, D2Style,
             D2DimensionalKeywords, 
-            D2RelationshipConstraint, D2ReportingParams, D2Axis, Sharing,
+            D2ReportingParams, Sharing,
             D2ProgramOwner, D2ProgramOwnerSchema,
             D2AttributeValueGeneric, D2AttributeValueGenericSchema
         } from "../schemas/base";

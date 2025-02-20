@@ -9,7 +9,7 @@ import { D2ApiGeneric, unwrap } from "./d2Api";
 import { Pager } from "./model";
 import { Selector, SelectedPick } from ".";
 import { Preset, FieldPresets, Id } from "../schemas";
-import { D2Relationship, D2RelationshipSchema } from "../2.36";
+import { D2Relationship, D2RelationshipSchema } from "../2.40";
 
 export class Events {
     constructor(public d2Api: D2ApiGeneric) {}
