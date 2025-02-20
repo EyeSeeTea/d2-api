@@ -125,13 +125,30 @@ function getModelName(klass: string, suffix?: string): string {
     }
 }
 
+/*
+Map Java type to correct propertyType.
+
+This mapping shouldn't be necessary, but there are some properties where propertyType and klass
+do not match. For example, in the schemas.json from v2.40, we have detected the following:
+
+- organisationUnit.level: "klass": "java.lang.Integer" but "propertyType": "TEXT"
+- attribute.objectTypes: "klass": "java.util.Set" but "propertyType": "TEXT"
+*/
+const javaClassToPropertyTypeOverrides: Record<string, SchemaProperty["propertyType"]> = {
+    "java.lang.Boolean": "BOOLEAN",
+    "java.lang.Integer": "INTEGER",
+    "java.lang.Long": "NUMBER",
+    "java.util.Set": "COLLECTION",
+};
+
 const getType = (
     schema: Schema,
     schemas: Schemas,
     property: SchemaProperty,
     suffix?: string
 ): string => {
-    const { propertyType, constants, itemPropertyType, itemKlass, klass } = property;
+    const { constants, itemPropertyType, itemKlass, klass } = property;
+    const propertyType = javaClassToPropertyTypeOverrides[klass] || property.propertyType;
 
     switch (propertyType) {
         case "REFERENCE":
@@ -158,10 +175,7 @@ const getType = (
         case "COLOR":
         case "PASSWORD":
         case "DATE":
-            // This shouldn't be necessary, but we are aware that -at least- one case where a field
-            // (organisationUnit.level) has "propertyType": "TEXT" but "klass": "java.lang.Integer".
-            // So let's also check the prop "klass" to determine the final type.
-            return klass === "java.lang.Integer" ? "number" : "string";
+            return "string";
         case "IDENTIFIER":
             return "Id";
         case "INTEGER":
