@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { D2Geometry, Preset } from "../schemas";
 import { Id, Selector, SelectedPick } from "./base";
-import { D2ApiResponse, getFieldsAsString } from "./common";
+import { D2ApiResponse, getFieldsAsString, parseTrackerPager } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import {
     D2TrackerEnrollment,
@@ -20,10 +20,18 @@ export class TrackedEntities {
         const orderParam = this.buildOrderParams(order);
         const paramsToRequest = { ...rest, order: orderParam };
 
-        return this.d2Api.get<TrackedEntitiesGetResponse<Fields>>("/tracker/trackedEntities", {
-            ...paramsToRequest,
-            fields: getFieldsAsString(fields),
-        });
+        return this.d2Api
+            .get<TrackerResponse<Fields>>("/tracker/trackedEntities", {
+                ...paramsToRequest,
+                fields: getFieldsAsString(fields),
+            })
+            .map(({ data }) => {
+                return {
+                    ..._.omit(data, "trackedEntities"),
+                    pager: parseTrackerPager(data),
+                    instances: data.trackedEntities || data.instances || [],
+                };
+            });
     }
 
     private buildOrderParams(order: Maybe<TrackedOrderBase[]>): Maybe<string> {
@@ -176,12 +184,17 @@ export type TrackedOrderField = {
 };
 
 export type TrackedAttributesFields = { type: "trackedEntityAttributeId"; id: Id };
-
-export interface TrackedEntitiesGetResponse<Fields> {
+export type TrackedPager = {
     page: number;
     pageSize: number;
+    // Only if requested with totalPages=true
+    pageCount?: boolean;
+    total?: number;
+};
+
+export interface TrackedEntitiesGetResponse<Fields> extends TrackedPager {
+    pager?: TrackedPager;
     instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[];
-    total?: number; // Only if requested with totalPages=true
 }
 
 export interface D2TrackerTrackedEntitySchema {
@@ -202,3 +215,8 @@ export interface D2TrackerTrackedEntitySchema {
 }
 
 type D2TrackerTrackedEntityFields = Selector<D2TrackerTrackedEntitySchema>;
+
+type TrackerResponse<Fields> = Omit<TrackedEntitiesGetResponse<Fields>, "instances"> & {
+    instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[] | undefined;
+    trackedEntities: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[] | undefined;
+};

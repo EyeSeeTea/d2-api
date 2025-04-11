@@ -1,10 +1,11 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
-import { Preset, FieldPresets } from "../schemas";
-import { getFieldsAsString } from "./common";
+import { Preset } from "../schemas";
+import { getFieldsAsString, parseTrackerPager } from "./common";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
+import { TrackedPager } from "./trackerTrackedEntities";
 
 export class TrackerEnrollments {
     constructor(public api: D2ApiGeneric) {}
@@ -12,10 +13,18 @@ export class TrackerEnrollments {
     get<Fields extends D2TrackerEnrollmentFields>(
         params: TrackerEnrollmentsParams<Fields>
     ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
-        return this.api.get<TrackerEnrollmentsResponse<Fields>>("/tracker/enrollments", {
-            ..._.omit(params, ["fields"]),
-            fields: getFieldsAsString(params.fields),
-        });
+        return this.api
+            .get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
+                ..._.omit(params, ["fields"]),
+                fields: getFieldsAsString(params.fields),
+            })
+            .map(({ data }) => {
+                return {
+                    ..._.omit(data, "enrollments"),
+                    pager: parseTrackerPager(data),
+                    instances: data.enrollments || data.instances || [],
+                };
+            });
     }
 }
 
@@ -96,11 +105,9 @@ type TrackerEnrollmentsParamsBase = {
 type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
-export interface TrackerEnrollmentsResponse<Fields> {
-    page: number;
-    pageSize: number;
+interface TrackerEnrollmentsResponse<Fields> extends TrackedPager {
+    pager?: TrackedPager;
     instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
-    total?: number; // Only if requested with totalPages=true
 }
 
 export interface D2TrackerEnrollmentSchema {
@@ -121,3 +128,8 @@ export interface D2TrackerEnrollmentSchema {
 }
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
+
+type EnrollmentResponse<Fields> = Omit<TrackerEnrollmentsResponse<Fields>, "instances"> & {
+    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
+    enrollments: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
+};
