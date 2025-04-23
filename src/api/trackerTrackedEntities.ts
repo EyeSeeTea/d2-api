@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { D2Geometry, Preset } from "../schemas";
 import { Id, Selector, SelectedPick } from "./base";
-import { D2ApiResponse, getFieldsAsString, parseTrackerPager } from "./common";
+import { D2ApiResponse, parseTrackerPager } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import {
     D2TrackerEnrollment,
@@ -9,6 +9,7 @@ import {
     D2TrackerEnrollmentToPost,
 } from "./trackerEnrollments";
 import { RequiredBy, Maybe } from "../utils/types";
+import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackedEntities {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -23,7 +24,7 @@ export class TrackedEntities {
         return this.d2Api
             .get<TrackerResponse<Fields>>("/tracker/trackedEntities", {
                 ...paramsToRequest,
-                fields: getFieldsAsString(fields),
+                fields: getTrackerFieldsParam(fields),
             })
             .map(({ data }) => {
                 return {
