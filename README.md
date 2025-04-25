@@ -36,19 +36,35 @@ $ yarn publish [--tag beta] [--patch | --minor | --major]
 
 ### Create an API instance
 
-An example for 2.32:
-
 ```ts
-import { D2Api } from "d2-api/2.32";
+import { D2Api } from "d2-api/2.36";
 
 const api = new D2Api({
-    baseUrl: "https://play.dhis2.org/2.30",
+    baseUrl: "https://play.im.dhis2.org/dev",
     auth: { username: "admin", password: "district" },
-    timeout: 60 * 1000,
 });
 ```
 
 ### Metadata models
+
+#### GET single (by ID)
+
+```ts
+const dataSet = await api.models.dataSets
+    .getById("BfMAe6Itzgt", {
+        fields: {
+            id: true,
+            name: true,
+            categoryOptions: {
+                id: true,
+                name: true,
+            },
+        },
+    })
+    .getData();
+
+console.log(dataSet.id, dataSet.name, dataSet.categoryOptions);
+```
 
 #### GET (list)
 
@@ -57,10 +73,6 @@ const { cancel, response } = api.models.dataSets.get({
     fields: {
         id: true,
         name: true,
-        categoryOptions: {
-            id: true,
-            name: true,
-        },
     },
     filter: {
         name: { ilike: "health", "!in": ["Child Health"] },
@@ -341,7 +353,7 @@ type Metadata = MetadataPick<{
 ## Testing
 
 ```ts
-import { D2Api } from "d2-api/2.32";
+import { D2Api } from "d2-api/2.36";
 import { getMockApiFromClass } from "d2-api";
 
 const currentUserMock = {
