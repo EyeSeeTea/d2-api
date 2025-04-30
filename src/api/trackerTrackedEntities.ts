@@ -185,11 +185,12 @@ export type TrackedOrderField = {
 };
 
 export type TrackedAttributesFields = { type: "trackedEntityAttributeId"; id: Id };
+
 export type TrackedPager = {
     page: number;
     pageSize: number;
-    // Only if requested with totalPages=true
-    pageCount?: boolean;
+    // These two fields are available only for requests with query "totalPages=true"
+    pageCount?: number;
     total?: number;
 };
 
