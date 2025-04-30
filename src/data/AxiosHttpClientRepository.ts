@@ -21,11 +21,25 @@ export class AxiosHttpClientRepository implements HttpClientRepository {
 
         const response: () => Promise<HttpClientResponse<Data>> = () => {
             const axiosResponse = this.instance({ ...options, cancelToken });
-            return axiosResponse.then(res => ({
-                status: res.status,
-                data: res.data as Data,
-                headers: res.headers as HttpClientResponse<Data>["headers"],
-            }));
+            return axiosResponse
+                .then(res => ({
+                    status: res.status,
+                    data: res.data as Data,
+                    headers: res.headers as HttpClientResponse<Data>["headers"],
+                }))
+                .catch(error => {
+                    if (axios.isAxiosError(error)) {
+                        const method = options.method;
+                        const fullUrl = options.url;
+                        const body = error.response ? error.response.data : undefined;
+                        const msg = `[d2-api:request] ${method} ${fullUrl}`;
+                        console.error(`${msg}\n${JSON.stringify(body, null, 4)}`);
+                    } else {
+                        console.error("Unexpected Error:", JSON.stringify(error));
+                    }
+
+                    throw error;
+                });
         };
 
         return CancelableResponse.build({ cancel, response: response });

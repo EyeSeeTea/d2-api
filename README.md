@@ -255,6 +255,31 @@ const data = await api.tracker.trackedEntities
 console.log(data.instances);
 ```
 
+Adding the `totalPages` param will include a pager object:
+
+```ts
+const data = await api.tracker.trackedEntities
+    .get({
+        fields: {
+            orgUnit: true,
+        },
+        ouMode: "ALL",
+        program: "program_id",
+        totalPages: true,
+    })
+    .getData();
+
+console.log(data.pager);
+/*
+{
+    page: 1;
+    pageSize: 50;
+    pageCount: 10;
+    total: 500;
+}
+*/
+```
+
 ### Emails
 
 Send a test email:
