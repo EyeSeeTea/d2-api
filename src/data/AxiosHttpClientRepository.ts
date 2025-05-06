@@ -31,11 +31,11 @@ export class AxiosHttpClientRepository implements HttpClientRepository {
                     if (axios.isAxiosError(error)) {
                         const method = options.method;
                         const fullUrl = options.url;
-                        const body = error.response?.data
+                        const body = error.response ? error.response.data : undefined;
                         const msg = `[d2-api:request] ${method} ${fullUrl}`;
                         console.error(`${msg}\n${JSON.stringify(body, null, 4)}`);
                     } else {
-                        console.error('Unexpected Error:', JSON.stringify(error));
+                        console.error("Unexpected Error:", JSON.stringify(error));
                     }
 
                     throw error;
