@@ -1,11 +1,12 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset } from "../schemas";
-import { getFieldsAsString, parseTrackerPager } from "./common";
+import { parseTrackerPager } from "./common";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
 import { TrackedPager } from "./trackerTrackedEntities";
+import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEnrollments {
     constructor(public api: D2ApiGeneric) {}
@@ -16,7 +17,7 @@ export class TrackerEnrollments {
         return this.api
             .get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
                 ..._.omit(params, ["fields"]),
-                fields: getFieldsAsString(params.fields),
+                fields: getTrackerFieldsParam(params.fields),
             })
             .map(({ data }) => {
                 return {
@@ -105,7 +106,7 @@ type TrackerEnrollmentsParamsBase = {
 type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
-interface TrackerEnrollmentsResponse<Fields> extends TrackedPager {
+export interface TrackerEnrollmentsResponse<Fields> extends TrackedPager {
     pager?: TrackedPager;
     instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
 }

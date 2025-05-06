@@ -1,10 +1,14 @@
 import { cache } from "../utils/cache";
 import { TrackerEnrollments, D2TrackerEnrollmentToPost } from "./trackerEnrollments";
-import { D2ApiResponse } from "./base";
-import { AsyncPostResponse } from "./common";
+import { D2ApiResponse, Selector } from "./base";
+import { AsyncPostResponse, getFieldsAsString } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { TrackerEvents, D2TrackerEventToPost } from "./trackerEvents";
-import { TrackedEntities, D2TrackedEntityInstanceToPost } from "./trackerTrackedEntities";
+import {
+    TrackedEntities,
+    D2TrackedEntityInstanceToPost,
+    D2TrackerTrackedEntitySchema,
+} from "./trackerTrackedEntities";
 
 export class Tracker {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -42,6 +46,24 @@ export class Tracker {
             { ...params, async: true },
             request
         );
+    }
+}
+
+export function getTrackerFieldsParam<Fields extends Selector<D2TrackerTrackedEntitySchema>>(
+    fields: Fields
+): string {
+    const keys = Object.keys(fields);
+
+    if (keys.some(param => param.startsWith("$"))) {
+        if (keys.includes("$all")) {
+            // Unlike the metadata endpoint, the tracked entpoint does not support
+            // $TYPE selectors. Convert :all -> * and error on all others.
+            return "*";
+        } else {
+            throw new Error(`Invalid virtual fields: ${keys.join(", ")}. Only $all is supported.`);
+        }
+    } else {
+        return getFieldsAsString(fields);
     }
 }
 

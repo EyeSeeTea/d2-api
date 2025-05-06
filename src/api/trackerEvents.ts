@@ -1,10 +1,11 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
-import { getFieldsAsString, parseTrackerPager } from "./common";
+import { parseTrackerPager } from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
 import { TrackedPager } from "./trackerTrackedEntities";
+import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEvents {
     constructor(public api: D2ApiGeneric) {}
@@ -15,7 +16,7 @@ export class TrackerEvents {
         return this.api
             .get<EventsResponse<Fields>>("/tracker/events", {
                 ..._.omit(params, ["fields"]),
-                fields: getFieldsAsString(params.fields),
+                fields: getTrackerFieldsParam(params.fields),
             })
             .map(({ data }) => {
                 return {
@@ -32,7 +33,7 @@ export class TrackerEvents {
     ): D2ApiResponse<D2TrackerEvent> {
         return this.api.get<D2TrackerEvent>(`/tracker/events/${id}`, {
             ..._.omit(params, ["fields"]),
-            fields: getFieldsAsString(params.fields),
+            fields: getTrackerFieldsParam(params.fields),
         });
     }
 }
