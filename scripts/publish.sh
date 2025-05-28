@@ -4,6 +4,7 @@ set -e -u -o pipefail
 version=$(cat package.json | jq -r '.version')
 publish_opts=$(if echo "$version" | grep -q beta; then echo "--tag beta"; fi)
 
+yarn clean
 yarn build
 yarn publish $publish_opts --new-version "$version" build/
 
