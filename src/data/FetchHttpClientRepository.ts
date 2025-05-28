@@ -69,6 +69,8 @@ export class FetchHttpClientRepository implements HttpClientRepository {
                     return { status: res.status, data: data as Data, headers };
                 })
                 .catch(error => {
+                    const msg = `[d2-api:request] ${method} ${fullUrl}`;
+                    console.debug(`${msg} \n${JSON.stringify(error, null, 4)}`);
                     if (error.request) throw error;
                     throw new HttpError(error.toString(), { request: options });
                 })

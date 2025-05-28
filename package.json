@@ -1,7 +1,7 @@
 {
     "name": "@eyeseetea/d2-api",
     "description": "Typed wrapper over DHIS2 API",
-    "version": "1.18.0-beta.4",
+    "version": "1.19.0",
     "license": "GPL-3.0",
     "author": "EyeSeeTea team",
     "repository": {
@@ -21,7 +21,8 @@
         "prettify": "prettier \"{.,src}/**/*.{js,jsx,ts,tsx,json,css}\" --write",
         "generate-schemas": "ts-node src/scripts/generate-schemas.ts",
         "prerelease": "yarn build",
-        "release": "bash scripts/publish.sh"
+        "release": "bash scripts/publish.sh",
+        "test": "echo no-op"
     },
     "dependencies": {
         "abort-controller": "3.0.0",
