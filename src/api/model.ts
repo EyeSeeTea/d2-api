@@ -66,6 +66,8 @@ type GetObject<D2ModelSchema extends D2ModelSchemaBase, Options> = SelectedPick<
     GetFields<Options>
 >;
 
+// At
+
 export class Model<
     D2ApiDefinition extends D2ApiDefinitionBase,
     D2ModelSchema extends D2ModelSchemaBase
@@ -106,6 +108,18 @@ export class Model<
                 objects: data[this.modelName] as Obj[],
             };
         });
+    }
+
+    getById<Options extends GetOptions<D2ApiDefinition, D2ModelSchema>>(
+        id: string,
+        options: Options
+    ): D2ApiResponse<GetObject<D2ModelSchema, Options>> {
+        type Obj = GetObject<D2ModelSchema, Options>;
+
+        const paramsFieldsFilter = processFieldsFilterParams(options as any);
+        const params = { ...options, ...paramsFieldsFilter };
+
+        return this.d2Api.get<Obj>(`/${this.modelName}/${id}`, params);
     }
 
     post(

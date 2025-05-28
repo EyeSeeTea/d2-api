@@ -1,9 +1,11 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
-import { Preset, FieldPresets, D2Geometry } from "../schemas";
-import { getFieldsAsString } from "./common";
+import { Preset, D2Geometry } from "../schemas";
+import { parseTrackerPager } from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
+import { TrackedPager } from "./trackerTrackedEntities";
+import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEvents {
     constructor(public api: D2ApiGeneric) {}
@@ -11,10 +13,18 @@ export class TrackerEvents {
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
     ): D2ApiResponse<TrackerEventsResponse<Fields>> {
-        return this.api.get<TrackerEventsResponse<Fields>>("/tracker/events", {
-            ..._.omit(params, ["fields"]),
-            fields: getFieldsAsString(params.fields),
-        });
+        return this.api
+            .get<EventsResponse<Fields>>("/tracker/events", {
+                ..._.omit(params, ["fields"]),
+                fields: getTrackerFieldsParam(params.fields),
+            })
+            .map(({ data }) => {
+                return {
+                    ..._.omit(data, "events"),
+                    pager: parseTrackerPager(data),
+                    instances: data.events || data.instances || [],
+                };
+            });
     }
 
     getById<Fields extends D2TrackerEventFields>(
@@ -23,7 +33,7 @@ export class TrackerEvents {
     ): D2ApiResponse<D2TrackerEvent> {
         return this.api.get<D2TrackerEvent>(`/tracker/events/${id}`, {
             ..._.omit(params, ["fields"]),
-            fields: getFieldsAsString(params.fields),
+            fields: getTrackerFieldsParam(params.fields),
         });
     }
 }
@@ -140,19 +150,6 @@ interface EventsParamsBase {
     assignedUser?: CommaDelimitedListOfUid;
 }
 
-interface D2EventDataValueSchema {
-    name: "D2DataValue";
-    model: DataValue;
-    fields: DataValue;
-    fieldPresets: {
-        $all: Preset<DataValue, keyof DataValue>;
-        $identifiable: Preset<DataValue, FieldPresets["identifiable"]>;
-        $nameable: Preset<DataValue, FieldPresets["nameable"]>;
-        $persisted: Preset<DataValue, keyof DataValue>;
-        $owner: Preset<DataValue, keyof DataValue>;
-    };
-}
-
 export interface DataValue {
     updatedAt: IsoDate;
     storedBy: Username;
@@ -162,13 +159,9 @@ export interface DataValue {
     providedElsewhere?: boolean;
 }
 
-export interface TrackerEventsResponse<Fields> {
-    page: number;
-    pageSize: number;
+export interface TrackerEventsResponse<Fields> extends TrackedPager {
+    pager?: TrackedPager;
     instances: SelectedPick<D2TrackerEventSchema, Fields>[];
-    // total and pageCount: Only if requested with totalPages=true
-    total?: number;
-    pageCount?: number;
 }
 
 export interface D2TrackerEventSchema {
@@ -185,3 +178,8 @@ export interface D2TrackerEventSchema {
 }
 
 type D2TrackerEventFields = Selector<D2TrackerEventSchema>;
+
+type EventsResponse<Fields> = Omit<TrackerEventsResponse<Fields>, "instances"> & {
+    instances: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
+    events: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
+};
