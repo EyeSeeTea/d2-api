@@ -55,6 +55,7 @@ const schemaFieldProperties: Array<keyof D2SchemaFieldProperties> = [
 ];
 
 const interfaceFromClass: _.Dictionary<string | { type: string; schema: string }> = {
+    "org.hisp.dhis.security.acl.AccessData": "D2AccessData",
     "org.hisp.dhis.security.acl.Access": "D2Access",
     "org.hisp.dhis.translation.ObjectTranslation": "D2Translation",
     "org.hisp.dhis.translation.Translation": "D2Translation",
@@ -124,13 +125,30 @@ function getModelName(klass: string, suffix?: string): string {
     }
 }
 
+/*
+Map Java type to correct propertyType.
+
+This mapping shouldn't be necessary, but there are some properties where propertyType and klass
+do not match. For example, in the schemas.json from v2.40, we have detected the following:
+
+- organisationUnit.level: "klass": "java.lang.Integer" but "propertyType": "TEXT"
+- attribute.objectTypes: "klass": "java.util.Set" but "propertyType": "TEXT"
+*/
+const javaClassToPropertyTypeOverrides: Record<string, SchemaProperty["propertyType"]> = {
+    "java.lang.Boolean": "BOOLEAN",
+    "java.lang.Integer": "INTEGER",
+    "java.lang.Long": "NUMBER",
+    "java.util.Set": "COLLECTION",
+};
+
 const getType = (
     schema: Schema,
     schemas: Schemas,
     property: SchemaProperty,
     suffix?: string
 ): string => {
-    const { propertyType, constants, itemPropertyType, itemKlass } = property;
+    const { constants, itemPropertyType, itemKlass, klass } = property;
+    const propertyType = javaClassToPropertyTypeOverrides[klass] || property.propertyType;
 
     switch (propertyType) {
         case "REFERENCE":
@@ -262,14 +280,7 @@ function joinStr(xs: string[]): string {
 type Instance = { version: string; url: string; isDeprecated?: boolean };
 
 const instances: Instance[] = [
-    { version: "2.30", url: "http://admin:district@localhost:8030", isDeprecated: true },
-    { version: "2.31", url: "http://admin:district@localhost:8031", isDeprecated: true },
-    { version: "2.32", url: "https://admin:district@play.dhis2.org/2.32", isDeprecated: true },
-    { version: "2.33", url: "https://admin:district@play.dhis2.org/2.33", isDeprecated: true },
-    { version: "2.34", url: "https://admin:district@play.dhis2.org/2.34", isDeprecated: true },
-    { version: "2.35", url: "https://admin:district@play.dhis2.org/2.35" },
-    { version: "2.36", url: "https://admin:district@play.dhis2.org/2.36" },
-    { version: "2.37", url: "https://admin:district@play.dhis2.org/2.37" },
+    { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-7" }, //
 ];
 
 async function generateSchema(instance: Instance) {
@@ -285,14 +296,16 @@ async function generateSchema(instance: Instance) {
     const models = schemas.filter(schema => !!schema.href);
     const schemasByClassName = _.keyBy(schemas, schema => _.last(schema.klass.split(".")) || "");
 
+    if (models.length === 0) throw new Error("No models found");
+
     const modelsDeclaration = `
         /* eslint-disable */
 
         import {
             Id, Ref, Preset, FieldPresets, D2SchemaProperties,
-            D2Access, D2AccessWithData, D2Translation, D2Geometry, D2Style,
+            D2AccessData, D2AccessWithData, D2Translation, D2Geometry, D2Style,
             D2DimensionalKeywords, 
-            D2RelationshipConstraint, D2ReportingParams, D2Axis, Sharing,
+            D2ReportingParams, Sharing,
             D2ProgramOwner, D2ProgramOwnerSchema,
             D2AttributeValueGeneric, D2AttributeValueGenericSchema
         } from "../schemas/base";
