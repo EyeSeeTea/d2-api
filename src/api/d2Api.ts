@@ -45,17 +45,25 @@ export class D2ApiGeneric {
             backend = "fetch",
             timeout,
             agent,
+            personalToken,
         } = options || {};
         this.baseUrl = baseUrl;
         this.apiPath = joinPath(baseUrl, "api", apiVersion ? String(apiVersion) : null);
         const HttpClientRepositoryImpl =
             backend === "fetch" ? FetchHttpClientRepository : AxiosHttpClientRepository;
-        this.baseConnection = new HttpClientRepositoryImpl({ baseUrl, auth, timeout, agent });
+        this.baseConnection = new HttpClientRepositoryImpl({
+            baseUrl,
+            auth,
+            timeout,
+            agent,
+            personalToken,
+        });
         this.apiConnection = new HttpClientRepositoryImpl({
             baseUrl: this.apiPath,
             auth,
             timeout,
             agent,
+            personalToken,
         });
     }
 

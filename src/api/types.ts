@@ -9,6 +9,7 @@ export interface D2ApiOptions {
     backend?: "xhr" | "fetch";
     timeout?: number;
     agent?: Agent;
+    personalToken?: PATToken;
 }
 
 export type IndexedModels<D2ApiDefinition extends D2ApiDefinitionBase> = {
@@ -21,3 +22,5 @@ export type IndexedModels<D2ApiDefinition extends D2ApiDefinitionBase> = {
 export interface D2ApiRequest extends HttpRequest {
     skipApiPrefix?: boolean;
 }
+
+export type PATToken = string;

@@ -1,5 +1,6 @@
 import MockAdapter from "axios-mock-adapter";
 import { CancelableResponse } from "./CancelableResponse";
+import { PATToken } from "../api/types";
 
 export interface HttpClientRepository {
     request<Data>(options: HttpRequest): CancelableResponse<Data>;
@@ -38,6 +39,7 @@ export interface ConstructorOptions {
     auth?: Credentials;
     timeout?: number;
     agent?: Agent;
+    personalToken?: PATToken;
 }
 
 export type Agent = unknown;

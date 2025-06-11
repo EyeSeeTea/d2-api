@@ -13,15 +13,17 @@ import {
     HttpError,
     HttpRequest,
     HttpClientResponse,
+    Credentials,
 } from "../repositories/HttpClientRepository";
 import { joinPath } from "../utils/connection";
+import { PATToken } from "../api/types";
 
 export class FetchHttpClientRepository implements HttpClientRepository {
     constructor(public options: ConstructorOptions) {}
 
     request<Data>(options: HttpRequest): CancelableResponse<Data> {
         const controller = new AbortController();
-        const { baseUrl = "", auth } = this.options;
+        const { baseUrl = "", auth, personalToken } = this.options;
         const timeout = options.timeout || this.options.timeout;
         const {
             method,
@@ -41,9 +43,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
                 : {}),
         };
 
-        const authHeaders: Record<string, string> = auth
-            ? { Authorization: "Basic " + btoa(auth.username + ":" + auth.password) }
-            : {};
+        const authHeaders = this.getAuthHeaders(auth, personalToken);
 
         const fetchOptions: RequestInit = {
             method,
@@ -82,6 +82,16 @@ export class FetchHttpClientRepository implements HttpClientRepository {
 
     getMockAdapter(): MockAdapter {
         throw new Error("Not implemented");
+    }
+
+    private getAuthHeaders(auth?: Credentials, personalToken?: PATToken): Record<string, string> {
+        if (auth) {
+            return { Authorization: "Basic " + btoa(auth.username + ":" + auth.password) };
+        } else if (personalToken) {
+            return { Authorization: `ApiToken ${personalToken}` };
+        } else {
+            return {};
+        }
     }
 }
 
