@@ -45,7 +45,6 @@ export class D2ApiGeneric {
             backend = "fetch",
             timeout,
             agent,
-            personalToken,
         } = options || {};
         this.baseUrl = baseUrl;
         this.apiPath = joinPath(baseUrl, "api", apiVersion ? String(apiVersion) : null);
@@ -56,14 +55,12 @@ export class D2ApiGeneric {
             auth,
             timeout,
             agent,
-            personalToken,
         });
         this.apiConnection = new HttpClientRepositoryImpl({
             baseUrl: this.apiPath,
             auth,
             timeout,
             agent,
-            personalToken,
         });
     }
 

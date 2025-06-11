@@ -5,12 +5,15 @@ import { Model } from ".";
 export interface D2ApiOptions {
     baseUrl?: string;
     apiVersion?: number;
-    auth?: { username: string; password: string };
+    auth?: Auth;
     backend?: "xhr" | "fetch";
     timeout?: number;
     agent?: Agent;
-    personalToken?: PATToken;
 }
+
+export type Auth =
+    | { type?: "basicAuth"; username: string; password: string }
+    | { type: "personalToken"; token: PATToken };
 
 export type IndexedModels<D2ApiDefinition extends D2ApiDefinitionBase> = {
     [ModelKey in keyof D2ApiDefinition["schemas"]]: Model<
@@ -23,4 +26,4 @@ export interface D2ApiRequest extends HttpRequest {
     skipApiPrefix?: boolean;
 }
 
-export type PATToken = string;
+type PATToken = string;
