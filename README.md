@@ -39,20 +39,20 @@ $ yarn publish [--tag beta] [--patch | --minor | --major]
 ```ts
 import { D2Api } from "d2-api/2.36";
 
-// basic authentication
+// Basic access authentication
 const api = new D2Api({
     baseUrl: "https://play.im.dhis2.org/dev",
-    auth: { username: "admin", password: "district" },
+    auth: { type: "basic", username: "admin", password: "district" },
 });
 
-// PAT token authentication
+// Personal Access Token (PAT) authentication
 const api = new D2Api({
     baseUrl: "https://play.im.dhis2.org/dev",
     auth: { type: "personalToken", token: "token_here" },
 });
 ```
 
-Learn more about [personal token authentication here](https://docs.dhis2.org/en/full/develop/dhis-core-version-240/developer-manual.html#webapi_pat_authentication)
+Learn more about [PAT authentication here](https://docs.dhis2.org/en/full/develop/dhis-core-version-240/developer-manual.html#webapi_pat_authentication)
 
 ### Metadata models
 

@@ -12,7 +12,7 @@ export interface D2ApiOptions {
 }
 
 export type Auth =
-    | { type?: "basicAuth"; username: string; password: string }
+    | { type?: "basic"; username: string; password: string }
     | { type: "personalToken"; token: PATToken };
 
 export type IndexedModels<D2ApiDefinition extends D2ApiDefinitionBase> = {
