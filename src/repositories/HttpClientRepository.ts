@@ -1,4 +1,5 @@
 import MockAdapter from "axios-mock-adapter";
+import { Auth } from "../api/types";
 import { CancelableResponse } from "./CancelableResponse";
 
 export interface HttpClientRepository {
@@ -35,7 +36,7 @@ export interface Credentials {
 
 export interface ConstructorOptions {
     baseUrl?: string;
-    auth?: Credentials;
+    auth?: Auth;
     timeout?: number;
     agent?: Agent;
 }
