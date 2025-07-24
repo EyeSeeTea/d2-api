@@ -49,9 +49,35 @@ export type AnalyticsOptions = {
     enrollmentDate?: string;
 };
 
+type KnownAscDescValues =
+    | "ouname"
+    | "programstatus"
+    | "createdbydisplayname"
+    | "lastupdatedbydisplayname"
+    | "enrollmentdate"
+    | "incidentdate"
+    | "lastupdated";
+
+type AscDescParameter = KnownAscDescValues | Id;
+
+type PageOptions = {
+    totalPages: boolean;
+    page: number;
+    pageSize: number;
+    paging: boolean;
+};
+
 export type GetEnrollmentsQueryOptions = {
     programId: Id;
-} & AnalyticsOptions;
+    programStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    ouMode?: "DESCENDANTS" | "CHILDREN" | "SELECTED";
+    asc?: AscDescParameter;
+    desc?: AscDescParameter;
+    coordinatesOnly?: boolean;
+    headers?: string;
+} & AnalyticsOptions &
+    Partial<PageOptions>;
+
 export type AnalyticsResponse = {
     headers: Array<{
         name: "dx" | "dy";
@@ -107,7 +133,7 @@ export class Analytics {
     }: GetEnrollmentsQueryOptions): D2ApiResponse<AnalyticsResponse> {
         return this.d2Api.get<AnalyticsResponse>(
             `/analytics/enrollments/query/${programId}`,
-            options as AnalyticsOptions
+            options as Omit<GetEnrollmentsQueryOptions, "programId">
         );
     }
 
