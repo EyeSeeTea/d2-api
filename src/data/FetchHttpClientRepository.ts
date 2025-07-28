@@ -1,8 +1,7 @@
-import AbortController from "abort-controller";
 import MockAdapter from "axios-mock-adapter";
 import btoa from "btoa";
 import iconv from "iconv-lite";
-import "cross-fetch/polyfill";
+import fetch from "cross-fetch";
 import _ from "lodash";
 import qs from "qs";
 import { CancelableResponse } from "../repositories/CancelableResponse";
@@ -46,7 +45,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
             : {};
 
         const fetchOptions: RequestInit = {
-            method,
+            method: method,
             signal: controller.signal,
             body: getBody(requestBodyType, data),
             headers: { ...baseHeaders, ...authHeaders, ...extraHeaders },
@@ -110,7 +109,7 @@ function raiseHttpError(request: HttpRequest, response: Response, body: unknown)
     });
 }
 
-function getHeadersRecord(headers: Headers) {
+function getHeadersRecord(headers: Headers): Record<string, string> {
     return headers ? _.fromPairs(Array.from(headers.entries())) : {};
 }
 
