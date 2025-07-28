@@ -36,68 +36,86 @@ $ yarn publish [--tag beta] [--patch | --minor | --major]
 
 ### Create an API instance
 
-An example for 2.32:
-
 ```ts
-import { D2Api } from "d2-api/2.32";
+import { D2Api } from "d2-api/2.36";
 
 const api = new D2Api({
-    baseUrl: "https://play.dhis2.org/2.30",
+    baseUrl: "https://play.im.dhis2.org/dev",
     auth: { username: "admin", password: "district" },
-    timeout: 60 * 1000,
 });
 ```
 
 ### Metadata models
 
+#### GET single (by ID)
+
+```ts
+const dataSet = await api.models.dataSets
+    .getById("BfMAe6Itzgt", {
+        fields: {
+            id: true,
+            name: true,
+            categoryOptions: {
+                id: true,
+                name: true,
+            },
+        },
+    })
+    .getData();
+
+console.log(dataSet.id, dataSet.name, dataSet.categoryOptions);
+```
+
 #### GET (list)
 
 ```ts
-const { cancel, response } = api.models.dataSets.get({
-    fields: {
-        id: true,
-        name: true,
-        categoryOptions: {
+const response = await api.models.dataSets
+    .get({
+        fields: {
             id: true,
             name: true,
         },
-    },
-    filter: {
-        name: { ilike: "health", "!in": ["Child Health"] },
-        code: { $like: "DS_" },
-    },
-    order: "name:asc",
-    paging: false,
-});
-
-console.log({ cancel, data: (await response).data.objects[0].name });
+        filter: {
+            name: { ilike: "health", "!in": ["Child Health"] },
+            code: { $like: "DS_" },
+        },
+        order: "name:asc",
+        paging: false,
+    })
+    .getData();
 ```
 
 #### POST (create)
 
 ```ts
-const { cancel, response } = api.models.dataSets.post({
-    name: "My DataSet",
-    periodType: "Monthly",
-});
+const response = await api.models.dataSets
+    .post({
+        name: "My DataSet",
+        periodType: "Monthly",
+    })
+    .getData();
 ```
 
 #### PUT (update)
 
 ```ts
-const { cancel, response } = api.models.dataSets.put({
-    id: "Ew82BhPZkpa",
-    name: "My DataSet",
-    periodType: "Daily",
-});
+const response = await api.models.dataSets
+    .put({
+        id: "Ew82BhPZkpa",
+        name: "My DataSet",
+        periodType: "Daily",
+    })
+    .getData();
 ```
 
 #### DELETE (delete)
 
 ```ts
-const { cancel, response } = api.models.dataSets.delete({
-    id: "Ew82BhPZkpa",
-});
+const response = await api.models.dataSets
+    .delete({
+        id: "Ew82BhPZkpa",
+    })
+    .getData();
 ```
 
 ### Metadata
@@ -105,44 +123,48 @@ const { cancel, response } = api.models.dataSets.delete({
 #### GET
 
 ```ts
-const { cancel, response } = api.metadata.get({
-    dataSets: {
-        fields: {
-            id: true,
-            name: true,
-            organisationUnits: {
+const response = await api.metadata
+    .get({
+        dataSets: {
+            fields: {
                 id: true,
                 name: true,
+                organisationUnits: {
+                    id: true,
+                    name: true,
+                },
+            },
+            filter: {
+                name: { ilike: "health", "!in": ["Child Health"] },
+                code: { $like: "DS_" },
             },
         },
-        filter: {
-            name: { ilike: "health", "!in": ["Child Health"] },
-            code: { $like: "DS_" },
+        categories: {
+            fields: {
+                $owner: true,
+            },
         },
-    },
-    categories: {
-        fields: {
-            $owner: true,
-        },
-    },
-});
+    })
+    .getData();
 
-const { dataSets, categories } = (await response).data;
+console.log(response);
 ```
 
 #### POST
 
 ```ts
-const { cancel, response } = api.metadata.post({
-    dataSets: [
-        {
-            name: "My DataSet",
-            periodType: "Monthly",
-        },
-    ],
-});
+const response = await api.metadata
+    .post({
+        dataSets: [
+            {
+                name: "My DataSet",
+                periodType: "Monthly",
+            },
+        ],
+    })
+    .getData();
 
-console.log((await response).data);
+console.log(response);
 ```
 
 ### Analytics
@@ -160,7 +182,7 @@ const analyticsData = await api.analytics
 
 #### Get enrollments query
 
-```
+```ts
 const analyticsData = await api.analytics
     .getEnrollmentsQuery("IpHINAT79UW", {
         dimension: ["GxdhnY5wmHq", "ou:ImspTQPwCqd"],
@@ -214,7 +236,7 @@ const value = await dataStore.get("key1").getData();
 
 ```ts
 const dataStore = api.dataStore("namespace1");
-dataStore.save("key1", { x: 1, y: 2 });
+await dataStore.save("key1", { x: 1, y: 2 });
 ```
 
 ### Tracker
@@ -231,8 +253,6 @@ const data = await api.tracker.trackedEntities
         program: "program_id",
     })
     .getData();
-
-console.log(data.instances);
 ```
 
 Order tracked entities by field/attribute id
@@ -251,8 +271,6 @@ const data = await api.tracker.trackedEntities
         ],
     })
     .getData();
-
-console.log(data.instances);
 ```
 
 Adding the `totalPages` param will include a pager object:
@@ -268,16 +286,14 @@ const data = await api.tracker.trackedEntities
         totalPages: true,
     })
     .getData();
-
-console.log(data.pager);
-/*
-{
-    page: 1;
-    pageSize: 50;
-    pageCount: 10;
-    total: 500;
-}
-*/
+/* Response:
+    {
+        page: 1;
+        pageSize: 50;
+        pageCount: 10;
+        total: 500;
+    }
+    */
 ```
 
 ### Emails
@@ -338,10 +354,24 @@ type Metadata = MetadataPick<{
 // type Metadata = {users: {id: string, favorite: boolean}, categories: {id: string, code: string}}
 ```
 
+## Cancelling requests
+
+The examples use the method `getData()` to resolve the result. That's what we call when we simply want to get the result, but, on the general case, we probably need a cancel object (for example when using cancellable promises/futures, React.useEffect, and so on). An example:
+
+```ts
+const { cancel, response } = api.models.dataSets.getById("BfMAe6Itzgt", {
+    fields: { id: true, name: true },
+});
+
+const res = await response(); // it's a function so the promise resolution can be controlled
+console.log("Cancel function", cancel);
+console.log(res.data);
+```
+
 ## Testing
 
 ```ts
-import { D2Api } from "d2-api/2.32";
+import { D2Api } from "d2-api/2.36";
 import { getMockApiFromClass } from "d2-api";
 
 const currentUserMock = {
