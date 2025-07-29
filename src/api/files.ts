@@ -75,7 +75,6 @@ export class Files {
                 url: "/fileResources",
                 data: formData,
                 requestBodyType: "raw",
-                headers: formData.getHeaders(),
             })
             .map(({ data }) => {
                 if (
