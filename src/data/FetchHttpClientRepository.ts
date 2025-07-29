@@ -58,7 +58,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
         const timeoutId = timeout ? setTimeout(() => controller.abort(), timeout) : null;
 
         const response: () => Promise<HttpClientResponse<Data>> = () => {
-            const fetchResponse = fetch(fullUrl, fetchOptions);
+            const fetchResponse = fetchFn(fullUrl, fetchOptions);
             return fetchResponse
                 .then(async res => {
                     const headers = getHeadersRecord(res.headers);
@@ -145,3 +145,9 @@ async function getResponseData(
         return content;
     }
 }
+
+// Use global fetch in the browser to avoid "Illegal invocation" errors.
+// Use cross-fetch in Node.js to ensure compatibility with multipart/form-data,
+// since native fetch in Node 18 does not fully support multipart uploads with form-data.
+// (to investigate: use native FormData in browser and formdata-node)
+const fetchFn = typeof window === "undefined" ? fetch : globalThis.fetch;
