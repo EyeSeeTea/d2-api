@@ -53,13 +53,14 @@ export class FetchHttpClientRepository implements HttpClientRepository {
             credentials: auth ? "omit" : ("include" as const),
         };
 
+        const optionsWithAgent = this.getAgentOptions(fetchOptions);
         const fullUrl = joinPath(baseUrl, url) + getQueryStrings(params);
 
         // Fetch API has no timeout mechanism, implement with a setTimeout + controller.abort
         const timeoutId = timeout ? setTimeout(() => controller.abort(), timeout) : null;
 
         const response: () => Promise<HttpClientResponse<Data>> = () => {
-            const fetchResponse = fetch(fullUrl, fetchOptions);
+            const fetchResponse = fetch(fullUrl, optionsWithAgent);
             return fetchResponse
                 .then(async res => {
                     const headers = getHeadersRecord(res.headers);
@@ -82,6 +83,24 @@ export class FetchHttpClientRepository implements HttpClientRepository {
 
     getMockAdapter(): MockAdapter {
         throw new Error("Not implemented");
+    }
+
+    private getAgentOptions(options: RequestInit) {
+        if (typeof window !== "undefined") return options;
+
+        // In Node.js, native fetch is based on undici and expects the `dispatcher` option
+        // to be an instance of `undici.Dispatcher`. We validate that the provided agent
+        // has a `dispatch` method to ensure compatibility
+        const isDispatcher = typeof (this.options.agent as any).dispatch === "function";
+
+        if (isDispatcher) {
+            return { ...options, dispatcher: this.options.agent };
+        } else {
+            console.warn(
+                "[FetchHttpClientRepository] 'agent' is not compatible with fetch (Node.js Dispatcher expected). Ignoring."
+            );
+            return options;
+        }
     }
 }
 
