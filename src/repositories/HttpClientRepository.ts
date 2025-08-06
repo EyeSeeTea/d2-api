@@ -6,7 +6,7 @@ export interface HttpClientRepository {
     getMockAdapter(): MockAdapter;
 }
 
-export type Method = "get" | "post" | "put" | "delete";
+export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export type ParamValue = string | number | boolean | undefined;
 
