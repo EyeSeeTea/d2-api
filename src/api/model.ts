@@ -12,7 +12,7 @@ import {
 } from "./common";
 import { D2ApiGeneric, unwrap } from "./d2Api";
 import { D2ModelSchemaBase, GetFields, SelectedPick } from "./inference";
-import { PATCH_HEADERS, PatchOperation } from "./patch";
+import { PatchOperation } from "./patch";
 
 type ModelResponse = {
     responseType: "ObjectReport";
