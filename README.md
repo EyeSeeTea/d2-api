@@ -127,6 +127,84 @@ const response = await api.models.dataSets
     .getData();
 ```
 
+#### PATCH (JSON Patch operations)
+
+The patch method supports the following operations according to [RFC 6902](https://datatracker.ietf.org/doc/html/rfc6902) and DHIS2 extensions. The `path` field uses [JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax:
+
+-   **`add`**: Adds a value to an object or array
+-   **`remove`**: Removes a value from an object or array
+-   **`replace`**: Replaces a value in an object or array
+-   **`remove-by-id`**: DHIS2-specific operation to remove an item by ID from an array
+
+```ts
+// Examples of different patch operations
+const patchOperations = [
+    // Add a new property
+    { op: "add", path: "/description", value: "New Description" },
+
+    // Add to end of array (using -)
+    { op: "add", path: "/users/-", value: { id: "FVsLhslRbTK" } },
+
+    // Add to specific array index (0 is the array index)
+    { op: "add", path: "/users/0", value: { id: "FVsLhslRbTK" } },
+
+    // Replace existing property
+    { op: "replace", path: "/name", value: "Updated Name" },
+
+    // Remove property
+    { op: "remove", path: "/description" },
+
+    // Remove array item by index (1 is the array index)
+    { op: "remove", path: "/users/1" },
+
+    // DHIS2-specific: Remove array item by ID
+    { op: "remove-by-id", path: "/users", id: "FVsLhslRbTK" },
+];
+```
+
+```ts
+// Patch dataSets
+const response = await api.models.dataSets
+    .patch("BfMAe6Itzgt", [
+        { op: "replace", path: "/name", value: "Updated Child Health" },
+        { op: "add", path: "/code", value: "DS_359711_NEW" },
+        { op: "remove", path: "/description" },
+        { op: "add", path: "/dataSetElements/-", value: { id: "x3Do5e7g4Qo" } },
+        { op: "remove-by-id", path: "/organisationUnits", id: "TGRCfJEnXJr" },
+    ])
+    .getData();
+
+// Patch users
+const userResponse = await api.models.users
+    .patch("gEnZri18JsV", [
+        { op: "replace", path: "/name", value: "Ali new" },
+        { op: "add", path: "/email", value: "ali.dummy@dhis2.org" },
+        { op: "replace", path: "/disabled", value: true },
+    ])
+    .getData();
+
+// Patch data elements
+const elementResponse = await api.models.dataElements
+    .patch("fbfJHSPpUQD", [
+        { op: "replace", path: "/name", value: "ANC first visit" },
+        { op: "replace", path: "/valueType", value: "INTEGER" },
+        { op: "add", path: "/domainType", value: "TRACKER" },
+        { op: "add", path: "/dataElementGroups/-", value: { id: "k1M0nuodfhN" } },
+        { op: "remove-by-id", path: "/dataElementGroups", id: "k1M0nuodfhN" },
+    ])
+    .getData();
+
+// Patch organisation units
+const orgUnitResponse = await api.models.organisationUnits
+    .patch("bL4ooGhyHRQ", [
+        { op: "replace", path: "/name", value: "New Pujehun Name" },
+        { op: "add", path: "/code", value: "OU_260377_NEW" },
+        { op: "remove-by-id", path: "/children", id: "RzKeCma9qb1" },
+        { op: "add", path: "/children/-", value: { id: "RzKeCma9qb1" } },
+    ])
+    .getData();
+```
+
 ### Metadata
 
 #### GET
