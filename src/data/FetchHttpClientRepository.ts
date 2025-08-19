@@ -1,7 +1,6 @@
-import AbortController from "abort-controller";
 import MockAdapter from "axios-mock-adapter";
 import iconv from "iconv-lite";
-import "cross-fetch/polyfill";
+import fetch from "cross-fetch";
 import _ from "lodash";
 import qs from "qs";
 import { CancelableResponse } from "../repositories/CancelableResponse";
@@ -44,7 +43,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
         const authHeaders = getAuthHeaders(auth);
 
         const fetchOptions: RequestInit = {
-            method,
+            method: method,
             signal: controller.signal,
             body: getBody(requestBodyType, data),
             headers: { ...baseHeaders, ...authHeaders, ...extraHeaders },
@@ -57,7 +56,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
         const timeoutId = timeout ? setTimeout(() => controller.abort(), timeout) : null;
 
         const response: () => Promise<HttpClientResponse<Data>> = () => {
-            const fetchResponse = fetch(fullUrl, fetchOptions);
+            const fetchResponse = fetchFn(fullUrl, fetchOptions);
             return fetchResponse
                 .then(async res => {
                     const headers = getHeadersRecord(res.headers);
@@ -108,7 +107,7 @@ function raiseHttpError(request: HttpRequest, response: Response, body: unknown)
     });
 }
 
-function getHeadersRecord(headers: Headers) {
+function getHeadersRecord(headers: Headers): Record<string, string> {
     return headers ? _.fromPairs(Array.from(headers.entries())) : {};
 }
 
@@ -144,3 +143,9 @@ async function getResponseData(
         return content;
     }
 }
+
+// Use global fetch in the browser to avoid "Illegal invocation" errors.
+// Use cross-fetch in Node.js to ensure compatibility with multipart/form-data,
+// since native fetch in Node 18 does not fully support multipart uploads with form-data.
+// (to investigate: use native FormData in browser and formdata-node)
+const fetchFn = typeof window === "undefined" ? fetch : globalThis.fetch;
