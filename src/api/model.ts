@@ -155,7 +155,7 @@ export class Model<
         options?: Partial<UpdateOptions>
     ): D2ApiResponse<ModelResponse> {
         return this.d2Api
-            .patch<ModelResponse | HttpResponse<ModelResponse>>(
+            .patch<HttpResponse<ModelResponse>>(
                 [this.modelName, id].join("/"),
                 patchOperations,
                 (options || {}) as Params

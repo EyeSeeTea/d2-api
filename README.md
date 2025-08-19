@@ -131,95 +131,68 @@ The patch method supports the following operations according to [RFC 6902](https
 // Examples of different patch operations
 const patchOperations = [
     // Add a new property
-    { op: "add", path: "/newProperty", value: "newValue" },
+    { op: "add", path: "/description", value: "New Description" },
 
     // Add to end of array (using -)
-    { op: "add", path: "/items/-", value: { id: "newItem" } },
+    { op: "add", path: "/users/-", value: { id: "FVsLhslRbTK" } },
 
     // Add to specific array index (0 is the array index)
-    { op: "add", path: "/items/0", value: { id: "firstItem" } },
+    { op: "add", path: "/users/0", value: { id: "FVsLhslRbTK" } },
 
     // Replace existing property
     { op: "replace", path: "/name", value: "Updated Name" },
 
     // Remove property
-    { op: "remove", path: "/obsoleteProperty" },
+    { op: "remove", path: "/description" },
 
     // Remove array item by index (1 is the array index)
-    { op: "remove", path: "/items/1" },
+    { op: "remove", path: "/users/1" },
 
     // DHIS2-specific: Remove array item by ID
-    { op: "remove-by-id", path: "/organisationUnits", id: "unit123" },
+    { op: "remove-by-id", path: "/users", id: "FVsLhslRbTK" },
 ];
 ```
 
 ```ts
 // Patch dataSets
 const response = await api.models.dataSets
-    .patch("dataSetId", [
-        { op: "replace", path: "/name", value: "Updated DataSet Name" },
-        { op: "add", path: "/code", value: "DS_NEW_CODE" },
+    .patch("BfMAe6Itzgt", [
+        { op: "replace", path: "/name", value: "Updated Child Health" },
+        { op: "add", path: "/code", value: "DS_359711_NEW" },
         { op: "remove", path: "/description" },
-        { op: "add", path: "/dataSetElements/-", value: { id: "dataElement123" } },
-        { op: "remove-by-id", path: "/organisationUnits", id: "orgUnit456" },
+        { op: "add", path: "/dataSetElements/-", value: { id: "x3Do5e7g4Qo" } },
+        { op: "remove-by-id", path: "/organisationUnits", id: "TGRCfJEnXJr" },
     ])
     .getData();
 
 // Patch users
 const userResponse = await api.models.users
-    .patch("userId", [
-        { op: "replace", path: "/name", value: "John" },
-        { op: "add", path: "/email", value: "john.doe@example.com" },
+    .patch("gEnZri18JsV", [
+        { op: "replace", path: "/name", value: "Ali new" },
+        { op: "add", path: "/email", value: "ali.dummy@dhis2.org" },
         { op: "replace", path: "/disabled", value: true },
     ])
     .getData();
 
 // Patch data elements
 const elementResponse = await api.models.dataElements
-    .patch("dataElementId", [
-        { op: "replace", path: "/name", value: "Updated Element Name" },
+    .patch("fbfJHSPpUQD", [
+        { op: "replace", path: "/name", value: "ANC first visit" },
         { op: "replace", path: "/valueType", value: "INTEGER" },
         { op: "add", path: "/domainType", value: "TRACKER" },
-        { op: "add", path: "/dataElementGroups/-", value: { id: "groupId789" } },
-        { op: "remove-by-id", path: "/dataElementGroups", id: "oldGroupId" },
+        { op: "add", path: "/dataElementGroups/-", value: { id: "k1M0nuodfhN" } },
+        { op: "remove-by-id", path: "/dataElementGroups", id: "k1M0nuodfhN" },
     ])
     .getData();
 
 // Patch organisation units
 const orgUnitResponse = await api.models.organisationUnits
-    .patch("orgUnitId", [
-        { op: "replace", path: "/name", value: "New Org Unit Name" },
-        { op: "add", path: "/code", value: "OU_CODE" },
-        { op: "add", path: "/children/-", value: { id: "childOrgUnitId" } },
+    .patch("bL4ooGhyHRQ", [
+        { op: "replace", path: "/name", value: "New Pujehun Name" },
+        { op: "add", path: "/code", value: "OU_260377_NEW" },
+        { op: "remove-by-id", path: "/children", id: "RzKeCma9qb1" },
+        { op: "add", path: "/children/-", value: { id: "RzKeCma9qb1" } },
     ])
-    .getData();
-```
-
-Sometimes you may need to make direct API calls using the low-level API methods:
-
-```ts
-// Direct patch call to any endpoint
-const response = await api
-    .patch("/dataElements/dataElementId", [
-        { op: "add", path: "/name", value: "New Element Name" },
-        { op: "replace", path: "/valueType", value: "INTEGER" },
-        { op: "add", path: "/domainType", value: "TRACKER" },
-    ])
-    .getData();
-
-// Or using the request method directly
-const response2 = await api
-    .request({
-        method: "PATCH",
-        url: "/users/userId",
-        data: [
-            { op: "replace", path: "/firstName", value: "John" },
-            { op: "replace", path: "/surname", value: "Doe" },
-        ],
-        headers: {
-            "Content-Type": "application/json-patch+json",
-        },
-    })
     .getData();
 ```
 
