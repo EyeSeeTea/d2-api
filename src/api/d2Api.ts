@@ -23,6 +23,7 @@ import { Maintenance } from "./maintenance";
 import { MessageConversations } from "./messageConversations";
 import { Metadata } from "./metadata";
 import { Model } from "./model";
+import { PATCH_HEADERS } from "./patch";
 import { Sharing } from "./sharing";
 import { SqlViews } from "./SqlViews";
 import { System } from "./system";
@@ -80,6 +81,16 @@ export class D2ApiGeneric {
 
     public put<T>(url: string, params?: Params, data?: object) {
         return this.request<T>({ method: "put", url, params, data });
+    }
+
+    public patch<T>(url: string, data: object, params?: Params) {
+        return this.request<T>({
+            method: "PATCH",
+            url: url,
+            headers: PATCH_HEADERS,
+            data: data,
+            params: params,
+        });
     }
 
     public delete<T>(url: string, params?: Params) {

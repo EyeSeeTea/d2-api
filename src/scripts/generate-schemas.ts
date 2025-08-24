@@ -202,8 +202,12 @@ function getInterface(
     suffix?: string
 ): string {
     const className = _.last(property.klass.split(".")) || "";
+    const isUsersOrGroupsProperty = property.name === "users" || property.name === "userGroups";
+    const isSharingSchema = schema.name === "sharing";
 
-    if (schemas[className]) {
+    if (isSharingSchema && isUsersOrGroupsProperty) {
+        return "D2UserGroupRef";
+    } else if (schemas[className]) {
         return `D2${className}${suffix || ""}`;
     } else if (interfaceFromClass[property.klass]) {
         const value = interfaceFromClass[property.klass];
@@ -280,7 +284,7 @@ function joinStr(xs: string[]): string {
 type Instance = { version: string; url: string; isDeprecated?: boolean };
 
 const instances: Instance[] = [
-    { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-7" }, //
+    { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-7-1" },
 ];
 
 async function generateSchema(instance: Instance) {
@@ -307,7 +311,7 @@ async function generateSchema(instance: Instance) {
             D2DimensionalKeywords, 
             D2ReportingParams, Sharing,
             D2ProgramOwner, D2ProgramOwnerSchema,
-            D2AttributeValueGeneric, D2AttributeValueGenericSchema
+            D2AttributeValueGeneric, D2AttributeValueGenericSchema, D2UserGroupRef
         } from "../schemas/base";
 
         ${schemas

@@ -6,7 +6,7 @@ publish_opts=$(if echo "$version" | grep -q beta; then echo "--tag beta"; fi)
 
 yarn clean
 yarn build
-yarn publish $publish_opts --new-version "$version" build/
+yarn publish $publish_opts --new-version "$version" "$@" build/
 
 git tag "v$version" -f -m "Bump version"
 git push --tags

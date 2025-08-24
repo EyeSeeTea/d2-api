@@ -8,6 +8,7 @@ import {
     HttpRequest,
     HttpClientResponse,
 } from "../repositories/HttpClientRepository";
+import { getAuthHeaders } from "./utils/http";
 
 export class AxiosHttpClientRepository implements HttpClientRepository {
     private instance: AxiosInstance;
@@ -52,7 +53,7 @@ export class AxiosHttpClientRepository implements HttpClientRepository {
     private getAxiosInstance(options: ConstructorOptions) {
         return axios.create({
             baseURL: options.baseUrl,
-            auth: options.auth,
+            headers: getAuthHeaders(options.auth),
             withCredentials: !options.auth,
             paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" }),
             validateStatus: status => status >= 200 && status < 300,
