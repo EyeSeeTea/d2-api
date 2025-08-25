@@ -1,4 +1,3 @@
-import { D2Api } from "../2.40";
 import { Id } from "../schemas";
 import { EmptyObject } from "../utils/types";
 import { D2ApiResponse, HttpResponse } from "./common";
@@ -232,75 +231,4 @@ export class Analytics {
     run(options?: RunAnalyticsOptions): D2ApiResponse<RunAnalyticsResponse> {
         return this.d2Api.post<RunAnalyticsResponse>("/resourceTables/analytics", options);
     }
-}
-
-const api = new D2Api({
-    baseUrl: "https://play.im.dhis2.org/dev",
-    auth: { type: "basic", username: "admin", password: "district" },
-});
-
-export async function test() {
-    // default paging:true, totalPages:false
-    const analyticsData = await api.analytics
-        .getEnrollmentsQuery({
-            programId: "IpHINAT79UW",
-            dimension: ["GxdhnY5wmHq", "ou:ImspTQPwCqd"],
-            enrollmentDate: "LAST_12_MONTHS,THIS_MONTH",
-            programStatus: "ACTIVE",
-        })
-        .getData();
-
-    console.log("analyticsData", analyticsData.metaData.pager.isLastPage);
-
-    // paging:true, totalPages:false
-    const analyticsDataPaging = await api.analytics
-        .getEnrollmentsQuery({
-            programId: "IpHINAT79UW",
-            dimension: ["GxdhnY5wmHq", "ou:ImspTQPwCqd"],
-            enrollmentDate: "LAST_12_MONTHS,THIS_MONTH",
-            paging: true,
-        })
-        .getData();
-
-    console.log("analyticsDataPaging", analyticsDataPaging.metaData);
-
-    // paging:false, totalPages:false
-    const analyticsDataNoPagingNoTotals = await api.analytics
-        .getEnrollmentsQuery({
-            programId: "IpHINAT79UW",
-            dimension: ["GxdhnY5wmHq", "ou:ImspTQPwCqd"],
-            enrollmentDate: "LAST_12_MONTHS,THIS_MONTH",
-            paging: false,
-            totalPages: false,
-        })
-        .getData();
-    const pagerNoPagingNoTotals = analyticsDataNoPagingNoTotals.metaData.pager;
-    console.log("pagerNoPagingNoTotals", pagerNoPagingNoTotals);
-
-    // paging:false, totalPages:true
-    const analyticsDataNoPaging = await api.analytics
-        .getEnrollmentsQuery({
-            programId: "IpHINAT79UW",
-            dimension: ["GxdhnY5wmHq", "ou:ImspTQPwCqd"],
-            enrollmentDate: "LAST_12_MONTHS,THIS_MONTH",
-            paging: false,
-            totalPages: true,
-        })
-        .getData();
-    const pagerNoPaging = analyticsDataNoPaging.metaData.pager;
-    console.log("pagerNoPaging", pagerNoPaging);
-
-    // paging:true, totalPages:true
-    const analyticsDataPagingAndTotals = await api.analytics
-        .getEnrollmentsQuery({
-            programId: "IpHINAT79UW",
-            dimension: ["GxdhnY5wmHq", "ou:ImspTQPwCqd"],
-            enrollmentDate: "LAST_12_MONTHS,THIS_MONTH",
-            paging: true,
-            totalPages: true,
-            skipData: true,
-        })
-        .getData();
-    const pagerPagingAndTotals = analyticsDataPagingAndTotals.metaData.pager;
-    console.log("pagerPagingAndTotals", pagerPagingAndTotals.total);
 }
