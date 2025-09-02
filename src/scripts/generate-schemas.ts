@@ -284,7 +284,8 @@ function joinStr(xs: string[]): string {
 type Instance = { version: string; url: string; isDeprecated?: boolean };
 
 const instances: Instance[] = [
-    { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-7-1" },
+    { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-8-2" },
+    { version: "2.41", url: "https://admin:district@play.im.dhis2.org/stable-2-41-5" },
 ];
 
 async function generateSchema(instance: Instance) {
