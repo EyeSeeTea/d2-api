@@ -202,8 +202,12 @@ function getInterface(
     suffix?: string
 ): string {
     const className = _.last(property.klass.split(".")) || "";
+    const isUsersOrGroupsProperty = property.name === "users" || property.name === "userGroups";
+    const isSharingSchema = schema.name === "sharing";
 
-    if (schemas[className]) {
+    if (isSharingSchema && isUsersOrGroupsProperty) {
+        return "D2UserGroupRef";
+    } else if (schemas[className]) {
         return `D2${className}${suffix || ""}`;
     } else if (interfaceFromClass[property.klass]) {
         const value = interfaceFromClass[property.klass];
@@ -266,21 +270,27 @@ function quote(s: string): string {
 
 function getProperties(schema: Schema, predicate: (property: SchemaProperty) => boolean): string {
     return (
-        schema.properties
+        _(schema.properties)
             .filter(predicate)
-            .map(property => quote(getPropertyName(property)))
+            .map(property => getPropertyName(property))
+            .sort()
+            .map(propertyName => quote(propertyName))
             .join(" | ") || "never"
     );
 }
 
 function joinStr(xs: string[]): string {
-    return xs.map(quote).join(" | ");
+    return _(xs)
+        .sort()
+        .map(quote)
+        .join(" | ");
 }
 
 type Instance = { version: string; url: string; isDeprecated?: boolean };
 
 const instances: Instance[] = [
-    { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-7" }, //
+    { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-8-2" },
+    { version: "2.41", url: "https://admin:district@play.im.dhis2.org/stable-2-41-5" },
 ];
 
 async function generateSchema(instance: Instance) {
@@ -292,7 +302,14 @@ async function generateSchema(instance: Instance) {
         validateStatus: (status: number) => status >= 200 && status < 300,
     })).data as { schemas: Schema[] };
 
-    const schemas = _.sortBy(allSchemas, schema => _.last(schema.klass.split(".")));
+    // To keep it stable, sort schemas and schema properties by name
+    const schemas = _(allSchemas)
+        .map((schema): typeof schema => ({
+            ...schema,
+            properties: _.sortBy(schema.properties, prop => prop.name),
+        }))
+        .sortBy(schema => _.last(schema.klass.split(".")))
+        .value();
     const models = schemas.filter(schema => !!schema.href);
     const schemasByClassName = _.keyBy(schemas, schema => _.last(schema.klass.split(".")) || "");
 
@@ -304,10 +321,10 @@ async function generateSchema(instance: Instance) {
         import {
             Id, Ref, Preset, FieldPresets, D2SchemaProperties,
             D2AccessData, D2AccessWithData, D2Translation, D2Geometry, D2Style,
-            D2DimensionalKeywords, 
+            D2DimensionalKeywords,
             D2ReportingParams, Sharing,
             D2ProgramOwner, D2ProgramOwnerSchema,
-            D2AttributeValueGeneric, D2AttributeValueGenericSchema
+            D2AttributeValueGeneric, D2AttributeValueGenericSchema, D2UserGroupRef
         } from "../schemas/base";
 
         ${schemas
@@ -348,7 +365,10 @@ async function generateSchema(instance: Instance) {
             .join("\n\n")}
 
         export type D2Model =
-            ${models.map(model => getModelName(model.klass)).join(" | ")}
+            ${_(models)
+                .map(model => getModelName(model.klass))
+                .sort()
+                .join(" | ")}
 
         export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> =
             ${JSON.stringify(

@@ -159,10 +159,12 @@ export interface ErrorReport {
     errorKlass: string;
     errorProperty: string;
     errorCode: string;
+    args?: (string | number)[];
+    errorProperties?: (string | number)[];
 }
 
 export interface HttpResponse<Response> {
-    httpStatus: "OK" | "Conflict";
+    httpStatus: "OK" | "Conflict" | "Bad Request" | "Internal Server Error";
     httpStatusCode: number;
     status: "OK" | "ERROR";
     message?: string;

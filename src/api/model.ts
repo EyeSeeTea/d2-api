@@ -12,6 +12,7 @@ import {
 } from "./common";
 import { D2ApiGeneric, unwrap } from "./d2Api";
 import { D2ModelSchemaBase, GetFields, SelectedPick } from "./inference";
+import { PatchOperation } from "./patch";
 
 type ModelResponse = {
     responseType: "ObjectReport";
@@ -144,6 +145,20 @@ export class Model<
                 [this.modelName, payload.id].join("/"),
                 (options || {}) as Params,
                 payload
+            )
+            .map(unwrap);
+    }
+
+    patch(
+        id: string,
+        patchOperations: PatchOperation[],
+        options?: Partial<UpdateOptions>
+    ): D2ApiResponse<ModelResponse> {
+        return this.d2Api
+            .patch<HttpResponse<ModelResponse>>(
+                [this.modelName, id].join("/"),
+                patchOperations,
+                (options || {}) as Params
             )
             .map(unwrap);
     }

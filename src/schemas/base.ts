@@ -276,3 +276,11 @@ export interface D2ProgramOwner {
 }
 
 export type D2ProgramOwnerSchema = GetDefaultSchema<D2ProgramOwner>;
+
+type D2SharingMetadataRef = {
+    id: Id;
+    access: string;
+    displayName: string;
+};
+
+export type D2UserGroupRef = Record<Id, D2SharingMetadataRef>;
