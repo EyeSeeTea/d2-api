@@ -271,9 +271,37 @@ const analyticsData = await api.analytics
 
 ```ts
 const analyticsData = await api.analytics
-    .getEnrollmentsQuery("IpHINAT79UW", {
-        dimension: ["GxdhnY5wmHq", "ou:ImspTQPwCqd"],
-        enrollmentDate: "LAST_12_MONTHS,THIS_MONTH",
+    .getEnrollmentsQuery({
+        programId: "IpHINAT79UW",
+        dimension: ["cejWyOfXge6", "lZGmxYbs97q", "ou:USER_ORGUNIT", "w75KJ2mc4zz", "zDhUuAYrxNC"],
+        programStatus: "ACTIVE",
+    })
+    .getData();
+```
+
+Disable pagination:
+
+```ts
+const analyticsData = await api.analytics
+    .getEnrollmentsQuery({
+        programId: "IpHINAT79UW",
+        dimension: ["cejWyOfXge6", "lZGmxYbs97q", "ou:USER_ORGUNIT", "w75KJ2mc4zz", "zDhUuAYrxNC"],
+        programStatus: "ACTIVE",
+        paging: false,
+    })
+    .getData();
+```
+
+Get pagination and total pages:
+
+```ts
+const analyticsData = await api.analytics
+    .getEnrollmentsQuery({
+        programId: "IpHINAT79UW",
+        dimension: ["cejWyOfXge6", "lZGmxYbs97q", "ou:USER_ORGUNIT", "w75KJ2mc4zz", "zDhUuAYrxNC"],
+        programStatus: "ACTIVE",
+        paging: true,
+        totalPages: true,
     })
     .getData();
 ```
