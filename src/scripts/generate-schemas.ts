@@ -70,6 +70,10 @@ const interfaceFromClass: _.Dictionary<string | { type: string; schema: string }
         type: "D2AttributeValueGeneric<D2Attribute>",
         schema: "D2AttributeValueGenericSchema<D2Attribute, D2AttributeSchema>",
     },
+    "org.hisp.dhis.attribute.AttributeValues": {
+        type: "D2AttributeValueGeneric<D2Attribute>[]",
+        schema: "D2AttributeValueGenericSchema<D2Attribute, D2AttributeSchema>[]",
+    },
     "org.hisp.dhis.eventdatavalue.EventDataValue": "unknown",
     "org.hisp.dhis.common.DataDimensionItem": "unknown",
     "org.hisp.dhis.common.DimensionalObject": "unknown",
@@ -291,6 +295,7 @@ type Instance = { version: string; url: string; isDeprecated?: boolean };
 const instances: Instance[] = [
     { version: "2.40", url: "https://admin:district@play.im.dhis2.org/stable-2-40-8-2" },
     { version: "2.41", url: "https://admin:district@play.im.dhis2.org/stable-2-41-5" },
+    { version: "2.42", url: "https://admin:district@play.im.dhis2.org/stable-2-42-1" },
 ];
 
 async function generateSchema(instance: Instance) {
