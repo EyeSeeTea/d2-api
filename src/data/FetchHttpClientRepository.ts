@@ -83,7 +83,7 @@ export class FetchHttpClientRepository implements HttpClientRepository {
     }
 
     private getAgentOptions(options: RequestInit) {
-        if (typeof window !== "undefined") return options;
+        if (typeof window !== "undefined" || !this.options.agent) return options;
 
         // In Node.js, native fetch is based on undici and expects the `dispatcher` option
         // to be an instance of `undici.Dispatcher`. We validate that the provided agent
