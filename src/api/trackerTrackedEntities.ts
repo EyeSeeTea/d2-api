@@ -75,7 +75,10 @@ interface D2TrackerTrackedEntityBase {
     attributes: Attribute[];
     enrollments: D2TrackerEnrollment[];
     programOwners: ProgramOwner[];
-    geometry: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
+    geometry:
+        | Extract<D2Geometry, { type: "Point" }>
+        | Extract<D2Geometry, { type: "Polygon" }>
+        | Extract<D2Geometry, { type: "MultiPolygon" }>;
 }
 
 export type D2TrackerTrackedEntity = D2TrackerTrackedEntityBase;
@@ -136,14 +139,17 @@ type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partia
         skipPaging: boolean;
     }>;
 
-type Params = RequiredBy<TrackedEntitiesParamsBase, "program" | "ouMode">;
+type Params = RequiredBy<TrackedEntitiesParamsBase, "program">;
 
 export type TrackedEntitiesParamsBase = {
     query: string;
     attribute: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
-    orgUnit: SemiColonDelimitedListOfUid;
-    ouMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
+    // removing orgUnit and ouMode because they are being deprecated in v42
+    // https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-242/tracker.html#tracked-entity-collections
+    // This is a breaking change, but upgrade should be as easy as find and replace
+    orgUnits: CommaDelimitedListOfUid;
+    orgUnitMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
     program: Id;
     programStatus: ProgramStatus;
     programStage: Id;
