@@ -68,6 +68,7 @@ interface D2TrackerTrackedEntityBase {
     createdAtClient: IsoDate;
     updatedAt: IsoDate;
     updatedAtClient: IsoDate;
+    orgUnits: CommaDelimitedListOfUid;
     orgUnit: SemiColonDelimitedListOfUid;
     inactive: boolean;
     deleted: boolean;
@@ -138,12 +139,18 @@ type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partia
 
 type Params = RequiredBy<TrackedEntitiesParamsBase, "program" | "ouMode">;
 
+type OrgUnitMode = "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
+
 export type TrackedEntitiesParamsBase = {
     query: string;
     attribute: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
+    // orgUnit and ouMode are being deprecated in v42
+    // https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-242/tracker.html#tracked-entity-collections
+    orgUnits: CommaDelimitedListOfUid;
+    orgUnitMode: OrgUnitMode;
     orgUnit: SemiColonDelimitedListOfUid;
-    ouMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
+    ouMode: OrgUnitMode;
     program: Id;
     programStatus: ProgramStatus;
     programStage: Id;
