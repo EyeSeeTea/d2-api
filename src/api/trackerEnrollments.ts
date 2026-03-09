@@ -5,7 +5,7 @@ import { parseTrackerPager } from "./common";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { TrackedPager } from "./trackerTrackedEntities";
+import { OrgUnitMode, TrackedPager } from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEnrollments {
@@ -85,11 +85,14 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         skipPaging: boolean;
     }>;
 
-type Params = RequiredBy<TrackerEnrollmentsParamsBase, "ouMode">;
+// TODO: in v40 ?orgUnit=[ID] is required
+type Params = Partial<TrackerEnrollmentsParamsBase>;
 
 type TrackerEnrollmentsParamsBase = {
+    orgUnits: CommaDelimitedListOfUid;
+    orgUnitMode: OrgUnitMode;
     orgUnit: SemiColonDelimitedListOfUid;
-    ouMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
+    ouMode: OrgUnitMode;
     program: Id;
     programStatus: ProgramStatus;
     followUp: boolean;

@@ -4,7 +4,7 @@ import { Preset, D2Geometry } from "../schemas";
 import { parseTrackerPager } from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { TrackedPager } from "./trackerTrackedEntities";
+import { OrgUnitMode, TrackedPager } from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEvents {
@@ -111,6 +111,7 @@ type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
     }>;
 
 interface EventsParamsBase {
+    orgUnitMode?: OrgUnitMode;
     program?: Id;
     programStage?: Id;
     programStatus?: ProgramStatus;
@@ -120,7 +121,7 @@ interface EventsParamsBase {
     trackedEntity?: Id;
     orgUnit?: Id;
     event?: Id;
-    ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
+    ouMode?: OrgUnitMode;
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;

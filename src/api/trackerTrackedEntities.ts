@@ -8,7 +8,7 @@ import {
     D2TrackerEnrollmentSchema,
     D2TrackerEnrollmentToPost,
 } from "./trackerEnrollments";
-import { RequiredBy, Maybe } from "../utils/types";
+import { RequiredBy, Maybe, RequireAtLeastOne } from "../utils/types";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackedEntities {
@@ -139,9 +139,21 @@ type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partia
         skipPaging: boolean;
     }>;
 
-type Params = RequiredBy<TrackedEntitiesParamsBase, "program">;
+type Params = RequireAtLeastOne<
+    Partial<TrackedEntitiesParamsBase>,
+    "program" | "trackedEntityType" | "trackedEntities"
+>;
+
+export type OrgUnitMode =
+    | "SELECTED"
+    | "CHILDREN"
+    | "DESCENDANTS"
+    | "ACCESSIBLE"
+    | "CAPTURE"
+    | "ALL";
 
 export type TrackedEntitiesParamsBase = {
+    trackedEntities: CommaDelimitedListOfUid;
     query: string;
     attribute: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
@@ -149,7 +161,7 @@ export type TrackedEntitiesParamsBase = {
     // https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-242/tracker.html#tracked-entity-collections
     // This is a breaking change, but upgrade should be as easy as find and replace
     orgUnits: CommaDelimitedListOfUid;
-    orgUnitMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
+    orgUnitMode: OrgUnitMode;
     program: Id;
     programStatus: ProgramStatus;
     programStage: Id;
