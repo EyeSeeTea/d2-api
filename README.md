@@ -37,7 +37,7 @@ $ yarn publish [--tag beta] [--patch | --minor | --major]
 ### Create an API instance
 
 ```ts
-import { D2Api } from "d2-api/2.36";
+import { D2Api } from "d2-api/2.42";
 
 // Basic access authentication
 const api = new D2Api({
@@ -364,7 +364,7 @@ const data = await api.tracker.trackedEntities
         fields: {
             orgUnit: true,
         },
-        ouMode: "ALL",
+        orgUnitMode: "ALL",
         program: "program_id",
     })
     .getData();
@@ -378,7 +378,7 @@ const data = await api.tracker.trackedEntities
         fields: {
             orgUnit: true,
         },
-        ouMode: "ALL",
+        orgUnitMode: "ALL",
         program: "program_id",
         order: [
             { type: "field", field: "createdAt", direction: "asc" },
@@ -396,17 +396,20 @@ const data = await api.tracker.trackedEntities
         fields: {
             orgUnit: true,
         },
-        ouMode: "ALL",
+        orgUnitMode: "ALL",
         program: "program_id",
         totalPages: true,
     })
     .getData();
 /* Response:
     {
-        page: 1;
-        pageSize: 50;
-        pageCount: 10;
-        total: 500;
+        pager: {
+            page: 1;
+            pageSize: 50;
+            pageCount: 10;
+            total: 500;
+        },
+        trackedEntities: []
     }
     */
 ```

@@ -1,7 +1,6 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
-import { parseTrackerPager } from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
 import { OrgUnitMode, TrackedPager } from "./trackerTrackedEntities";
@@ -13,18 +12,10 @@ export class TrackerEvents {
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
     ): D2ApiResponse<TrackerEventsResponse<Fields>> {
-        return this.api
-            .get<EventsResponse<Fields>>("/tracker/events", {
-                ..._.omit(params, ["fields"]),
-                fields: getTrackerFieldsParam(params.fields),
-            })
-            .map(({ data }) => {
-                return {
-                    ..._.omit(data, "events"),
-                    pager: parseTrackerPager(data),
-                    instances: data.events || data.instances || [],
-                };
-            });
+        return this.api.get<EventsResponse<Fields>>("/tracker/events", {
+            ..._.omit(params, ["fields"]),
+            fields: getTrackerFieldsParam(params.fields),
+        });
     }
 
     getById<Fields extends D2TrackerEventFields>(
@@ -103,14 +94,16 @@ export type Note = {
     storedBy: Username;
     value: string;
 };
-type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
+
+export type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
-        skipPaging: boolean;
+        paging: boolean;
     }>;
 
 interface EventsParamsBase {
+    events?: CommaDelimitedListOfUid;
     orgUnitMode?: OrgUnitMode;
     program?: Id;
     programStage?: Id;
@@ -121,7 +114,6 @@ interface EventsParamsBase {
     trackedEntity?: Id;
     orgUnit?: Id;
     event?: Id;
-    ouMode?: OrgUnitMode;
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
@@ -160,10 +152,10 @@ export interface DataValue {
     providedElsewhere?: boolean;
 }
 
-export interface TrackerEventsResponse<Fields> extends TrackedPager {
-    pager?: TrackedPager;
-    instances: SelectedPick<D2TrackerEventSchema, Fields>[];
-}
+export type TrackerEventsResponse<Fields> = {
+    pager: TrackedPager;
+    events: SelectedPick<D2TrackerEventSchema, Fields>[];
+};
 
 export interface D2TrackerEventSchema {
     name: "D2TrackerEvent";
@@ -180,7 +172,49 @@ export interface D2TrackerEventSchema {
 
 type D2TrackerEventFields = Selector<D2TrackerEventSchema>;
 
-type EventsResponse<Fields> = Omit<TrackerEventsResponse<Fields>, "instances"> & {
-    instances: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
+type EventsResponse<Fields> = TrackerEventsResponse<Fields> & {
     events: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
 };
+
+export interface EventsPostResponse {
+    responseType: "ImportSummaries";
+    status: "ERROR" | "SUCCESS" | "WARNING";
+    imported: number;
+    updated: number;
+    deleted: number;
+    ignored: number;
+    total: number;
+    importOptions: object;
+    importSummaries?: Array<
+        | {
+              responseType: "ImportSummary";
+              status: "ERROR" | "WARNING";
+              reference?: string;
+              description: string;
+              importOptions: object;
+              conflicts: Array<{
+                  object: string;
+                  value: string;
+              }>;
+              importCount: {
+                  imported: number;
+                  updated: number;
+                  ignored: number;
+                  deleted: number;
+              };
+          }
+        | {
+              responseType: "ImportSummary";
+              status: "SUCCESS";
+              reference: string;
+              href: string;
+              importOptions: object;
+              importCount: {
+                  imported: number;
+                  updated: number;
+                  ignored: number;
+                  deleted: number;
+              };
+          }
+    >;
+}

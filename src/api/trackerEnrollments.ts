@@ -14,18 +14,10 @@ export class TrackerEnrollments {
     get<Fields extends D2TrackerEnrollmentFields>(
         params: TrackerEnrollmentsParams<Fields>
     ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
-        return this.api
-            .get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
-                ..._.omit(params, ["fields"]),
-                fields: getTrackerFieldsParam(params.fields),
-            })
-            .map(({ data }) => {
-                return {
-                    ..._.omit(data, "enrollments"),
-                    pager: parseTrackerPager(data),
-                    instances: data.enrollments || data.instances || [],
-                };
-            });
+        return this.api.get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
+            ..._.omit(params, ["fields"]),
+            fields: getTrackerFieldsParam(params.fields),
+        });
     }
 }
 
@@ -82,7 +74,7 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
-        skipPaging: boolean;
+        paging: boolean;
     }>;
 
 // TODO: in v40 ?orgUnit=[ID] is required
@@ -109,10 +101,10 @@ type TrackerEnrollmentsParamsBase = {
 type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
-export interface TrackerEnrollmentsResponse<Fields> extends TrackedPager {
-    pager?: TrackedPager;
-    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
-}
+export type TrackerEnrollmentsResponse<Fields> = {
+    pager: TrackedPager;
+    enrollments: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
+};
 
 export interface D2TrackerEnrollmentSchema {
     name: "D2TrackerEnrollment";
@@ -133,7 +125,6 @@ export interface D2TrackerEnrollmentSchema {
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
 
-type EnrollmentResponse<Fields> = Omit<TrackerEnrollmentsResponse<Fields>, "instances"> & {
-    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
+type EnrollmentResponse<Fields> = TrackerEnrollmentsResponse<Fields> & {
     enrollments: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
 };

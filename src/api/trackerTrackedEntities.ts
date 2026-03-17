@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { D2Geometry, Preset } from "../schemas";
 import { Id, Selector, SelectedPick } from "./base";
-import { D2ApiResponse, parseTrackerPager } from "./common";
+import { D2ApiResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import {
     D2TrackerEnrollment,
@@ -26,11 +26,10 @@ export class TrackedEntities {
                 ...paramsToRequest,
                 fields: getTrackerFieldsParam(fields),
             })
-            .map(({ data }) => {
+            .map(response => {
                 return {
-                    ..._.omit(data, "trackedEntities"),
-                    pager: parseTrackerPager(data),
-                    instances: data.trackedEntities || data.instances || [],
+                    pager: response.data.pager,
+                    trackedEntities: response.data.trackedEntities,
                 };
             });
     }
@@ -132,11 +131,11 @@ export interface Attribute {
 
 export type AttributeToPost = Pick<Attribute, "attribute" | "value">;
 
-type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partial<{
+export type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
-        skipPaging: boolean;
+        paging: boolean;
     }>;
 
 type Params = RequireAtLeastOne<
@@ -153,15 +152,12 @@ export type OrgUnitMode =
     | "ALL";
 
 export type TrackedEntitiesParamsBase = {
+    orgUnits: CommaDelimitedListOfUid;
+    orgUnitMode: OrgUnitMode;
     trackedEntities: CommaDelimitedListOfUid;
     query: string;
     attribute: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
-    // removing orgUnit and ouMode because they are being deprecated in v42
-    // https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-242/tracker.html#tracked-entity-collections
-    // This is a breaking change, but upgrade should be as easy as find and replace
-    orgUnits: CommaDelimitedListOfUid;
-    orgUnitMode: OrgUnitMode;
     program: Id;
     programStatus: ProgramStatus;
     programStage: Id;
@@ -174,9 +170,9 @@ export type TrackedEntitiesParamsBase = {
     enrollmentOccurredAfter: IsoDate;
     enrollmentOccurredBefore: IsoDate;
     trackedEntityType: Id;
-    trackedEntity: SemiColonDelimitedListOfUid;
+    trackedEntity: Id;
     assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
-    assignedUsers: SemiColonDelimitedListOfUid;
+    assignedUsers: CommaDelimitedListOfUid;
     eventStatus: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     eventOccurredAfter: IsoDate;
     eventOccurredBefore: IsoDate;
@@ -212,10 +208,10 @@ export type TrackedPager = {
     total?: number;
 };
 
-export interface TrackedEntitiesGetResponse<Fields> extends TrackedPager {
-    pager?: TrackedPager;
-    instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[];
-}
+export type TrackedEntitiesGetResponse<Fields> = {
+    pager: TrackedPager;
+    trackedEntities: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[];
+};
 
 export interface D2TrackerTrackedEntitySchema {
     name: "D2TrackerTrackedEntity";
@@ -234,9 +230,55 @@ export interface D2TrackerTrackedEntitySchema {
     };
 }
 
-type D2TrackerTrackedEntityFields = Selector<D2TrackerTrackedEntitySchema>;
+export type D2TrackerTrackedEntityFields = Selector<D2TrackerTrackedEntitySchema>;
 
-type TrackerResponse<Fields> = Omit<TrackedEntitiesGetResponse<Fields>, "instances"> & {
-    instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[] | undefined;
+type TrackerResponse<Fields> = TrackedEntitiesGetResponse<Fields> & {
     trackedEntities: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[] | undefined;
 };
+
+export interface TeiPostResponse {
+    responseType: "ImportSummaries";
+    status: "ERROR" | "SUCCESS";
+    imported: number;
+    updated: number;
+    deleted: number;
+    ignored: number;
+    total: number;
+    importSummaries?: Array<
+        | {
+              responseType: "ImportSummary";
+              status: "ERROR";
+              reference?: string;
+              conflicts: Array<{
+                  object: string;
+                  value: string;
+              }>;
+              importCount: {
+                  imported: number;
+                  updated: number;
+                  ignored: number;
+                  deleted: number;
+              };
+          }
+        | {
+              responseType: "ImportSummary";
+              status: "SUCCESS";
+              reference: string;
+              importCount: {
+                  imported: number;
+                  updated: number;
+                  ignored: number;
+                  deleted: number;
+              };
+              enrollments: {
+                  responseType: "ImportSummaries";
+                  status: "ERROR" | "SUCCESS";
+                  imported: number;
+                  updated: number;
+                  deleted: number;
+                  ignored: number;
+                  total: number;
+              };
+          }
+    >;
+}

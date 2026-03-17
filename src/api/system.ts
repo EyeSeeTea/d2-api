@@ -4,10 +4,10 @@ import { timeout } from "../utils/promises";
 import { D2ApiResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import { DataValueSetsPostResponse } from "./dataValues";
-import { EventsPostResponse } from "./events";
 import { MetadataResponse } from "./metadata";
-import { TeiPostResponse } from "./trackedEntityInstances";
 import { TrackerPostResponse } from "./tracker";
+import { EventsPostResponse } from "./trackerEvents";
+import { TeiPostResponse } from "./trackerTrackedEntities";
 
 export class System {
     constructor(public d2Api: D2ApiGeneric) {}
