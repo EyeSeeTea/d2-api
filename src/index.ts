@@ -6,3 +6,6 @@ export { Canceler, isCancel } from "./repositories/CancelableResponse";
 
 export { CancelableResponse } from "./repositories/CancelableResponse";
 export { Id, Ref, D2Geometry } from "./schemas";
+
+// Re-export the current DHIS2 API version at package root for simpler imports.
+export * from "./2.42";

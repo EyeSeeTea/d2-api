@@ -172,9 +172,7 @@ export interface D2TrackerEventSchema {
 
 type D2TrackerEventFields = Selector<D2TrackerEventSchema>;
 
-type EventsResponse<Fields> = TrackerEventsResponse<Fields> & {
-    events: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
-};
+type EventsResponse<Fields> = TrackerEventsResponse<Fields>;
 
 export interface EventsPostResponse {
     responseType: "ImportSummaries";

@@ -83,8 +83,6 @@ type Params = Partial<TrackerEnrollmentsParamsBase>;
 type TrackerEnrollmentsParamsBase = {
     orgUnits: CommaDelimitedListOfUid;
     orgUnitMode: OrgUnitMode;
-    orgUnit: SemiColonDelimitedListOfUid;
-    ouMode: OrgUnitMode;
     program: Id;
     programStatus: ProgramStatus;
     followUp: boolean;
@@ -98,7 +96,6 @@ type TrackerEnrollmentsParamsBase = {
     includeDeleted: boolean;
 };
 
-type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
 export type TrackerEnrollmentsResponse<Fields> = {
@@ -125,6 +122,4 @@ export interface D2TrackerEnrollmentSchema {
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
 
-type EnrollmentResponse<Fields> = TrackerEnrollmentsResponse<Fields> & {
-    enrollments: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
-};
+type EnrollmentResponse<Fields> = TrackerEnrollmentsResponse<Fields>;

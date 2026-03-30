@@ -232,9 +232,7 @@ export interface D2TrackerTrackedEntitySchema {
 
 export type D2TrackerTrackedEntityFields = Selector<D2TrackerTrackedEntitySchema>;
 
-type TrackerResponse<Fields> = TrackedEntitiesGetResponse<Fields> & {
-    trackedEntities: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[] | undefined;
-};
+type TrackerResponse<Fields> = TrackedEntitiesGetResponse<Fields>;
 
 export interface TeiPostResponse {
     responseType: "ImportSummaries";
