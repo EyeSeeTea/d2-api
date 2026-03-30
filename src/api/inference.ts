@@ -25,7 +25,7 @@ export type OmitNever<T> = OmitByValue<T, never>;
 export type Selector<ModelSchema extends D2ModelSchemaBase> = {
     [Key in keyof ModelSchema["fields"]]?:
         | boolean
-        | {}
+        | object
         | If<
               IsLiteral<ModelSchema["fields"][Key]>,
               boolean, // TODO: functions

@@ -422,7 +422,7 @@ async function generateSchemas(options: { includeDeprecated: boolean }) {
 }
 
 function logErrorAndExit(err: any) {
-    console.error(err); // eslint-disable-line no-console2
+    console.error(err);
     process.exit(1);
 }
 

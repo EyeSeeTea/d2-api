@@ -1,7 +1,6 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset } from "../schemas";
-import { parseTrackerPager } from "./common";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
