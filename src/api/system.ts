@@ -6,8 +6,6 @@ import { D2ApiGeneric } from "./d2Api";
 import { DataValueSetsPostResponse } from "./dataValues";
 import { MetadataResponse } from "./metadata";
 import { TrackerPostResponse } from "./tracker";
-import { EventsPostResponse } from "./trackerEvents";
-import { TeiPostResponse } from "./trackerTrackedEntities";
 
 export class System {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -112,8 +110,6 @@ export type TaskCategory =
     | "DATA_SET_NOTIFICATION"
     | "DATA_STATISTICS"
     | "DATA_SYNC"
-    | "ENROLLMENT_IMPORT"
-    | "EVENT_IMPORT"
     | "FILE_RESOURCE_CLEANUP"
     | "GML_IMPORT"
     | "LEADER_ELECTION"
@@ -130,7 +126,6 @@ export type TaskCategory =
     | "RESOURCE_TABLE"
     | "SEND_SCHEDULED_MESSAGE"
     | "SMS_SEND"
-    | "TEI_IMPORT"
     | "TRACKER_IMPORT_JOB"
     | "VALIDATION_RESULTS_NOTIFICATION";
 
@@ -211,8 +206,6 @@ export interface SystemInfo {
 
 export type WaitForResponse = {
     DATAVALUE_IMPORT: DataValueSetsPostResponse;
-    EVENT_IMPORT: EventsPostResponse;
     METADATA_IMPORT: MetadataResponse;
-    TEI_IMPORT: TeiPostResponse;
     TRACKER_IMPORT_JOB: TrackerPostResponse;
 };
