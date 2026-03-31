@@ -221,17 +221,6 @@ export function validate404(status: number): boolean {
     return validate2xx(status) || status === 404;
 }
 
-export function parseTrackerPager(data: ParamTracker) {
-    return (
-        data.pager || {
-            page: data.page,
-            pageSize: data.pageSize,
-            total: data.total,
-            pageCount: data.pageCount,
-        }
-    );
-}
-
 interface ParamTracker extends TrackedPager {
     pager?: TrackedPager;
 }
