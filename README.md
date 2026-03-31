@@ -52,7 +52,7 @@ const api = new D2Api({
 });
 ```
 
-Learn more about [PAT authentication here](https://docs.dhis2.org/en/full/develop/dhis-core-version-240/developer-manual.html#webapi_pat_authentication)
+Learn more about [PAT authentication here](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-242/introduction.html#webapi_pat_authentication)
 
 ### Metadata models
 
