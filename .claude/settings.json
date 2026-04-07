@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command // \"\"' | grep -qE '^git commit' || echo '{\"decision\":\"allow\",\"suppressOutput\":true}'",
+            "timeout": 5,
+            "statusMessage": "Checking if commit..."
+          },
+          {
+            "type": "agent",
+            "prompt": "You are a pre-commit architecture reviewer. The tool input is: $ARGUMENTS\n\nFirst check: does tool_input.command start with 'git commit'? If NOT, immediately return {\"decision\":\"allow\"} and do nothing else.\n\nIf it IS a git commit, review the staged changes by running: git diff --staged\n\nThen check ONLY these critical rules (read .claude/CLAUDE.md for full context):\n\n1. ARCHITECTURE: Does the code respect the dependency rule? Is there any direct I/O bypassing the proper architectural layers?\n2. PATTERNS: Does new code follow the same patterns as existing sibling files in the same layer?\n3. FUNCTIONAL STYLE: Are there for loops with mutable accumulators (push, let counter) that should be map/flatMap/filter/reduce/Object.fromEntries?\n4. TEST QUALITY: Are there weak assertions (toBeDefined, toBeTruthy, toHaveProperty) when a concrete value is knowable?\n5. DUPLICATION: Is logic copy-pasted between files instead of extracted into a shared function/hook?\n6. SEPARATION: Is business logic leaking into the presentation/wiring layer?\n\nIf you find critical violations (especially #1 architecture bypass), output JSON: {\"decision\":\"block\",\"reason\":\"[description of violations]\"}\nIf only minor suggestions, output: {\"decision\":\"allow\",\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"Pre-commit review notes: [suggestions]\"}}\nIf no issues, output: {\"decision\":\"allow\"}",
+            "model": "claude-sonnet-4-6",
+            "timeout": 120,
+            "statusMessage": "Reviewing staged changes..."
+          }
+        ]
+      }
+    ]
+  }
+}
