@@ -100,20 +100,6 @@ Write tests that validate behavior precisely and are easy to maintain:
 - When CI workflows are added, do not restrict the `pull_request` trigger to specific branches — leave it unrestricted so all PRs get checked regardless of branch naming. Listing patterns like `feature/**` is fragile and misses other conventions (`fix/**`, `hotfix/**`, etc.). Keep `push` triggers limited to `master` and `development`.
 - Every PR should get automated feedback (lint, type-check, tests) before merge.
 
-## UI Design Workflow
-
-<!-- ADAPT: Remove this section if the project has no UI -->
-When a feature includes user-facing UI (web views, forms, dashboards):
-
-1. **Design before implementation.** Wireframes/mockups must be created in Pencil (`.pen` files via MCP tools) and approved before any `[FE]` or `[GD]` implementation tasks begin.
-2. **Design artifacts** live in `openspec/designs/`:
-   - `.pen` files in `openspec/designs/wireframes/` or `openspec/designs/mockups/`
-   - PNG exports in `openspec/designs/exports/` (naming: `[feature]-[screen]-[state].png`)
-3. **Design is part of the proposal.** The change's `design.md` must reference the wireframes/exports. Approval of the proposal implicitly approves the design.
-4. **Design tasks** are tagged `[GD]` in `tasks.md` and must be completed before `[FE]` tasks that depend on them.
-5. **Always commit the `.pen` source file.** The `.pen` file is the source of truth — PNG exports are derived artifacts.
-6. **Designs are part of the feature commit, not an afterthought.** When implementing a UI feature, the Pencil design and its PNG exports must be created and committed as part of the same body of work.
-
 ## After Every Feature Change
 
 After implementing any feature addition, modification, or bug fix, always update **all** of the following before considering the work done:

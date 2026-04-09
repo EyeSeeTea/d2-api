@@ -1,90 +1,179 @@
 schema: spec-driven
 
-# ADAPT: Replace this entire context block with your project's details.
-# This is the most important file to customize — it tells OpenSpec (and the AI)
-# everything about your project.
 context: |
-  Project: <YOUR PROJECT NAME>
+    Project: @eyeseetea/d2-api
 
-  What it is:
-  - <One-line description of what the project does>
-  - <How it works at a high level>
+    What it is:
+    - Typed TypeScript wrapper over the DHIS2 Web API
+    - Exposes a `D2Api` class that provides type-safe access to DHIS2 metadata models, analytics, tracker, data values, data store, sharing, messages, files, and email endpoints
+    - Schema generation: types are derived from DHIS2 schemas (see `src/scripts/generate-schemas.ts` and `src/2.42/schemas.ts`) so consumers get autocomplete and compile-time checks for metadata fields and filters
+    - HTTP transport is pluggable via a `HttpClientRepository` interface, with Axios and Fetch implementations
 
-  Tech stack:
-  - <Language and version>
-  - <Framework(s)>
-  - <Build tool>
-  - <Testing framework>
-  - <External APIs / services>
+    Tech stack:
+    - TypeScript 4.1
+    - Axios 1.x as the default HTTP client (Fetch implementation also provided)
+    - Lodash, qs (querystring), iconv-lite, form-data, abort-controller, cross-fetch
+    - Babel (build) + tsc (type-only emit) + @zeit/ncc (single-file dist bundle)
+    - Yarn (package manager)
+    - ESLint + Prettier
+    - Vitest (test framework — being introduced)
+    - Targets DHIS2 API v42 only
 
-  Directory structure:
-  - src/
-    - <describe your source directory layout>
+    Directory structure:
+    - src/
+      - index.ts            — public entry point and re-exports
+      - testing.ts          — test helpers (`getMockApiFromClass`, etc.)
+      - api/                — public surface: `D2Api` (`d2Api.ts`), endpoint clients
+                              (analytics, tracker, metadata, dataValues, dataStore,
+                              sharing, files, email, messageConversations, system,
+                              audit, appHub, SqlViews, currentUser, UserLookup,
+                              maintenance, expressions, model, patch, inference,
+                              types, common, base)
+      - data/               — concrete `HttpClientRepository` implementations
+                              (`AxiosHttpClientRepository`, `FetchHttpClientRepository`)
+                              and HTTP utilities (`utils/http.ts`)
+      - repositories/       — repository interfaces (`HttpClientRepository`,
+                              `CancelableResponse`)
+      - schemas/            — generic schema types (`base.ts`, `index.ts`)
+      - 2.42/                — DHIS2 v42 generated schemas and entry point
+      - utils/              — shared utilities (cache, connection, misc, promises,
+                              types, uid)
+      - scripts/            — developer scripts (`generate-schemas.ts`)
 
-  Configuration:
-  - <Environment variables, config files, etc.>
+    Configuration:
+    - No environment variables required at runtime. Consumers configure a `D2Api`
+      instance with `{ baseUrl, auth }` (basic auth or personal access token)
+    - Build/tooling config files: `tsconfig.json`, `.babelrc`/`babel.config.*`,
+      `.eslintrc*`, `.prettierrc*`
+    - `scripts/publish.sh` drives the release flow
 
-  Canonical commands:
-  - Build: <build command>
-  - Run: <run command>
-  - Dev: <dev command>
-  - Test: <test command>
-  - Lint: <lint command>
+    Canonical commands:
+    - Install:         yarn install
+    - Build:           yarn build           (babel transpile + tsc + copy package.json)
+    - Dist bundle:     yarn dist            (ncc single-file build)
+    - Dev (watch):     yarn start           (babel-watch on src/)
+    - Generate schemas: yarn generate-schemas
+    - Lint:            yarn lint            (eslint src --ext .js,.jsx,.ts,.tsx)
+    - Format:          yarn prettify
+    - Test:            yarn test            (Vitest — being introduced)
+    - Release:         yarn release
 
-  Code conventions:
-  - <Key conventions (naming, style, patterns)>
+    Code conventions:
+    - File naming: camelCase for modules (`dataStore.ts`), PascalCase for files
+      that primarily export a class (`AxiosHttpClientRepository.ts`, `D2Api`)
+    - Public API is re-exported from `src/index.ts`; consumers should not import
+      from deep paths
+    - Types and interfaces live alongside the module they describe (`api/types.ts`,
+      `utils/types.ts`)
+    - Functional/declarative style: prefer `map`/`flatMap`/`filter` over
+      imperative loops with mutable accumulators
+    - Immutability: prefer `Readonly<T>` / `ReadonlyArray<T>` for data structures;
+      do not mutate function arguments
+    - Composition over inheritance
+    - Derive union types from `as const` arrays rather than unsafe casts
+    - Conventional Commits for all commit messages
 
-  Architecture:
-  - <Architecture pattern (Clean Architecture, MVC, etc.)>
-  - <Layer descriptions and dependency rules>
+    Architecture (actual layout):
+    - The codebase is layered around an HTTP transport abstraction rather than
+      strict Clean Architecture (no domain/application split):
+        1. `repositories/`  — abstract interfaces (`HttpClientRepository`,
+                              `CancelableResponse`). No implementation details.
+        2. `data/`          — concrete HTTP clients (`AxiosHttpClientRepository`,
+                              `FetchHttpClientRepository`) implementing the
+                              repository interfaces.
+        3. `schemas/` + `2.42/` — type-level description of DHIS2 entities used
+                              to type the public API surface.
+        4. `api/`           — public surface. `D2Api` (`api/d2Api.ts`) is the
+                              composition root: it instantiates an
+                              `HttpClientRepository` and wires up endpoint clients
+                              (analytics, tracker, metadata, dataValues, etc.).
+                              Endpoint clients build typed requests and return
+                              `CancelableResponse` objects.
+        5. `utils/`         — cross-cutting helpers, no business rules.
+    - Dependency rule: `api/` may depend on `data/`, `repositories/`, `schemas/`,
+      `2.42/`, and `utils/`. `data/` depends only on `repositories/` and `utils/`.
+      `repositories/` depends on nothing inside the project.
+    - All network access goes through `HttpClientRepository`. Endpoint clients
+      must not import `axios` / `fetch` directly.
 
-  Git workflow:
-  - Feature branches start from `development` and merge back to `development`
-  - Branch naming: feature/<name> for features, fix/<name> for bugs
-  - Commits follow Conventional Commits
+    Git workflow:
+    - Base branch: `2.42` (this repo tracks DHIS2 v42; `2.42` is the integration
+      branch, not `master` or `development`)
+    - Feature branches start from `2.42` and merge back to `2.42`
+    - Branch naming: `feature/<name>` for features, `fix/<name>` for bug fixes
+    - Branch from another feature branch only when there is a hard dependency on
+      unmerged work
+    - All commits follow Conventional Commits
+      (`feat(scope): …`, `fix(scope): …`, `refactor(scope): …`,
+      `test(scope): …`, `docs(scope): …`, `chore(scope): …`)
 
-  Non-goals (do NOT introduce these):
-  - <Things explicitly out of scope>
+    Non-goals (do NOT introduce these):
+    - Support for DHIS2 versions other than v42. Code, schemas, and types are
+      v42-only; do not add multi-version branching inside the library
+    - Direct use of `axios` or `fetch` outside `data/`. New transports must
+      implement `HttpClientRepository`
+    - Replacing the public `D2Api` surface with breaking changes without an
+      OpenSpec proposal
 
-  Extension principles:
-  - <How to add new features correctly>
+    Extension principles:
+    - To add a new DHIS2 endpoint: create a new module under `src/api/`, depend
+      on the injected `HttpClientRepository` (do not import axios/fetch
+      directly), return `CancelableResponse<T>`, and wire it into `D2Api` in
+      `src/api/d2Api.ts`. Re-export public types from `src/index.ts` if needed
+    - To add a new HTTP transport: implement `HttpClientRepository` under
+      `src/data/` and let consumers inject it via `D2Api` construction
+    - To add or update schemas: regenerate via `yarn generate-schemas` rather
+      than hand-editing `src/2.42/schemas.ts`
+    - Keep type derivations driven by the schema files so consumers get accurate
+      autocomplete
 
-  Testing strategy:
-  - <Test types and where they live>
-  - <Test conventions>
+    Testing strategy:
+    - Test framework: Vitest (being introduced — `yarn test`)
+    - Test location: colocated `*.test.ts` next to the module under test inside
+      `src/`
+    - Use `getMockApiFromClass(D2Api)` from `src/testing.ts` to obtain a mocked
+      `D2Api` plus an `axios-mock-adapter` instance; stub endpoints with
+      `mock.onGet(...).reply(...)` and reset between tests
+    - Group related tests with `describe` blocks; assert concrete values
+      (`toEqual` / `toBe`), never `toBeDefined` / `toBeTruthy` when an exact
+      value is knowable
+    - Extract repeated literals (paths, fixtures) into constants and shared
+      helpers to reduce duplication
+    - Tests are the behavioral source of truth; specs in `openspec/specs/`
+      capture the "why"
 
-  Code style:
-  - Prefer functional/declarative patterns over imperative loops with mutable state
-  - Use flatMap, find, reduce, map, filter instead of for...of + push/break
-  - Avoid mutating function arguments or shared state — return new objects/arrays
-  - Apply immutability comprehensively; use Readonly<T> for data structures
-  - Prefer composition over inheritance
+    Code style:
+    - Prefer functional/declarative patterns over imperative loops with mutable state
+    - Use flatMap, find, map, filter instead of for...of + push/break
+    - Avoid mutating function arguments or shared state — return new objects/arrays
+    - Apply immutability comprehensively; use Readonly<T> for data structures
+    - Prefer composition over inheritance
 
 rules:
-  project:
-    - "Specs first: before modifying any behavior, check openspec/specs/ for existing specs. If behavior is unclear, read the spec. If no spec exists, propose one under changes/."
-    - Follow code conventions as defined in the project context above.
-    - "New code goes in the correct directory per the architecture."
-    - "Clean Architecture: domain layer must have no framework or infrastructure dependencies. All external access goes through repository interfaces."
-    - "Git: always branch from `development` unless the feature depends on an unmerged branch. Use feature/<name> for features, fix/<name> for bugs. All commits must follow Conventional Commits."
-    - "Definition of Done: a change is complete when specs are updated, code aligns with specs, tests pass, and no breaking surfaces are altered without a proposal."
-    - "Boy Scout Rule: leave every file you touch cleaner than you found it."
+    project:
+        - "Specs first: before modifying any behavior, check openspec/specs/ for existing specs. If behavior is unclear, read the spec. If no spec exists, propose one under changes/."
+        - Follow code conventions as defined in the project context above.
+        - "New code goes in the correct directory per the architecture."
+        - "Clean Architecture: domain layer must have no framework or infrastructure dependencies. All external access goes through repository interfaces."
+        - "Git: always branch from `development` unless the feature depends on an unmerged branch. Use feature/<name> for features, fix/<name> for bugs. All commits must follow Conventional Commits."
+        - "Definition of Done: a change is complete when specs are updated, code aligns with specs, tests pass, and no breaking surfaces are altered without a proposal."
+        - "Boy Scout Rule: leave every file you touch cleaner than you found it."
 
-  proposal:
-    - Must include: Goals, Non-goals, User impact, Compatibility, and Rollback plan.
-    - If changing public interfaces, explicitly list old vs new.
+    proposal:
+        - Must include: Goals, Non-goals, User impact, Compatibility, and Rollback plan.
+        - If changing public interfaces, explicitly list old vs new.
 
-  design:
-    - Must describe: data flow through the architecture layers.
-    - Note known constraints when relevant.
-    - "UI design gate: when a change includes user-facing UI, the design phase MUST produce wireframes or mockups in Pencil (.pen files) before implementation begins. Designs are stored in openspec/designs/ and exported to openspec/designs/exports/."
+    design:
+        - Must describe: data flow through the architecture layers.
+        - Note known constraints when relevant.
+        - "UI design gate: when a change includes user-facing UI, the design phase MUST produce wireframes or mockups in Pencil (.pen files) before implementation begins. Designs are stored in openspec/designs/ and exported to openspec/designs/exports/."
 
-  tasks:
-    - Include at least one task for tests when behavior changes.
-    - Include a task to update specs/ when behavior changes.
-    - "Tag each task with the responsible agent role: [BE], [FE], [GD], [DB], [CR], or other as applicable."
+    tasks:
+        - Include at least one task for tests when behavior changes.
+        - Include a task to update specs/ when behavior changes.
+        - "Tag each task with the responsible agent role: [BE], [FE], [GD], [DB], [CR], or other as applicable."
 
-  specs:
-    - "Tests are the behavioral source of truth. Specs provide design context that tests cannot express (goals, non-goals, design decisions, rationale)."
-    - "Specs and tests are complementary: specs capture the 'why', tests capture the 'what'."
-    - "Keep specs lean: avoid duplicating in markdown what is already asserted by well-named tests."
+    specs:
+        - "Tests are the behavioral source of truth. Specs provide design context that tests cannot express (goals, non-goals, design decisions, rationale)."
+        - "Specs and tests are complementary: specs capture the 'why', tests capture the 'what'."
+        - "Keep specs lean: avoid duplicating in markdown what is already asserted by well-named tests."
