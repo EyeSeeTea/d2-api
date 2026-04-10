@@ -148,6 +148,7 @@ context: |
     - Avoid mutating function arguments or shared state — return new objects/arrays
     - Apply immutability comprehensively; use Readonly<T> for data structures
     - Prefer composition over inheritance
+    - Code must be 100% typesafety with no `any`, unsafe cast (`as`), `@ts-ignore` or operator (`!`) usage
 
 rules:
     project:
