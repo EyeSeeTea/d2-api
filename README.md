@@ -338,6 +338,36 @@ const response = await api.dataValues
     .getData();
 ```
 
+### Data approvals
+
+```ts
+// Single status
+const status = await api.dataApprovals
+    .get({ wf: "rIUL3hYOjJc", pe: "202401", ou: "YuQRtpLP10I" })
+    .getData();
+
+// Bulk status
+const statuses = await api.dataApprovals
+    .getMany({
+        wf: ["rIUL3hYOjJc"],
+        pe: ["202401", "202402"],
+        ou: ["YuQRtpLP10I"],
+    })
+    .getData();
+
+// Approve / unapprove / accept / unaccept
+await api.dataApprovals.approve({ wf: "rIUL3hYOjJc", pe: "202401", ou: "YuQRtpLP10I" }).getData();
+
+// Bulk approve
+await api.dataApprovals
+    .approveMany({
+        wf: ["rIUL3hYOjJc"],
+        pe: ["202401"],
+        approvals: [{ ou: "YuQRtpLP10I", aoc: "HllvX50cXC0" }],
+    })
+    .getData();
+```
+
 ### Data store
 
 #### Get
