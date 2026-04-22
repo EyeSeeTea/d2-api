@@ -10,6 +10,7 @@ import {
 } from "./trackerEnrollments";
 import { RequiredBy, Maybe, RequireAtLeastOne } from "../utils/types";
 import { getTrackerFieldsParam } from "./tracker";
+import { UserInfo, Username } from "./trackerEvents";
 
 export class TrackedEntities {
     constructor(public d2Api: D2ApiGeneric) {}
@@ -56,9 +57,9 @@ export class TrackedEntities {
 
 type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 type IsoDate = string;
-type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
+type IdScheme = string;
 
 interface D2TrackerTrackedEntityBase {
     trackedEntity: Id;
@@ -67,9 +68,13 @@ interface D2TrackerTrackedEntityBase {
     createdAtClient: IsoDate;
     updatedAt: IsoDate;
     updatedAtClient: IsoDate;
-    orgUnit: SemiColonDelimitedListOfUid;
+    orgUnit: Id;
     inactive: boolean;
     deleted: boolean;
+    potentialDuplicate: boolean;
+    storedBy: Username;
+    createdBy: UserInfo;
+    updatedBy: UserInfo;
     relationships: Relationship[];
     attributes: Attribute[];
     enrollments: D2TrackerEnrollment[];
@@ -155,11 +160,10 @@ export type TrackedEntitiesParamsBase = {
     orgUnits: CommaDelimitedListOfUid;
     orgUnitMode: OrgUnitMode;
     trackedEntities: CommaDelimitedListOfUid;
-    query: string;
-    attribute: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
     program: Id;
     programStatus: ProgramStatus;
+    enrollmentStatus: ProgramStatus;
     programStage: Id;
     followUp: boolean;
     updatedAfter: IsoDate;
@@ -171,14 +175,14 @@ export type TrackedEntitiesParamsBase = {
     enrollmentOccurredBefore: IsoDate;
     trackedEntityType: Id;
     trackedEntity: Id;
-    assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
+    assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY" | "ALL";
     assignedUsers: CommaDelimitedListOfUid;
     eventStatus: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     eventOccurredAfter: IsoDate;
     eventOccurredBefore: IsoDate;
-    skipMeta: boolean;
+    idScheme: IdScheme;
+    orgUnitIdScheme: IdScheme;
     includeDeleted: boolean;
-    includeAllAttributes: boolean;
     potentialDuplicate: boolean;
     order: TrackedOrderBase[];
 };
@@ -195,7 +199,8 @@ export type TrackedOrderField = {
         | "enrolledAt"
         | "inactive"
         | "trackedEntity"
-        | "updatedAt";
+        | "updatedAt"
+        | "updatedAtClient";
 };
 
 export type TrackedAttributesFields = { type: "trackedEntityAttributeId"; id: Id };

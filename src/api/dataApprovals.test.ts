@@ -5,9 +5,7 @@ import {
     BulkApprovalPayload,
     DataApprovalBulkStatus,
     DataApprovalByCategoryOptionCombo,
-    DataApprovalState,
     DataApprovalStatus,
-    dataApprovalStates,
 } from "./dataApprovals";
 
 const WORKFLOW_ID = "rIUL3hYOjJc";

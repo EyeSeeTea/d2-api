@@ -7,3 +7,7 @@ export * from "./dataStore";
 export * from "./dataValues";
 export * from "./metadata";
 export * from "./model";
+export * from "./tracker";
+export * from "./trackerTrackedEntities";
+export * from "./trackerEnrollments";
+export * from "./trackerEvents";

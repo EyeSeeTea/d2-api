@@ -1225,6 +1225,14 @@
   dependencies:
     "@types/node" "*"
 
+"@types/chai@5.2.3":
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-5.2.3.tgz#8e9cd9e1c3581fa6b341a5aed5588eb285be0b4a"
+  integrity sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==
+  dependencies:
+    "@types/deep-eql" "*"
+    assertion-error "^2.0.1"
+
 "@types/connect@*":
   version "3.4.32"
   resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.32.tgz#aa0e9616b9435ccad02bc52b5b454ffc2c70ba28"
@@ -1236,6 +1244,11 @@
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/cryptr/-/cryptr-4.0.0.tgz#be0d46cc25256e5e0f444f9e01c9f45e5b8e78b1"
   integrity sha512-chJ7i/EJYNo2zQjttyCGzJ96t9jF5NKPLL+36CzJwnj70TqzNoBDc6IgDp7TdqwbpjMJpGz0m9HAWxMNUwLDzg==
+
+"@types/deep-eql@*":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/deep-eql/-/deep-eql-4.0.2.tgz#334311971d3a07121e7eb91b684a605e7eea9cbd"
+  integrity sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==
 
 "@types/estree@1.0.8", "@types/estree@^1.0.0":
   version "1.0.8"

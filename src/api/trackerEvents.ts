@@ -3,7 +3,7 @@ import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { OrgUnitMode, TrackedPager } from "./trackerTrackedEntities";
+import { OrgUnitMode, Relationship, TrackedPager } from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEvents {
@@ -20,10 +20,9 @@ export class TrackerEvents {
 
     getById<Fields extends D2TrackerEventFields>(
         id: string,
-        params: EventsParams<Fields>
-    ): D2ApiResponse<D2TrackerEvent> {
-        return this.api.get<D2TrackerEvent>(`/tracker/events/${id}`, {
-            ..._.omit(params, ["fields"]),
+        params: { fields: Fields }
+    ): D2ApiResponse<SelectedPick<D2TrackerEventSchema, Fields>> {
+        return this.api.get<SelectedPick<D2TrackerEventSchema, Fields>>(`/tracker/events/${id}`, {
             fields: getTrackerFieldsParam(params.fields),
         });
     }
@@ -31,11 +30,11 @@ export class TrackerEvents {
 
 type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 type IsoDate = string;
-type Username = string;
+export type Username = string;
 type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
 type CommaDelimitedListOfDataElementFilter = string;
-type UserInfo = {
+export type UserInfo = {
     uid: Id;
     username: string;
     firstName: string;
@@ -56,16 +55,22 @@ interface D2TrackerEventBase {
     occurredAt: IsoDate;
     scheduledAt: IsoDate;
     storedBy: Username;
-    followup: boolean;
+    followUp: boolean;
     deleted: boolean;
     createdAt: IsoDate;
+    createdAtClient: IsoDate;
     updatedAt: IsoDate;
+    updatedAtClient: IsoDate;
+    completedAt?: IsoDate;
+    completedBy?: Username;
     createdBy: UserInfo;
     attributeOptionCombo: Id;
     attributeCategoryOptions: Id;
     updatedBy: UserInfo;
+    assignedUser?: UserInfo;
     dataValues: DataValue[];
     notes: Note[];
+    relationships?: Relationship[];
     trackedEntity?: Id;
 }
 
@@ -108,6 +113,7 @@ interface EventsParamsBase {
     program?: Id;
     programStage?: Id;
     programStatus?: ProgramStatus;
+    enrollmentStatus?: ProgramStatus;
     filter?: CommaDelimitedListOfDataElementFilter;
     filterAttributes?: CommaDelimitedListOfAttributeFilter;
     followUp?: boolean;
@@ -119,7 +125,6 @@ interface EventsParamsBase {
     occurredBefore?: IsoDate;
     scheduledAfter?: IsoDate;
     scheduledBefore?: IsoDate;
-    updatedAt?: IsoDate;
     updatedAfter?: IsoDate;
     updatedBefore?: IsoDate;
     updatedWithin?: IsoDate;
@@ -127,19 +132,18 @@ interface EventsParamsBase {
     enrollmentEnrolledBefore?: IsoDate;
     enrollmentOccurredAfter?: IsoDate;
     enrollmentOccurredBefore?: IsoDate;
-    skipMeta?: boolean;
     dataElementIdScheme?: IdScheme;
     categoryOptionComboIdScheme?: IdScheme;
+    categoryOptionIdScheme?: IdScheme;
     orgUnitIdScheme?: IdScheme;
     programIdScheme?: IdScheme;
     programStageIdScheme?: IdScheme;
     idScheme?: IdScheme;
     order?: CommaDelimitedListOfUid;
-    skipEventId?: boolean;
-    attributeCc?: string;
-    attributeCos?: string;
+    attributeCategoryCombo?: Id;
+    attributeCategoryOptions?: Id;
     includeDeleted?: boolean;
-    assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
+    assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY" | "ALL";
     assignedUser?: CommaDelimitedListOfUid;
 }
 
