@@ -222,14 +222,12 @@ export function validate404(status: number): boolean {
 }
 
 export function parseTrackerPager(data: ParamTracker) {
-    return (
-        data.pager || {
-            page: data.page,
-            pageSize: data.pageSize,
-            total: data.total,
-            pageCount: data.pageCount,
-        }
-    );
+    return {
+        page: data.page,
+        pageSize: data.pageSize,
+        total: data.total,
+        pageCount: data.pageCount,
+    };
 }
 
 interface ParamTracker extends TrackedPager {

@@ -1,14 +1,14 @@
 import _ from "lodash";
 import { D2Geometry, Preset } from "../schemas";
 import { Id, Selector, SelectedPick } from "./base";
-import { D2ApiResponse, parseTrackerPager } from "./common";
+import { D2ApiResponse } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 import {
     D2TrackerEnrollment,
     D2TrackerEnrollmentSchema,
     D2TrackerEnrollmentToPost,
 } from "./trackerEnrollments";
-import { RequiredBy, Maybe } from "../utils/types";
+import { RequiredBy, Maybe, RequireAtLeastOne } from "../utils/types";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackedEntities {
@@ -21,18 +21,10 @@ export class TrackedEntities {
         const orderParam = this.buildOrderParams(order);
         const paramsToRequest = { ...rest, order: orderParam };
 
-        return this.d2Api
-            .get<TrackerResponse<Fields>>("/tracker/trackedEntities", {
-                ...paramsToRequest,
-                fields: getTrackerFieldsParam(fields),
-            })
-            .map(({ data }) => {
-                return {
-                    ..._.omit(data, "trackedEntities"),
-                    pager: parseTrackerPager(data),
-                    instances: data.trackedEntities || data.instances || [],
-                };
-            });
+        return this.d2Api.get<TrackerResponse<Fields>>("/tracker/trackedEntities", {
+            ...paramsToRequest,
+            fields: getTrackerFieldsParam(fields),
+        });
     }
 
     private buildOrderParams(order: Maybe<TrackedOrderBase[]>): Maybe<string> {
@@ -75,7 +67,10 @@ interface D2TrackerTrackedEntityBase {
     attributes: Attribute[];
     enrollments: D2TrackerEnrollment[];
     programOwners: ProgramOwner[];
-    geometry: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
+    geometry:
+        | Extract<D2Geometry, { type: "Point" }>
+        | Extract<D2Geometry, { type: "Polygon" }>
+        | Extract<D2Geometry, { type: "MultiPolygon" }>;
 }
 
 export type D2TrackerTrackedEntity = D2TrackerTrackedEntityBase;
@@ -129,21 +124,33 @@ export interface Attribute {
 
 export type AttributeToPost = Pick<Attribute, "attribute" | "value">;
 
-type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partial<{
+export type TrackerTrackedEntitiesParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
         skipPaging: boolean;
     }>;
 
-type Params = RequiredBy<TrackedEntitiesParamsBase, "program" | "ouMode">;
+type Params = RequireAtLeastOne<
+    Partial<TrackedEntitiesParamsBase>,
+    "program" | "trackedEntityType"
+>;
+
+export type OrgUnitMode =
+    | "SELECTED"
+    | "CHILDREN"
+    | "DESCENDANTS"
+    | "ACCESSIBLE"
+    | "CAPTURE"
+    | "ALL";
 
 export type TrackedEntitiesParamsBase = {
+    orgUnits: CommaDelimitedListOfUid;
+    orgUnitMode: OrgUnitMode;
+    trackedEntities: CommaDelimitedListOfUid;
     query: string;
     attribute: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
-    orgUnit: SemiColonDelimitedListOfUid;
-    ouMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
     program: Id;
     programStatus: ProgramStatus;
     programStage: Id;
@@ -156,9 +163,9 @@ export type TrackedEntitiesParamsBase = {
     enrollmentOccurredAfter: IsoDate;
     enrollmentOccurredBefore: IsoDate;
     trackedEntityType: Id;
-    trackedEntity: SemiColonDelimitedListOfUid;
+    trackedEntity: Id;
     assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
-    assignedUsers: SemiColonDelimitedListOfUid;
+    assignedUsers: CommaDelimitedListOfUid;
     eventStatus: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     eventOccurredAfter: IsoDate;
     eventOccurredBefore: IsoDate;
@@ -194,10 +201,9 @@ export type TrackedPager = {
     total?: number;
 };
 
-export interface TrackedEntitiesGetResponse<Fields> extends TrackedPager {
-    pager?: TrackedPager;
+export type TrackedEntitiesGetResponse<Fields> = TrackedPager & {
     instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[];
-}
+};
 
 export interface D2TrackerTrackedEntitySchema {
     name: "D2TrackerTrackedEntity";
@@ -216,9 +222,6 @@ export interface D2TrackerTrackedEntitySchema {
     };
 }
 
-type D2TrackerTrackedEntityFields = Selector<D2TrackerTrackedEntitySchema>;
+export type D2TrackerTrackedEntityFields = Selector<D2TrackerTrackedEntitySchema>;
 
-type TrackerResponse<Fields> = Omit<TrackedEntitiesGetResponse<Fields>, "instances"> & {
-    instances: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[] | undefined;
-    trackedEntities: SelectedPick<D2TrackerTrackedEntitySchema, Fields>[] | undefined;
-};
+type TrackerResponse<Fields> = TrackedEntitiesGetResponse<Fields>;

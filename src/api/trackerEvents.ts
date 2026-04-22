@@ -1,10 +1,9 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
-import { parseTrackerPager } from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { TrackedPager } from "./trackerTrackedEntities";
+import { OrgUnitMode, TrackedPager } from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEvents {
@@ -13,18 +12,10 @@ export class TrackerEvents {
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
     ): D2ApiResponse<TrackerEventsResponse<Fields>> {
-        return this.api
-            .get<EventsResponse<Fields>>("/tracker/events", {
-                ..._.omit(params, ["fields"]),
-                fields: getTrackerFieldsParam(params.fields),
-            })
-            .map(({ data }) => {
-                return {
-                    ..._.omit(data, "events"),
-                    pager: parseTrackerPager(data),
-                    instances: data.events || data.instances || [],
-                };
-            });
+        return this.api.get<EventsResponse<Fields>>("/tracker/events", {
+            ..._.omit(params, ["fields"]),
+            fields: getTrackerFieldsParam(params.fields),
+        });
     }
 
     getById<Fields extends D2TrackerEventFields>(
@@ -103,7 +94,8 @@ export type Note = {
     storedBy: Username;
     value: string;
 };
-type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
+
+export type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
@@ -111,6 +103,8 @@ type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
     }>;
 
 interface EventsParamsBase {
+    events?: CommaDelimitedListOfUid;
+    orgUnitMode?: OrgUnitMode;
     program?: Id;
     programStage?: Id;
     programStatus?: ProgramStatus;
@@ -120,7 +114,6 @@ interface EventsParamsBase {
     trackedEntity?: Id;
     orgUnit?: Id;
     event?: Id;
-    ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
@@ -159,10 +152,9 @@ export interface DataValue {
     providedElsewhere?: boolean;
 }
 
-export interface TrackerEventsResponse<Fields> extends TrackedPager {
-    pager?: TrackedPager;
+export type TrackerEventsResponse<Fields> = TrackedPager & {
     instances: SelectedPick<D2TrackerEventSchema, Fields>[];
-}
+};
 
 export interface D2TrackerEventSchema {
     name: "D2TrackerEvent";
@@ -179,7 +171,4 @@ export interface D2TrackerEventSchema {
 
 type D2TrackerEventFields = Selector<D2TrackerEventSchema>;
 
-type EventsResponse<Fields> = Omit<TrackerEventsResponse<Fields>, "instances"> & {
-    instances: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
-    events: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
-};
+type EventsResponse<Fields> = TrackerEventsResponse<Fields>;
