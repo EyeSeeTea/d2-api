@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { EmptyObject } from "../utils/types";
 import { Ref } from "./../schemas/base";
 import { D2ModelSchemaBase, Selector } from "./inference";
 import { TaskCategory } from "./system";
@@ -62,7 +61,7 @@ export interface FilterBase {
 }
 
 function applyFieldTransformers(key: string, value: any) {
-    if (value.hasOwnProperty("$fn")) {
+    if (Object.prototype.hasOwnProperty.call(value, "$fn")) {
         const valueWithFn = _.omit(value, ["$fn"]);
 
         switch (value["$fn"]["name"]) {
