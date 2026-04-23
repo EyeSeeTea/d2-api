@@ -22,7 +22,10 @@
         "generate-schemas": "ts-node src/scripts/generate-schemas.ts",
         "prerelease": "yarn build",
         "release": "bash scripts/publish.sh",
-        "test": "echo no-op"
+        "test": "yarn test:unit && yarn test:integration",
+        "test:watch": "vitest",
+        "test:unit": "vitest run --config vitest.unit.config.ts",
+        "test:integration": "vitest run --config vitest.integration.config.ts"
     },
     "dependencies": {
         "abort-controller": "3.0.0",
