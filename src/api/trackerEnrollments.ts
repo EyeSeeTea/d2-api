@@ -1,10 +1,16 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
-import { Preset } from "../schemas";
+import { Preset, D2Geometry } from "../schemas";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { OrgUnitMode, TrackedPager } from "./trackerTrackedEntities";
+import {
+    Attribute,
+    OrgUnitMode,
+    Relationship,
+    TrackedPager,
+    UserInfo,
+} from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEnrollments {
@@ -40,11 +46,17 @@ export interface D2TrackerEnrollment {
     orgUnitName: string;
     enrolledAt: IsoDate;
     occurredAt: IsoDate;
+    completedAt?: IsoDate;
+    completedBy?: string;
     followUp: boolean;
     deleted: boolean;
     storedBy: Username;
+    createdBy?: UserInfo;
+    updatedBy?: UserInfo;
+    geometry?: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
     events: D2TrackerEvent[];
-    attributes: D2TrackerEnrollmentAttribute[];
+    attributes: Attribute[];
+    relationships?: Relationship[];
     notes: Note[];
 }
 
@@ -59,9 +71,10 @@ type RequiredFieldsOnPost =
 
 export type D2TrackerEnrollmentToPost = Omit<
     RequiredBy<D2TrackerEnrollment, RequiredFieldsOnPost>,
-    "events"
+    "events" | "attributes"
 > & {
     events: D2TrackerEventToPost[];
+    attributes: D2TrackerEnrollmentAttribute[];
 };
 
 export interface D2TrackerEnrollmentAttribute {
@@ -80,8 +93,8 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
 type Params = Partial<TrackerEnrollmentsParamsBase>;
 
 type TrackerEnrollmentsParamsBase = {
-    orgUnits: CommaDelimitedListOfUid;
-    orgUnitMode: OrgUnitMode;
+    orgUnit: Id;
+    ouMode: OrgUnitMode;
     program: Id;
     programStatus: ProgramStatus;
     followUp: boolean;

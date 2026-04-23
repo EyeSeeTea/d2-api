@@ -49,9 +49,16 @@ export class TrackedEntities {
 
 type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 type IsoDate = string;
-type SemiColonDelimitedListOfUid = string;
-type CommaDelimitedListOfUid = string;
+export type SemiColonDelimitedListOfUid = string;
+export type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
+
+export type UserInfo = {
+    uid: Id;
+    username: string;
+    firstName: string;
+    surname: string;
+};
 
 interface D2TrackerTrackedEntityBase {
     trackedEntity: Id;
@@ -60,14 +67,18 @@ interface D2TrackerTrackedEntityBase {
     createdAtClient: IsoDate;
     updatedAt: IsoDate;
     updatedAtClient: IsoDate;
-    orgUnit: SemiColonDelimitedListOfUid;
+    orgUnit: Id;
     inactive: boolean;
     deleted: boolean;
+    potentialDuplicate?: boolean;
+    storedBy?: string;
+    createdBy?: UserInfo;
+    updatedBy?: UserInfo;
     relationships: Relationship[];
     attributes: Attribute[];
     enrollments: D2TrackerEnrollment[];
     programOwners: ProgramOwner[];
-    geometry:
+    geometry?:
         | Extract<D2Geometry, { type: "Point" }>
         | Extract<D2Geometry, { type: "Polygon" }>
         | Extract<D2Geometry, { type: "MultiPolygon" }>;
@@ -145,9 +156,8 @@ export type OrgUnitMode =
     | "ALL";
 
 export type TrackedEntitiesParamsBase = {
-    orgUnits: CommaDelimitedListOfUid;
-    orgUnitMode: OrgUnitMode;
-    trackedEntities: CommaDelimitedListOfUid;
+    orgUnit: SemiColonDelimitedListOfUid;
+    ouMode: OrgUnitMode;
     query: string;
     attribute: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
@@ -163,15 +173,16 @@ export type TrackedEntitiesParamsBase = {
     enrollmentOccurredAfter: IsoDate;
     enrollmentOccurredBefore: IsoDate;
     trackedEntityType: Id;
-    trackedEntity: Id;
+    trackedEntity: SemiColonDelimitedListOfUid;
     assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
-    assignedUsers: CommaDelimitedListOfUid;
+    assignedUser: SemiColonDelimitedListOfUid;
     eventStatus: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     eventOccurredAfter: IsoDate;
     eventOccurredBefore: IsoDate;
     skipMeta: boolean;
     includeDeleted: boolean;
     includeAllAttributes: boolean;
+    attachment: string;
     potentialDuplicate: boolean;
     order: TrackedOrderBase[];
 };
@@ -188,7 +199,8 @@ export type TrackedOrderField = {
         | "enrolledAt"
         | "inactive"
         | "trackedEntity"
-        | "updatedAt";
+        | "updatedAt"
+        | "updatedAtClient";
 };
 
 export type TrackedAttributesFields = { type: "trackedEntityAttributeId"; id: Id };
