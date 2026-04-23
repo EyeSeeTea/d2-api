@@ -4715,6 +4715,7 @@ export type D2Route = {
     lastUpdatedBy: D2User;
     name: string;
     publicAccess: string;
+    responseTimeoutSeconds: number;
     sharing: D2Sharing;
     translations: D2Translation[];
     url: string;
@@ -14729,6 +14730,7 @@ export interface D2RouteSchema {
         lastUpdatedBy: D2UserSchema;
         name: string;
         publicAccess: string;
+        responseTimeoutSeconds: number;
         sharing: D2SharingSchema;
         translations: D2Translation[];
         url: string;
@@ -14755,6 +14757,7 @@ export interface D2RouteSchema {
             | "lastUpdated"
             | "lastUpdatedBy"
             | "name"
+            | "responseTimeoutSeconds"
             | "sharing"
             | "translations"
             | "url"
@@ -14774,6 +14777,7 @@ export interface D2RouteSchema {
             | "lastUpdated"
             | "lastUpdatedBy"
             | "name"
+            | "responseTimeoutSeconds"
             | "sharing"
             | "translations"
             | "url"
@@ -36455,6 +36459,12 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 fieldName: "publicAccess",
                 propertyType: "TEXT",
                 klass: "java.lang.String",
+            },
+            {
+                name: "responseTimeoutSeconds",
+                fieldName: "responseTimeoutSeconds",
+                propertyType: "INTEGER",
+                klass: "java.lang.Integer",
             },
             {
                 name: "sharing",
