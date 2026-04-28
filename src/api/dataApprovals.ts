@@ -1,5 +1,4 @@
-import { Id } from "../schemas";
-import { RequireAtLeastOne } from "../utils/types";
+import { Id, Ref } from "../schemas";
 import { D2ApiResponse, Params } from "./common";
 import { D2ApiGeneric } from "./d2Api";
 
@@ -16,45 +15,20 @@ export const dataApprovalStates = [
 
 export type DataApprovalState = (typeof dataApprovalStates)[number];
 
-type WorkflowOrDataSet<T extends { wf?: unknown; ds?: unknown }> = RequireAtLeastOne<
-    T,
-    "wf" | "ds"
->;
+type ApprovalSelectorBase = { pe: string; ou: Id; aoc?: Id };
+export type ApprovalSelector =
+    | (ApprovalSelectorBase & { wf: Id; ds?: never })
+    | (ApprovalSelectorBase & { ds: Id; wf?: never });
 
-export type ApprovalSelector = WorkflowOrDataSet<{
-    wf?: Id;
-    ds?: Id;
-    pe: string;
-    ou: Id;
-    aoc?: Id;
-}>;
+type BulkApprovalSelectorBase = { pe: string[]; ou: Id[]; aoc?: Id[] };
+export type BulkApprovalSelector =
+    | (BulkApprovalSelectorBase & { wf: Id[]; ds?: never })
+    | (BulkApprovalSelectorBase & { ds: Id[]; wf?: never });
 
-export type BulkApprovalSelector = WorkflowOrDataSet<{
-    wf?: Id[];
-    ds?: Id[];
-    pe: string[];
-    ou: Id[];
-    aoc?: Id[];
-}>;
-
-export type BulkApprovalPayload = WorkflowOrDataSet<{
-    wf?: Id[];
-    ds?: Id[];
-    pe: string[];
-    approvals: { ou: Id; aoc: Id }[];
-}>;
-
-export interface DataApprovalStatus {
-    readonly mayApprove: boolean;
-    readonly mayUnapprove: boolean;
-    readonly mayAccept: boolean;
-    readonly mayUnaccept: boolean;
-    readonly state: DataApprovalState;
-    readonly approvedBy?: string;
-    readonly approvedAt?: string;
-    readonly acceptedBy?: string;
-    readonly acceptedAt?: string;
-}
+type BulkApprovalPayloadBase = { pe: string[]; approvals: { ou: Id; aoc: Id }[] };
+export type BulkApprovalPayload =
+    | (BulkApprovalPayloadBase & { wf: Id[]; ds?: never })
+    | (BulkApprovalPayloadBase & { ds: Id[]; wf?: never });
 
 export interface DataApprovalPermissions {
     readonly mayApprove: boolean;
@@ -68,6 +42,10 @@ export interface DataApprovalPermissions {
     readonly acceptedAt?: string;
 }
 
+export type DataApprovalStatus = DataApprovalPermissions & {
+    readonly state: DataApprovalState;
+};
+
 export interface DataApprovalBulkStatus {
     readonly wf: Id;
     readonly pe: string;
@@ -80,7 +58,7 @@ export interface DataApprovalBulkStatus {
 
 export interface DataApprovalByCategoryOptionCombo {
     readonly id: Id;
-    readonly level?: Id;
+    readonly level?: Ref;
     readonly ou: Id;
     readonly accepted: boolean;
     readonly permissions: DataApprovalPermissions;

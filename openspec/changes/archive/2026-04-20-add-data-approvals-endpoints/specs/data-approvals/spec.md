@@ -28,7 +28,7 @@ The library exports a `const` tuple `dataApprovalStates` containing the 8 approv
 #### Scenario: Query by workflow
 - **WHEN** called with `{ wf: "rIUL3hYOjJc", pe: "201801", ou: "YuQRtpLP10I" }`
 - **THEN** the request is `GET /dataApprovals?wf=rIUL3hYOjJc&pe=201801&ou=YuQRtpLP10I`
-- **AND** the response is decoded into an object with `mayApprove`, `mayUnapprove`, `mayAccept`, `mayUnaccept`, and `state`
+- **AND** the response is decoded into an object with `mayApprove`, `mayUnapprove`, `mayAccept`, `mayUnaccept`, `mayReadData`, and `state`
 
 #### Scenario: Legacy query by data set
 - **WHEN** called with `{ ds: "BfMAe6Itzgt", pe: "201801", ou: "YuQRtpLP10I" }`
@@ -45,6 +45,11 @@ The library exports a `const` tuple `dataApprovalStates` containing the 8 approv
 #### Scenario: Requires wf or ds
 - **WHEN** a consumer tries to call `get` without `wf` and without `ds`
 - **THEN** the TypeScript compiler rejects the call
+
+#### Scenario: wf and ds are mutually exclusive
+- **WHEN** a consumer tries to call `get` with both `wf` and `ds`
+- **THEN** the TypeScript compiler rejects the call
+- **AND** the rejection prevents silently sending both to the server, which would otherwise resolve `ds` and ignore `wf`
 
 ### Requirement: getMany returns approval statuses in bulk
 

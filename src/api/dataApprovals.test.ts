@@ -30,6 +30,7 @@ const singleStatusResponse: DataApprovalStatus = {
     mayUnapprove: true,
     mayAccept: true,
     mayUnaccept: false,
+    mayReadData: true,
     state: "APPROVED_HERE",
     approvedBy: "User A",
     approvedAt: "2022-01-13T12:56:07.005",
@@ -76,7 +77,7 @@ const bulkStatusResponse: DataApprovalBulkStatus[] = [
 const categoryOptionComboResponse: DataApprovalByCategoryOptionCombo[] = [
     {
         id: AOC,
-        level: "KaTJLhGmU95",
+        level: { id: "KaTJLhGmU95" },
         ou: ORG_UNIT,
         accepted: true,
         permissions: {

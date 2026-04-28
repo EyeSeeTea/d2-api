@@ -34,16 +34,16 @@ The library layering (`api/` → `data/`/`repositories/` → schemas + utils) ma
 
 Rationale: the DHIS2 docs treat approve/unapprove/accept/unaccept as one cohesive workflow driven by the same selectors. Splitting "status" vs "actions" would force consumers to wire two clients for a single flow, with no benefit. `DataAcceptances` endpoints are merged in under semantically-named methods (`accept`, `acceptMany`, …) rather than exposing a second class whose URL happens to be `/dataAcceptances`.
 
-### 2. `wf | ds` via `RequireAtLeastOne`
+### 2. `wf | ds` as a discriminated union (mutually exclusive)
 
 ```ts
-type ApprovalSelector = RequireAtLeastOne<
-    { wf?: Id; ds?: Id; pe: string; ou: Id; aoc?: Id },
-    "wf" | "ds"
->;
+type ApprovalSelectorBase = { pe: string; ou: Id; aoc?: Id };
+type ApprovalSelector =
+    | (ApprovalSelectorBase & { wf: Id; ds?: never })
+    | (ApprovalSelectorBase & { ds: Id; wf?: never });
 ```
 
-Matches the precedent set by `src/api/messageConversations.ts:14`. `RequireAtLeastOne` from `src/utils/types.ts` is already a library primitive. If both are passed, both are forwarded — DHIS2 resolves the ambiguity server-side (workflow wins).
+The compiler rejects `{ wf, ds, ... }`. Reason: against the live DHIS2 v42 server, when both are sent over the wire `ds` wins and `wf` is silently ignored — verified by issuing `wf` only, `ds` only, and both, against `play.im.dhis2.org/stable-2-42-4` with a workflow whose dataset is attached to a *different* workflow. The earlier assumption that "workflow wins" was wrong, so a `RequireAtLeastOne`-style permissive type would let consumers think they were querying `wf` while actually getting the workflow associated with `ds`. The discriminated union prevents that class of bug at compile time. `RequireAtLeastOne` is still appropriate elsewhere (e.g. `messageConversations.ts:14`) where multiple keys are genuinely additive.
 
 ### 3. Bulk GET: arrays in, CSVs out
 
@@ -101,7 +101,6 @@ Add a `@cache() get dataApprovals(): DataApprovals` next to `dataValues` in `src
 
 ## Risks / Trade-offs
 
--   **`wf | ds` semantic ambiguity**: if a consumer passes both, the server decides. We document "prefer `wf`" in the method JSDoc but do not throw. Throwing would surprise consumers migrating from raw HTTP where both were permitted.
 -   **Bulk mutation payload validation**: we don't validate that each `(ou, aoc)` in `approvals[]` corresponds to an approvable selection. Mirrors the existing posture (`DataValues.postSet` doesn't pre-validate). Errors surface via the `D2ApiResponse`.
 -   **Response field optionality**: the docs list `approvedBy`/`approvedAt`/`acceptedBy`/`acceptedAt` as "if present (not always needed)". We type them as optional to match — consumers must null-check. Making them required would lie.
 -   **Over-specifying bulk state `level`**: the bulk GET response sometimes includes `level: Id`, sometimes not. Typed as optional.
