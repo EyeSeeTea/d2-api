@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { getPlayD2Api, playFixtures } from "../testing";
-import { D2Api } from "../2.42";
+import { getPlayD2Api, playFixtures } from "../../testing";
+import { D2Api } from "../../2.42";
 
 describe("TrackerEnrollments.get against play.dhis2.org/42", () => {
     let api: D2Api;

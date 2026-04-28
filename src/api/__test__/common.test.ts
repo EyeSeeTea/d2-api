@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getFieldsAsString, processFieldsFilterParams } from "./common";
+import { getFieldsAsString, processFieldsFilterParams } from "../common";
 
 describe("getFieldsAsString", () => {
     describe("flat boolean fields", () => {

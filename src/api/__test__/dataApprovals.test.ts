@@ -1,12 +1,12 @@
 import MockAdapter from "axios-mock-adapter";
 import { beforeEach, describe, expect, it } from "vitest";
-import { D2Api } from "../2.42";
+import { D2Api } from "../../2.42";
 import {
     BulkApprovalPayload,
     DataApprovalBulkStatus,
     DataApprovalByCategoryOptionCombo,
     DataApprovalStatus,
-} from "./dataApprovals";
+} from "../dataApprovals";
 
 const WORKFLOW_ID = "rIUL3hYOjJc";
 const WORKFLOW_ID_2 = "lyLU2wR22tC";

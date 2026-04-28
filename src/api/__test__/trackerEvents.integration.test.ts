@@ -1,5 +1,5 @@
 import { describe, it, expect, expectTypeOf } from "vitest";
-import { getPlayD2Api, playFixtures } from "../testing";
+import { getPlayD2Api, playFixtures } from "../../testing";
 
 const EVENT_ID = "RcBUozdEU8o";
 
