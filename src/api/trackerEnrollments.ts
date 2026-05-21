@@ -1,10 +1,17 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
-import { Preset } from "../schemas";
-import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
+import { Preset, D2Geometry } from "../schemas";
+import {
+    D2TrackerEvent,
+    D2TrackerEventSchema,
+    Note,
+    D2TrackerEventToPost,
+    UserInfo,
+    Username,
+} from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { OrgUnitMode, TrackedPager } from "./trackerTrackedEntities";
+import { OrgUnitMode, Relationship, TrackedPager } from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEnrollments {
@@ -24,14 +31,14 @@ type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 
 export type IsoDate = string;
 
-type Username = string;
-
 export interface D2TrackerEnrollment {
     enrollment: Id;
     createdAt: IsoDate;
     createdAtClient: IsoDate;
     updatedAt: IsoDate;
     updatedAtClient: IsoDate;
+    completedAt?: IsoDate;
+    completedBy?: Username;
     trackedEntity: Id;
     trackedEntityType: Id;
     program: Id;
@@ -43,6 +50,10 @@ export interface D2TrackerEnrollment {
     followUp: boolean;
     deleted: boolean;
     storedBy: Username;
+    createdBy: UserInfo;
+    updatedBy: UserInfo;
+    geometry?: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
+    relationships?: Relationship[];
     events: D2TrackerEvent[];
     attributes: D2TrackerEnrollmentAttribute[];
     notes: Note[];
@@ -76,13 +87,14 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         paging: boolean;
     }>;
 
-// TODO: in v40 ?orgUnit=[ID] is required
 type Params = Partial<TrackerEnrollmentsParamsBase>;
 
 type TrackerEnrollmentsParamsBase = {
     orgUnits: CommaDelimitedListOfUid;
     orgUnitMode: OrgUnitMode;
     program: Id;
+    status: ProgramStatus;
+    /** @deprecated and to be removed in v43. use status */
     programStatus: ProgramStatus;
     followUp: boolean;
     updatedAfter: IsoDate;
@@ -93,6 +105,7 @@ type TrackerEnrollmentsParamsBase = {
     trackedEntity: Id;
     enrollment: CommaDelimitedListOfUid;
     includeDeleted: boolean;
+    order: CommaDelimitedListOfUid;
 };
 
 type CommaDelimitedListOfUid = string;

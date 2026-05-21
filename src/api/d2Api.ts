@@ -13,6 +13,7 @@ import { AppHub } from "./appHub";
 import { Audit } from "./audit";
 import { D2ApiDefinitionBase, D2ApiResponse, Params, HttpResponse } from "./common";
 import { CurrentUser } from "./currentUser";
+import { DataApprovals } from "./dataApprovals";
 import { DataStore } from "./dataStore";
 import { DataValues } from "./dataValues";
 import { Email } from "./email";
@@ -161,6 +162,11 @@ export abstract class D2ApiVersioned<
     @cache()
     get dataValues() {
         return new DataValues(this);
+    }
+
+    @cache()
+    get dataApprovals() {
+        return new DataApprovals(this);
     }
 
     @cache()
