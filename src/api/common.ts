@@ -220,7 +220,3 @@ export function validate2xx(status: number): boolean {
 export function validate404(status: number): boolean {
     return validate2xx(status) || status === 404;
 }
-
-interface ParamTracker extends TrackedPager {
-    pager?: TrackedPager;
-}
