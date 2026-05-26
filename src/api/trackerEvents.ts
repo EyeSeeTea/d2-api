@@ -113,7 +113,6 @@ interface EventsParamsBase {
     followUp?: boolean;
     trackedEntity?: Id;
     orgUnit?: Id;
-    event?: Id;
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
