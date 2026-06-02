@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, expectTypeOf } from "vitest";
 import { getPlayD2Api, playFixtures } from "../../testing";
-import { D2Api } from "../../2.42";
+import { D2Api } from "../../2.43";
 
-describe("TrackedEntities.get against play.dhis2.org/42", () => {
+describe("TrackedEntities.get against play.dhis2.org/43", () => {
     let api: D2Api;
 
     beforeAll(() => {
@@ -93,7 +93,7 @@ describe("TrackedEntities.get against play.dhis2.org/42", () => {
         expect(dates).toEqual(sortedDesc);
     });
 
-    it("decodes v42 fields (potentialDuplicate, createdBy, updatedBy, orgUnit)", async () => {
+    it("decodes v43 fields (potentialDuplicate, createdBy, updatedBy, orgUnit)", async () => {
         const response = await api.tracker.trackedEntities
             .get({
                 program: playFixtures.program,

@@ -11,7 +11,12 @@ import {
 } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { OrgUnitMode, Relationship, TrackedPager } from "./trackerTrackedEntities";
+import {
+    EnrollmentStatus,
+    OrgUnitMode,
+    Relationship,
+    TrackedPager,
+} from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEnrollments {
@@ -27,8 +32,6 @@ export class TrackerEnrollments {
     }
 }
 
-type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
-
 export type IsoDate = string;
 
 export interface D2TrackerEnrollment {
@@ -42,7 +45,7 @@ export interface D2TrackerEnrollment {
     trackedEntity: Id;
     trackedEntityType: Id;
     program: Id;
-    status: ProgramStatus;
+    status: EnrollmentStatus;
     orgUnit: Id;
     orgUnitName: string;
     enrolledAt: IsoDate;
@@ -93,9 +96,7 @@ type TrackerEnrollmentsParamsBase = {
     orgUnits: CommaDelimitedListOfUid;
     orgUnitMode: OrgUnitMode;
     program: Id;
-    status: ProgramStatus;
-    /** @deprecated and to be removed in v43. use status */
-    programStatus: ProgramStatus;
+    status: EnrollmentStatus;
     followUp: boolean;
     updatedAfter: IsoDate;
     updatedWithin: IsoDate;

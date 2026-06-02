@@ -3,7 +3,12 @@ import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { OrgUnitMode, Relationship, TrackedPager } from "./trackerTrackedEntities";
+import {
+    EnrollmentStatus,
+    OrgUnitMode,
+    Relationship,
+    TrackedPager,
+} from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEvents {
@@ -28,7 +33,6 @@ export class TrackerEvents {
     }
 }
 
-type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 type IsoDate = string;
 export type Username = string;
 type CommaDelimitedListOfUid = string;
@@ -49,7 +53,7 @@ interface D2TrackerEventBase {
     program: Id;
     programStage: Id;
     enrollment: Id;
-    enrollmentStatus: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    enrollmentStatus: EnrollmentStatus;
     orgUnit: Id;
     orgUnitName: string;
     occurredAt: IsoDate;
@@ -112,8 +116,7 @@ interface EventsParamsBase {
     orgUnitMode?: OrgUnitMode;
     program?: Id;
     programStage?: Id;
-    programStatus?: ProgramStatus;
-    enrollmentStatus?: ProgramStatus;
+    enrollmentStatus?: EnrollmentStatus;
     filter?: CommaDelimitedListOfDataElementFilter;
     filterAttributes?: CommaDelimitedListOfAttributeFilter;
     followUp?: boolean;

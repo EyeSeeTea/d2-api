@@ -3,11 +3,11 @@ import { getPlayD2Api, playFixtures } from "../../testing";
 
 const EVENT_ID = "RcBUozdEU8o";
 
-describe("TrackerEvents.get against play.dhis2.org/42", () => {
+describe("TrackerEvents.get against play.dhis2.org/43", () => {
     const api = getPlayD2Api();
 
     it("rejects an unknown attributeCategoryCombo (regression: attributeCc was silently ignored)", async () => {
-        // With the old `attributeCc` name, DHIS2 v42 ignored the param and returned 200.
+        // With the old `attributeCc` name, DHIS2 v43 ignored the param and returned 200.
         // After the rename to `attributeCategoryCombo`, an unknown CC must surface a server error.
         await expect(
             api.tracker.events
@@ -77,7 +77,7 @@ describe("TrackerEvents.get against play.dhis2.org/42", () => {
     });
 });
 
-describe("TrackerEvents.getById against play.dhis2.org/42", () => {
+describe("TrackerEvents.getById against play.dhis2.org/43", () => {
     const api = getPlayD2Api();
 
     it("returns exactly the requested fields (SelectedPick narrowing)", async () => {

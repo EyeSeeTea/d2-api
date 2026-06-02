@@ -1,6 +1,6 @@
 import MockAdapter from "axios-mock-adapter";
 import { beforeEach, describe, expect, it } from "vitest";
-import { D2Api } from "../../2.42";
+import { D2Api } from "../../2.43";
 import {
     BulkApprovalPayload,
     DataApprovalBulkStatus,

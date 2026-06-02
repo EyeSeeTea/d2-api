@@ -1,6 +1,6 @@
 import { D2ApiGeneric } from "./api/d2Api";
 import MockAdapter from "axios-mock-adapter";
-import { D2Api } from "./2.42";
+import { D2Api } from "./2.43";
 
 export type D2ApiMock = MockAdapter;
 
@@ -15,7 +15,7 @@ export function getMockApiFromClass<D2Api extends D2ApiGeneric>(apiClass: {
 }
 
 export const playFixtures = {
-    baseUrl: "https://play.im.dhis2.org/stable-2-42-4",
+    baseUrl: "https://play.im.dhis2.org/stable-2-43-0",
     auth: { username: "admin", password: "district" },
     program: "IpHINAT79UW",
     trackedEntityType: "nEenWmSyUEp",

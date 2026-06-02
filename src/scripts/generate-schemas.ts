@@ -293,7 +293,7 @@ function joinStr(xs: string[]): string {
 type Instance = { version: string; url: string; isDeprecated?: boolean };
 
 const instances: Instance[] = [
-    { version: "2.42", url: "https://admin:district@play.im.dhis2.org/stable-2-42-4" },
+    { version: "2.43", url: "https://admin:district@play.im.dhis2.org/stable-2-43-0" },
 ];
 
 async function generateSchema(instance: Instance) {

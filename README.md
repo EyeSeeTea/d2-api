@@ -41,18 +41,18 @@ import { D2Api } from "@eyeseetea/d2-api";
 
 // Basic access authentication
 const api = new D2Api({
-    baseUrl: "https://play.im.dhis2.org/dev",
+    baseUrl: "https://play.im.dhis2.org/stable-2-43-0",
     auth: { type: "basic", username: "admin", password: "district" },
 });
 
 // Personal Access Token (PAT) authentication
 const api = new D2Api({
-    baseUrl: "https://play.im.dhis2.org/dev",
+    baseUrl: "https://play.im.dhis2.org/stable-2-43-0",
     auth: { type: "personalToken", token: "token_here" },
 });
 ```
 
-Learn more about [PAT authentication here](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-242/introduction.html#webapi_pat_authentication)
+Learn more about [PAT authentication here](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-243/introduction.html#webapi_pat_authentication)
 
 ### Metadata models
 

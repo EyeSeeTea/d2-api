@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { getPlayD2Api, playFixtures } from "../../testing";
-import { D2Api } from "../../2.42";
+import { D2Api } from "../../2.43";
 
-describe("TrackerEnrollments.get against play.dhis2.org/42", () => {
+describe("TrackerEnrollments.get against play.dhis2.org/43", () => {
     let api: D2Api;
 
     beforeAll(() => {
@@ -67,7 +67,7 @@ describe("TrackerEnrollments.get against play.dhis2.org/42", () => {
         expect(dates).toEqual(sortedDesc);
     });
 
-    it("decodes v42 enrollment fields on COMPLETED records", async () => {
+    it("decodes v43 enrollment fields on COMPLETED records", async () => {
         const response = await api.tracker.enrollments
             .get({
                 program: playFixtures.program,

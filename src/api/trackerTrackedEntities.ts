@@ -55,7 +55,7 @@ export class TrackedEntities {
     }
 }
 
-type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
+export type EnrollmentStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 type IsoDate = string;
 type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
@@ -162,8 +162,7 @@ export type TrackedEntitiesParamsBase = {
     trackedEntities: CommaDelimitedListOfUid;
     filter: CommaDelimitedListOfAttributeFilter;
     program: Id;
-    programStatus: ProgramStatus;
-    enrollmentStatus: ProgramStatus;
+    enrollmentStatus: EnrollmentStatus;
     programStage: Id;
     followUp: boolean;
     updatedAfter: IsoDate;
