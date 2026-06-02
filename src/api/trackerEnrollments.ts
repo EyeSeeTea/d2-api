@@ -1,11 +1,10 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset } from "../schemas";
-import { parseTrackerPager } from "./common";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { TrackedPager } from "./trackerTrackedEntities";
+import { OrgUnitMode, TrackedPager } from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEnrollments {
@@ -14,18 +13,10 @@ export class TrackerEnrollments {
     get<Fields extends D2TrackerEnrollmentFields>(
         params: TrackerEnrollmentsParams<Fields>
     ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
-        return this.api
-            .get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
-                ..._.omit(params, ["fields"]),
-                fields: getTrackerFieldsParam(params.fields),
-            })
-            .map(({ data }) => {
-                return {
-                    ..._.omit(data, "enrollments"),
-                    pager: parseTrackerPager(data),
-                    instances: data.enrollments || data.instances || [],
-                };
-            });
+        return this.api.get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
+            ..._.omit(params, ["fields"]),
+            fields: getTrackerFieldsParam(params.fields),
+        });
     }
 }
 
@@ -82,14 +73,15 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
-        skipPaging: boolean;
+        paging: boolean;
     }>;
 
-type Params = RequiredBy<TrackerEnrollmentsParamsBase, "ouMode">;
+// TODO: in v40 ?orgUnit=[ID] is required
+type Params = Partial<TrackerEnrollmentsParamsBase>;
 
 type TrackerEnrollmentsParamsBase = {
-    orgUnit: SemiColonDelimitedListOfUid;
-    ouMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
+    orgUnits: CommaDelimitedListOfUid;
+    orgUnitMode: OrgUnitMode;
     program: Id;
     programStatus: ProgramStatus;
     followUp: boolean;
@@ -103,13 +95,12 @@ type TrackerEnrollmentsParamsBase = {
     includeDeleted: boolean;
 };
 
-type SemiColonDelimitedListOfUid = string;
 type CommaDelimitedListOfUid = string;
 
-export interface TrackerEnrollmentsResponse<Fields> extends TrackedPager {
-    pager?: TrackedPager;
-    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
-}
+export type TrackerEnrollmentsResponse<Fields> = {
+    pager: TrackedPager;
+    enrollments: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
+};
 
 export interface D2TrackerEnrollmentSchema {
     name: "D2TrackerEnrollment";
@@ -130,7 +121,4 @@ export interface D2TrackerEnrollmentSchema {
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
 
-type EnrollmentResponse<Fields> = Omit<TrackerEnrollmentsResponse<Fields>, "instances"> & {
-    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
-    enrollments: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
-};
+type EnrollmentResponse<Fields> = TrackerEnrollmentsResponse<Fields>;

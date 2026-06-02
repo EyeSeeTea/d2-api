@@ -1,4 +1,4 @@
-# d2-api
+# @eyeseetea/d2-api
 
 Typescript library for the DHIS2 API.
 
@@ -22,7 +22,7 @@ $ yarn link
 On your app:
 
 ```shell
-$ yarn link d2-api
+$ yarn link @eyeseetea/d2-api
 ```
 
 ## Publish
@@ -37,7 +37,7 @@ $ yarn publish [--tag beta] [--patch | --minor | --major]
 ### Create an API instance
 
 ```ts
-import { D2Api } from "d2-api/2.36";
+import { D2Api } from "@eyeseetea/d2-api";
 
 // Basic access authentication
 const api = new D2Api({
@@ -52,7 +52,7 @@ const api = new D2Api({
 });
 ```
 
-Learn more about [PAT authentication here](https://docs.dhis2.org/en/full/develop/dhis-core-version-240/developer-manual.html#webapi_pat_authentication)
+Learn more about [PAT authentication here](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-242/introduction.html#webapi_pat_authentication)
 
 ### Metadata models
 
@@ -364,8 +364,8 @@ const data = await api.tracker.trackedEntities
         fields: {
             orgUnit: true,
         },
-        ouMode: "ALL",
-        program: "program_id",
+        orgUnitMode: "ALL",
+        program: "IpHINAT79UW",
     })
     .getData();
 ```
@@ -378,8 +378,8 @@ const data = await api.tracker.trackedEntities
         fields: {
             orgUnit: true,
         },
-        ouMode: "ALL",
-        program: "program_id",
+        orgUnitMode: "ALL",
+        program: "IpHINAT79UW",
         order: [
             { type: "field", field: "createdAt", direction: "asc" },
             { type: "trackedEntityAttributeId", id: "wMhqqPLb7pP", direction: "desc" },
@@ -393,20 +393,31 @@ Adding the `totalPages` param will include a pager object:
 ```ts
 const data = await api.tracker.trackedEntities
     .get({
-        fields: {
-            orgUnit: true,
-        },
-        ouMode: "ALL",
-        program: "program_id",
+        fields: { orgUnit: true, trackedEntity: true },
+        orgUnitMode: "ALL",
+        program: "IpHINAT79UW",
         totalPages: true,
+        pageSize: 2,
     })
     .getData();
 /* Response:
     {
-        page: 1;
-        pageSize: 50;
-        pageCount: 10;
-        total: 500;
+        "pager": {
+            "page": 1,
+            "pageSize": 2,
+            "total": 19034,
+            "pageCount": 9517
+        },
+        "trackedEntities": [
+            {
+                "trackedEntity": "bGGHdTTXzpm",
+                "orgUnit": "DiszpKrYNg8"
+            },
+            {
+                "trackedEntity": "k69nwvhCOQF",
+                "orgUnit": "DiszpKrYNg8"
+            }
+        ]
     }
     */
 ```
@@ -444,7 +455,7 @@ await api.email
 
 ## Using type helpers
 
-_d2-api_ exposes some type helpers that you may need in your app. Some examples:
+_@eyeseetea/d2-api_ exposes some type helpers that you may need in your app. Some examples:
 
 -   `SelectedPick`: Get model from a selector:
 
@@ -486,8 +497,7 @@ console.log(res.data);
 ## Testing
 
 ```ts
-import { D2Api } from "d2-api/2.36";
-import { getMockApiFromClass } from "d2-api";
+import { D2Api, getMockApiFromClass } from "@eyeseetea/d2-api";
 
 const currentUserMock = {
     id: "xE7jOejl9FI",

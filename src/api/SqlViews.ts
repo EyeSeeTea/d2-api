@@ -7,7 +7,7 @@ import { CancelableResponse } from "../repositories/CancelableResponse";
 export class SqlViews {
     constructor(public api: D2ApiGeneric) {}
 
-    query<Variables extends {}, Field extends string>(
+    query<Variables extends object, Field extends string>(
         id: Id,
         variables: Variables,
         paging?: SqlViewPaging
@@ -54,7 +54,7 @@ export interface SqlViewGetData<Field extends string> {
 export interface SqlViewDataResponse<Field extends string> {
     pager: Pager;
     listGrid: {
-        metaData: {};
+        metaData: object;
         headerWidth: number;
         width: number;
         title: string;
