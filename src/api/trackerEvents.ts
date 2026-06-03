@@ -102,6 +102,7 @@ export type Note = {
     storedAt: IsoDate;
     storedBy: Username;
     value: string;
+    createdBy?: UserInfo;
 };
 
 export type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
@@ -146,7 +147,7 @@ interface EventsParamsBase {
     attributeCategoryCombo?: Id;
     attributeCategoryOptions?: Id;
     includeDeleted?: boolean;
-    assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY" | "ALL";
+    assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
     assignedUser?: CommaDelimitedListOfUid;
 }
 

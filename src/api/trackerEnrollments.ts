@@ -107,6 +107,7 @@ type TrackerEnrollmentsParamsBase = {
     enrollment: CommaDelimitedListOfUid;
     includeDeleted: boolean;
     order: CommaDelimitedListOfUid;
+    attributeOptionCombo?: Id;
 };
 
 type CommaDelimitedListOfUid = string;

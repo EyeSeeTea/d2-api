@@ -114,6 +114,10 @@ export interface Relationship {
     relationshipName: string;
     from: RelationshipItem;
     to: RelationshipItem;
+    bidirectional: boolean;
+    createdAt: IsoDate;
+    updatedAt: IsoDate;
+    createdAtClient?: IsoDate;
 }
 
 export interface RelationshipItem {
@@ -121,6 +125,7 @@ export interface RelationshipItem {
         trackedEntity: Id;
     };
     event?: { event: Id };
+    enrollment?: { enrollment: Id };
 }
 
 export interface Attribute {

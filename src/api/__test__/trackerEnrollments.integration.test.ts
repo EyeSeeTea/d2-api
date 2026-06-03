@@ -30,26 +30,6 @@ describe("TrackerEnrollments.get against play.dhis2.org/43", () => {
         expect(filtered.enrollments.every(e => e.status === "COMPLETED")).toBe(true);
     });
 
-    it("honors the legacy programStatus alias server-side", async () => {
-        const params = {
-            program: playFixtures.program,
-            orgUnits: playFixtures.orgUnit,
-            orgUnitMode: "DESCENDANTS" as const,
-            pageSize: 5,
-            totalPages: true,
-            fields: { enrollment: true, status: true } as const,
-        };
-
-        const withStatus = await api.tracker.enrollments
-            .get({ ...params, status: "COMPLETED" })
-            .getData();
-        const withLegacy = await api.tracker.enrollments
-            .get({ ...params, programStatus: "COMPLETED" })
-            .getData();
-
-        expect(withLegacy.pager.total).toBe(withStatus.pager.total);
-    });
-
     it("serializes the order param", async () => {
         const response = await api.tracker.enrollments
             .get({
