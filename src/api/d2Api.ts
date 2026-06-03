@@ -13,10 +13,10 @@ import { AppHub } from "./appHub";
 import { Audit } from "./audit";
 import { D2ApiDefinitionBase, D2ApiResponse, Params, HttpResponse } from "./common";
 import { CurrentUser } from "./currentUser";
+import { DataApprovals } from "./dataApprovals";
 import { DataStore } from "./dataStore";
 import { DataValues } from "./dataValues";
 import { Email } from "./email";
-import { Events } from "./events";
 import { Expressions } from "./expressions";
 import { Files } from "./files";
 import { Maintenance } from "./maintenance";
@@ -27,7 +27,6 @@ import { PATCH_HEADERS } from "./patch";
 import { Sharing } from "./sharing";
 import { SqlViews } from "./SqlViews";
 import { System } from "./system";
-import { TrackedEntityInstances } from "./trackedEntityInstances";
 import { Tracker } from "./tracker";
 import { D2ApiOptions, D2ApiRequest, IndexedModels } from "./types";
 import { UserLookup } from "./UserLookup";
@@ -166,13 +165,8 @@ export abstract class D2ApiVersioned<
     }
 
     @cache()
-    get events() {
-        return new Events(this);
-    }
-
-    @cache()
-    get trackedEntityInstances() {
-        return new TrackedEntityInstances(this);
+    get dataApprovals() {
+        return new DataApprovals(this);
     }
 
     @cache()

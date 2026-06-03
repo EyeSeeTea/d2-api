@@ -1,10 +1,14 @@
 import { D2ApiGeneric } from "./d2Api";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
-import { parseTrackerPager } from "./common";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { TrackedPager } from "./trackerTrackedEntities";
+import {
+    EnrollmentStatus,
+    OrgUnitMode,
+    Relationship,
+    TrackedPager,
+} from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEvents {
@@ -13,38 +17,28 @@ export class TrackerEvents {
     get<Fields extends D2TrackerEventFields>(
         params: EventsParams<Fields>
     ): D2ApiResponse<TrackerEventsResponse<Fields>> {
-        return this.api
-            .get<EventsResponse<Fields>>("/tracker/events", {
-                ..._.omit(params, ["fields"]),
-                fields: getTrackerFieldsParam(params.fields),
-            })
-            .map(({ data }) => {
-                return {
-                    ..._.omit(data, "events"),
-                    pager: parseTrackerPager(data),
-                    instances: data.events || data.instances || [],
-                };
-            });
+        return this.api.get<EventsResponse<Fields>>("/tracker/events", {
+            ..._.omit(params, ["fields"]),
+            fields: getTrackerFieldsParam(params.fields),
+        });
     }
 
     getById<Fields extends D2TrackerEventFields>(
         id: string,
-        params: EventsParams<Fields>
-    ): D2ApiResponse<D2TrackerEvent> {
-        return this.api.get<D2TrackerEvent>(`/tracker/events/${id}`, {
-            ..._.omit(params, ["fields"]),
+        params: { fields: Fields }
+    ): D2ApiResponse<SelectedPick<D2TrackerEventSchema, Fields>> {
+        return this.api.get<SelectedPick<D2TrackerEventSchema, Fields>>(`/tracker/events/${id}`, {
             fields: getTrackerFieldsParam(params.fields),
         });
     }
 }
 
-type ProgramStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 type IsoDate = string;
-type Username = string;
+export type Username = string;
 type CommaDelimitedListOfUid = string;
 type CommaDelimitedListOfAttributeFilter = string;
 type CommaDelimitedListOfDataElementFilter = string;
-type UserInfo = {
+export type UserInfo = {
     uid: Id;
     username: string;
     firstName: string;
@@ -59,22 +53,28 @@ interface D2TrackerEventBase {
     program: Id;
     programStage: Id;
     enrollment: Id;
-    enrollmentStatus: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    enrollmentStatus: EnrollmentStatus;
     orgUnit: Id;
     orgUnitName: string;
     occurredAt: IsoDate;
     scheduledAt: IsoDate;
     storedBy: Username;
-    followup: boolean;
+    followUp: boolean;
     deleted: boolean;
     createdAt: IsoDate;
+    createdAtClient: IsoDate;
     updatedAt: IsoDate;
+    updatedAtClient: IsoDate;
+    completedAt?: IsoDate;
+    completedBy?: Username;
     createdBy: UserInfo;
     attributeOptionCombo: Id;
     attributeCategoryOptions: Id;
     updatedBy: UserInfo;
+    assignedUser?: UserInfo;
     dataValues: DataValue[];
     notes: Note[];
+    relationships?: Relationship[];
     trackedEntity?: Id;
 }
 
@@ -102,31 +102,33 @@ export type Note = {
     storedAt: IsoDate;
     storedBy: Username;
     value: string;
+    createdBy?: UserInfo;
 };
-type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
+
+export type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Partial<{
         totalPages: boolean;
         page: number;
         pageSize: number;
-        skipPaging: boolean;
+        paging: boolean;
     }>;
 
 interface EventsParamsBase {
+    events?: CommaDelimitedListOfUid;
+    orgUnitMode?: OrgUnitMode;
     program?: Id;
     programStage?: Id;
-    programStatus?: ProgramStatus;
+    enrollmentStatus?: EnrollmentStatus;
     filter?: CommaDelimitedListOfDataElementFilter;
     filterAttributes?: CommaDelimitedListOfAttributeFilter;
     followUp?: boolean;
     trackedEntity?: Id;
     orgUnit?: Id;
     event?: Id;
-    ouMode?: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
     scheduledAfter?: IsoDate;
     scheduledBefore?: IsoDate;
-    updatedAt?: IsoDate;
     updatedAfter?: IsoDate;
     updatedBefore?: IsoDate;
     updatedWithin?: IsoDate;
@@ -134,17 +136,16 @@ interface EventsParamsBase {
     enrollmentEnrolledBefore?: IsoDate;
     enrollmentOccurredAfter?: IsoDate;
     enrollmentOccurredBefore?: IsoDate;
-    skipMeta?: boolean;
     dataElementIdScheme?: IdScheme;
     categoryOptionComboIdScheme?: IdScheme;
+    categoryOptionIdScheme?: IdScheme;
     orgUnitIdScheme?: IdScheme;
     programIdScheme?: IdScheme;
     programStageIdScheme?: IdScheme;
     idScheme?: IdScheme;
     order?: CommaDelimitedListOfUid;
-    skipEventId?: boolean;
-    attributeCc?: string;
-    attributeCos?: string;
+    attributeCategoryCombo?: Id;
+    attributeCategoryOptions?: Id;
     includeDeleted?: boolean;
     assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
     assignedUser?: CommaDelimitedListOfUid;
@@ -159,10 +160,10 @@ export interface DataValue {
     providedElsewhere?: boolean;
 }
 
-export interface TrackerEventsResponse<Fields> extends TrackedPager {
-    pager?: TrackedPager;
-    instances: SelectedPick<D2TrackerEventSchema, Fields>[];
-}
+export type TrackerEventsResponse<Fields> = {
+    pager: TrackedPager;
+    events: SelectedPick<D2TrackerEventSchema, Fields>[];
+};
 
 export interface D2TrackerEventSchema {
     name: "D2TrackerEvent";
@@ -179,7 +180,4 @@ export interface D2TrackerEventSchema {
 
 type D2TrackerEventFields = Selector<D2TrackerEventSchema>;
 
-type EventsResponse<Fields> = Omit<TrackerEventsResponse<Fields>, "instances"> & {
-    instances: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
-    events: SelectedPick<D2TrackerEventSchema, Fields>[] | undefined;
-};
+type EventsResponse<Fields> = TrackerEventsResponse<Fields>;

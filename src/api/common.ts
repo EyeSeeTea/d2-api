@@ -1,9 +1,7 @@
 import _ from "lodash";
-import { EmptyObject } from "../utils/types";
 import { Ref } from "./../schemas/base";
 import { D2ModelSchemaBase, Selector } from "./inference";
 import { TaskCategory } from "./system";
-import { TrackedPager } from "./trackerTrackedEntities";
 
 export interface GetOptionValue<
     D2ApiDefinition extends D2ApiDefinitionBase,
@@ -62,7 +60,7 @@ export interface FilterBase {
 }
 
 function applyFieldTransformers(key: string, value: any) {
-    if (value.hasOwnProperty("$fn")) {
+    if (Object.prototype.hasOwnProperty.call(value, "$fn")) {
         const valueWithFn = _.omit(value, ["$fn"]);
 
         switch (value["$fn"]["name"]) {
@@ -220,19 +218,4 @@ export function validate2xx(status: number): boolean {
 
 export function validate404(status: number): boolean {
     return validate2xx(status) || status === 404;
-}
-
-export function parseTrackerPager(data: ParamTracker) {
-    return (
-        data.pager || {
-            page: data.page,
-            pageSize: data.pageSize,
-            total: data.total,
-            pageCount: data.pageCount,
-        }
-    );
-}
-
-interface ParamTracker extends TrackedPager {
-    pager?: TrackedPager;
 }
