@@ -58,8 +58,7 @@ interface D2TrackerEventBase {
     status: EventStatus;
     program: Id;
     programStage: Id;
-    enrollment: Id;
-    enrollmentStatus: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    enrollment?: Id;
     orgUnit: Id;
     orgUnitName: string;
     occurredAt: IsoDate;
