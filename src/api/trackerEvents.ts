@@ -28,13 +28,10 @@ export class TrackerEvents {
         id: string,
         params: EventsParams<Fields>
     ): D2ApiResponse<SelectedPick<D2TrackerEventSchema, Fields>> {
-        return this.api.get<SelectedPick<D2TrackerEventSchema, Fields>>(
-            `/tracker/events/${id}`,
-            {
-                ..._.omit(params, ["fields"]),
-                fields: getTrackerFieldsParam(params.fields),
-            }
-        );
+        return this.api.get<SelectedPick<D2TrackerEventSchema, Fields>>(`/tracker/events/${id}`, {
+            ..._.omit(params, ["fields"]),
+            fields: getTrackerFieldsParam(params.fields),
+        });
     }
 }
 
