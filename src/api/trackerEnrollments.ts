@@ -91,7 +91,7 @@ type TrackerEnrollmentsParamsBase = {
     enrolledBefore: IsoDate;
     trackedEntityType: Id;
     trackedEntity: Id;
-    enrollment: CommaDelimitedListOfUid;
+    enrollments: CommaDelimitedListOfUid;
     includeDeleted: boolean;
 };
 
