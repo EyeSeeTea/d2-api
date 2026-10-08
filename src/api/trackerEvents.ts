@@ -56,7 +56,7 @@ interface D2TrackerEventBase {
     occurredAt: IsoDate;
     scheduledAt: IsoDate;
     storedBy: Username;
-    followup: boolean;
+    followUp: boolean;
     deleted: boolean;
     createdAt: IsoDate;
     updatedAt: IsoDate;
