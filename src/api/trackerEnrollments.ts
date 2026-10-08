@@ -1,4 +1,5 @@
 import { D2ApiGeneric } from "./d2Api";
+import { Maybe } from "../utils/types";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset } from "../schemas";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
@@ -14,8 +15,9 @@ export class TrackerEnrollments {
         params: TrackerEnrollmentsParams<Fields>
     ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
         return this.api.get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
-            ..._.omit(params, ["fields"]),
+            ..._.omit(params, ["fields", "order"]),
             fields: getTrackerFieldsParam(params.fields),
+            order: getTrackerOrderParam(params.order),
         });
     }
 }
@@ -93,7 +95,22 @@ type TrackerEnrollmentsParamsBase = {
     trackedEntity: Id;
     enrollments: CommaDelimitedListOfUid;
     includeDeleted: boolean;
+    order: TrackerEnrollmentOrder[];
 };
+
+/**
+ * Ordering by tracked entity attribute is not supported for enrollments.
+ * DHIS2 2.42 respond 409 ("column reference is ambiguous") for createdAt and updatedAt. (looks like a bug so)
+ */
+export type TrackerEnrollmentOrderField =
+    | "completedAt"
+    | "createdAt"
+    | "createdAtClient"
+    | "enrolledAt"
+    | "updatedAt"
+    | "updatedAtClient";
+
+export type TrackerEnrollmentOrder = TrackerOrder<TrackerEnrollmentOrderField>;
 
 type CommaDelimitedListOfUid = string;
 
@@ -122,3 +139,16 @@ export interface D2TrackerEnrollmentSchema {
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
 
 type EnrollmentResponse<Fields> = TrackerEnrollmentsResponse<Fields>;
+
+export type TrackerOrder<Field extends string> = {
+    field: Field;
+    direction: "asc" | "desc";
+};
+
+export function getTrackerOrderParam<Field extends string>(
+    order: Maybe<TrackerOrder<Field>[]>
+): Maybe<string> {
+    if (!order || order.length === 0) return undefined;
+
+    return order.map(({ field, direction }) => `${field}:${direction}`).join(",");
+}
