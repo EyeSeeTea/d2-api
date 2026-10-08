@@ -17,6 +17,8 @@ module.exports = {
         "@typescript-eslint/ban-ts-ignore": "off",
         "@typescript-eslint/prefer-interface": "off",
         "no-dupe-class-members": "off",
+        // used in internal things eg: cache.ts
+        "@typescript-eslint/ban-types": "off",
     },
-    env: { node: true, browser: true, es6: true },
+    env: { node: true, browser: true, es2020: true },
 };

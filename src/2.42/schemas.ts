@@ -2205,6 +2205,7 @@ export type D2ExternalMapLayer = {
 
 export type D2FileResource = {
     access: D2Access;
+    assigned: boolean;
     attributeValues: D2AttributeValueGeneric<D2Attribute>[];
     code: Id;
     contentLength: number;
@@ -2507,6 +2508,7 @@ export type D2JobConfiguration = {
         | "DATA_SET_NOTIFICATION"
         | "DATA_STATISTICS"
         | "DATA_SYNC"
+        | "DATA_VALUE_TRIM"
         | "DISABLE_INACTIVE_USERS"
         | "FILE_RESOURCE_CLEANUP"
         | "GEOJSON_IMPORT"
@@ -2526,10 +2528,12 @@ export type D2JobConfiguration = {
         | "REMOVE_USED_OR_EXPIRED_RESERVED_VALUES"
         | "RESOURCE_TABLE"
         | "SEND_SCHEDULED_MESSAGE"
+        | "SINGLE_EVENT_DATA_SYNC"
         | "SMS_INBOUND_PROCESSING"
         | "SMS_SEND"
         | "SYSTEM_VERSION_UPDATE_CHECK"
         | "TEST"
+        | "TRACKED_ENTITY_DATA_SYNC"
         | "TRACKER_IMPORT_JOB"
         | "TRACKER_IMPORT_NOTIFICATION_JOB"
         | "TRACKER_IMPORT_RULE_ENGINE_JOB"
@@ -9682,6 +9686,7 @@ export interface D2FileResourceSchema {
     model: D2FileResource;
     fields: {
         access: D2AccessSchema;
+        assigned: boolean;
         attributeValues: D2AttributeValueGenericSchema<D2Attribute, D2AttributeSchema>[];
         code: Id;
         contentLength: number;
@@ -9718,6 +9723,7 @@ export interface D2FileResourceSchema {
         $nameable: Preset<D2FileResource, FieldPresets["nameable"]>;
         $persisted: Preset<
             D2FileResource,
+            | "assigned"
             | "code"
             | "contentLength"
             | "contentMd5"
@@ -9733,6 +9739,7 @@ export interface D2FileResourceSchema {
         >;
         $owner: Preset<
             D2FileResource,
+            | "assigned"
             | "code"
             | "contentLength"
             | "contentMd5"
@@ -10291,6 +10298,7 @@ export interface D2JobConfigurationSchema {
             | "DATA_SET_NOTIFICATION"
             | "DATA_STATISTICS"
             | "DATA_SYNC"
+            | "DATA_VALUE_TRIM"
             | "DISABLE_INACTIVE_USERS"
             | "FILE_RESOURCE_CLEANUP"
             | "GEOJSON_IMPORT"
@@ -10310,10 +10318,12 @@ export interface D2JobConfigurationSchema {
             | "REMOVE_USED_OR_EXPIRED_RESERVED_VALUES"
             | "RESOURCE_TABLE"
             | "SEND_SCHEDULED_MESSAGE"
+            | "SINGLE_EVENT_DATA_SYNC"
             | "SMS_INBOUND_PROCESSING"
             | "SMS_SEND"
             | "SYSTEM_VERSION_UPDATE_CHECK"
             | "TEST"
+            | "TRACKED_ENTITY_DATA_SYNC"
             | "TRACKER_IMPORT_JOB"
             | "TRACKER_IMPORT_NOTIFICATION_JOB"
             | "TRACKER_IMPORT_RULE_ENGINE_JOB"
@@ -24647,6 +24657,12 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 fieldName: "access",
                 propertyType: "COMPLEX",
                 klass: "org.hisp.dhis.security.acl.Access",
+            },
+            {
+                name: "assigned",
+                fieldName: "assigned",
+                propertyType: "BOOLEAN",
+                klass: "java.lang.Boolean",
             },
             {
                 name: "attributeValues",
