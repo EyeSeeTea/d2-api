@@ -85,6 +85,9 @@ type TrackerEnrollmentsParamsBase = {
     orgUnits: CommaDelimitedListOfUid;
     orgUnitMode: OrgUnitMode;
     program: Id;
+    /**
+     * @deprecated Use `status` instead. programStatus will be removed in v43.
+     */
     programStatus: ProgramStatus;
     followUp: boolean;
     updatedAfter: IsoDate;
@@ -96,6 +99,7 @@ type TrackerEnrollmentsParamsBase = {
     enrollments: CommaDelimitedListOfUid;
     includeDeleted: boolean;
     order: TrackerEnrollmentOrder[];
+    status: ProgramStatus;
 };
 
 /**
