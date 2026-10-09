@@ -9,6 +9,7 @@ import {
     TrackedPager,
     UserInfo,
     CommaDelimitedListOfUid,
+    SemiColonDelimitedListOfUid,
 } from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
@@ -116,7 +117,7 @@ interface EventsParamsBase {
     followUp?: boolean;
     trackedEntityInstance?: Id;
     orgUnit?: Id;
-    event?: CommaDelimitedListOfUid;
+    event?: SemiColonDelimitedListOfUid;
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
@@ -136,7 +137,7 @@ interface EventsParamsBase {
     attributeCos?: string;
     includeDeleted?: boolean;
     assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
-    assignedUser?: CommaDelimitedListOfUid;
+    assignedUser?: SemiColonDelimitedListOfUid;
 }
 
 export interface DataValue {
