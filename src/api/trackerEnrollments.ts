@@ -3,11 +3,12 @@ import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
 import { Preset, D2Geometry } from "../schemas";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
-import { RequiredBy } from "../utils/types";
+import { Maybe, RequiredBy } from "../utils/types";
 import {
     Attribute,
     OrgUnitMode,
     Relationship,
+    SemiColonDelimitedListOfUid,
     TrackedPager,
     UserInfo,
 } from "./trackerTrackedEntities";
@@ -20,8 +21,9 @@ export class TrackerEnrollments {
         params: TrackerEnrollmentsParams<Fields>
     ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
         return this.api.get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
-            ..._.omit(params, ["fields"]),
+            ..._.omit(params, ["fields", "order"]),
             fields: getTrackerFieldsParam(params.fields),
+            order: getTrackerOrderParam(params.order),
         });
     }
 }
@@ -104,11 +106,30 @@ type TrackerEnrollmentsParamsBase = {
     enrolledBefore: IsoDate;
     trackedEntityType: Id;
     trackedEntity: Id;
-    enrollment: CommaDelimitedListOfUid;
+    enrollment: SemiColonDelimitedListOfUid;
     includeDeleted: boolean;
+    order: TrackerEnrollmentOrder[];
 };
 
-type CommaDelimitedListOfUid = string;
+/**
+ * Ordering by tracked entity attribute is not supported for enrollments.
+ */
+export type TrackerEnrollmentOrderField =
+    | "completedAt"
+    | "completedBy"
+    | "createdAt"
+    | "createdAtClient"
+    | "deleted"
+    | "enrolledAt"
+    | "enrollment"
+    | "occurredAt"
+    | "program"
+    | "status"
+    | "storedBy"
+    | "updatedAt"
+    | "updatedAtClient";
+
+export type TrackerEnrollmentOrder = TrackerOrder<TrackerEnrollmentOrderField>;
 
 export type TrackerEnrollmentsResponse<Fields> = TrackedPager & {
     instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
@@ -134,3 +155,16 @@ export interface D2TrackerEnrollmentSchema {
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
 
 type EnrollmentResponse<Fields> = TrackerEnrollmentsResponse<Fields>;
+
+export type TrackerOrder<Field extends string> = {
+    field: Field;
+    direction: "asc" | "desc";
+};
+
+export function getTrackerOrderParam<Field extends string>(
+    order: Maybe<TrackerOrder<Field>[]>
+): Maybe<string> {
+    if (!order || order.length === 0) return undefined;
+
+    return order.map(({ field, direction }) => `${field}:${direction}`).join(",");
+}
