@@ -8,3 +8,5 @@ export * from "./api/events";
 export { CancelableResponse } from "./repositories/CancelableResponse";
 export { Id, Ref, D2Geometry } from "./schemas";
 export * from "./api/events";
+
+export * from "./2.40";

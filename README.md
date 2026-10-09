@@ -37,17 +37,17 @@ $ yarn publish [--tag beta] [--patch | --minor | --major]
 ### Create an API instance
 
 ```ts
-import { D2Api } from "d2-api/2.36";
+import { D2Api } from "@eyeseetea/d2-api";
 
 // Basic access authentication
 const api = new D2Api({
-    baseUrl: "https://play.im.dhis2.org/dev",
+    baseUrl: "https://play.im.dhis2.org/stable-2-40-11",
     auth: { type: "basic", username: "admin", password: "district" },
 });
 
 // Personal Access Token (PAT) authentication
 const api = new D2Api({
-    baseUrl: "https://play.im.dhis2.org/dev",
+    baseUrl: "https://play.im.dhis2.org/stable-2-40-11",
     auth: { type: "personalToken", token: "token_here" },
 });
 ```
@@ -365,7 +365,7 @@ const data = await api.tracker.trackedEntities
             orgUnit: true,
         },
         ouMode: "ALL",
-        program: "program_id",
+        program: "IpHINAT79UW",
     })
     .getData();
 ```
@@ -379,7 +379,7 @@ const data = await api.tracker.trackedEntities
             orgUnit: true,
         },
         ouMode: "ALL",
-        program: "program_id",
+        program: "IpHINAT79UW",
         order: [
             { type: "field", field: "createdAt", direction: "asc" },
             { type: "trackedEntityAttributeId", id: "wMhqqPLb7pP", direction: "desc" },
@@ -397,7 +397,7 @@ const data = await api.tracker.trackedEntities
             orgUnit: true,
         },
         ouMode: "ALL",
-        program: "program_id",
+        program: "IpHINAT79UW",
         totalPages: true,
     })
     .getData();
@@ -444,7 +444,7 @@ await api.email
 
 ## Using type helpers
 
-_d2-api_ exposes some type helpers that you may need in your app. Some examples:
+_@eyeseetea/d2-api_ exposes some type helpers that you may need in your app. Some examples:
 
 -   `SelectedPick`: Get model from a selector:
 
@@ -486,8 +486,7 @@ console.log(res.data);
 ## Testing
 
 ```ts
-import { D2Api } from "d2-api/2.36";
-import { getMockApiFromClass } from "d2-api";
+import { D2Api, getMockApiFromClass } from "@eyeseetea/d2-api";
 
 const currentUserMock = {
     id: "xE7jOejl9FI",
