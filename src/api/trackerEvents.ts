@@ -57,7 +57,7 @@ interface D2TrackerEventBase {
     completedAt?: IsoDate;
     completedBy?: string;
     storedBy: Username;
-    followup: boolean;
+    followUp: boolean;
     deleted: boolean;
     createdAt: IsoDate;
     createdAtClient?: IsoDate;
@@ -105,6 +105,7 @@ export type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Parti
         page: number;
         pageSize: number;
         skipPaging: boolean;
+        paging: boolean;
     }>;
 
 interface EventsParamsBase {
@@ -141,7 +142,7 @@ interface EventsParamsBase {
     attributeCategoryOptions?: CommaDelimitedListOfUid;
     includeDeleted?: boolean;
     assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
-    assignedUsers: SemiColonDelimitedListOfUid;
+    assignedUsers?: SemiColonDelimitedListOfUid;
     assignedUser?: CommaDelimitedListOfUid;
 }
 
@@ -156,7 +157,7 @@ export interface DataValue {
 
 export type TrackerEventsResponse<Fields> = TrackedPager & {
     pager: TrackedPager;
-    trackedEntities: SelectedPick<D2TrackerEventSchema, Fields>[];
+    events: SelectedPick<D2TrackerEventSchema, Fields>[];
 };
 
 export interface D2TrackerEventSchema {
