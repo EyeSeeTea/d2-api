@@ -92,7 +92,7 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         paging: boolean;
     }>;
 
-type Params = Partial<TrackerEnrollmentsParamsBase>;
+type Params = RequiredBy<TrackerEnrollmentsParamsBase, "program">;
 
 type TrackerEnrollmentsParamsBase = {
     orgUnits: CommaDelimitedListOfUid;

@@ -115,7 +115,7 @@ export type EventsParams<Fields> = EventsParamsBase & { fields: Fields } & Parti
 interface EventsParamsBase {
     events?: CommaDelimitedListOfUid;
     orgUnitMode?: OrgUnitMode;
-    program?: Id;
+    program: Id;
     programStage?: Id;
     enrollmentStatus?: EnrollmentStatus;
     filter?: CommaDelimitedListOfDataElementFilter;
