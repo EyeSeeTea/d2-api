@@ -3,8 +3,9 @@ export { D2ApiMock, getMockApiFromClass } from "./testing";
 
 export { HttpError } from "./repositories/HttpClientRepository";
 export { Canceler, isCancel } from "./repositories/CancelableResponse";
-export * from "./api/events";
 
 export { CancelableResponse } from "./repositories/CancelableResponse";
 export { Id, Ref, D2Geometry } from "./schemas";
-export * from "./api/events";
+
+// Re-export the current DHIS2 API version at package root for simpler imports.
+export * from "./2.43";

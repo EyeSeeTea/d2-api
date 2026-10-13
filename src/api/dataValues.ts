@@ -31,17 +31,11 @@ export type DataValueSetsPostParams = Partial<{
     skipExistingCheck: boolean;
     skipAudit: boolean;
     force: boolean;
+    attributeOptionComboIdScheme?: IdScheme;
+    dataSetIdScheme?: IdScheme;
 }>;
 
-type ImportStrategy =
-    | "CREATE"
-    | "UPDATE"
-    | "CREATE_AND_UPDATE"
-    | "DELETE"
-    | "NEW_AND_UPDATES"
-    | "NEW"
-    | "UPDATES"
-    | "DELETES";
+type ImportStrategy = "CREATE" | "UPDATE" | "CREATE_AND_UPDATE" | "DELETE";
 
 export interface DataValueSetsPostResponse {
     responseType: "ImportSummary";
@@ -86,6 +80,7 @@ export interface DataValueSetsPostResponse {
 }
 
 type IdScheme = string;
+type IdOrCodeScheme = "id" | "code";
 
 export type DataValueSetsGetRequest = {
     dataSet: Id[];
@@ -107,6 +102,12 @@ export type DataValueSetsGetRequest = {
     orgUnitIdScheme?: IdScheme;
     categoryOptionComboIdScheme?: IdScheme;
     dataSetIdScheme?: IdScheme;
+    attributeOptionComboIdScheme?: IdScheme;
+    inputOrgUnitIdScheme?: IdOrCodeScheme;
+    inputDataSetIdScheme?: IdOrCodeScheme;
+    inputDataElementGroupIdScheme?: IdOrCodeScheme;
+    inputDataElementIdScheme?: IdOrCodeScheme;
+    inputIdScheme?: IdOrCodeScheme;
 };
 
 export interface DataValueSetsGetResponse {

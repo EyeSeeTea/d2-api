@@ -151,6 +151,6 @@ export interface TrackerPostResponse {
     };
     stats: Stats;
     bundleReport: BundleReport;
-    timingsStats: {};
+    timingsStats: object;
     message: string;
 }
