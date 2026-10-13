@@ -178,7 +178,6 @@ export type TrackedEntitiesParamsBase = {
     enrollmentOccurredAfter: IsoDate;
     enrollmentOccurredBefore: IsoDate;
     trackedEntityType: Id;
-    trackedEntity: Id;
     assignedUserMode: "CURRENT" | "PROVIDED" | "NONE" | "ANY" | "ALL";
     assignedUsers: CommaDelimitedListOfUid;
     eventStatus: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";

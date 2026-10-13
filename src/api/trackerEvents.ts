@@ -123,7 +123,6 @@ interface EventsParamsBase {
     followUp?: boolean;
     trackedEntity?: Id;
     orgUnit?: Id;
-    event?: Id;
     status?: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULE" | "OVERDUE" | "SKIPPED";
     occurredAfter?: IsoDate;
     occurredBefore?: IsoDate;
@@ -148,7 +147,7 @@ interface EventsParamsBase {
     attributeCategoryOptions?: Id;
     includeDeleted?: boolean;
     assignedUserMode?: "CURRENT" | "PROVIDED" | "NONE" | "ANY";
-    assignedUser?: CommaDelimitedListOfUid;
+    assignedUsers?: CommaDelimitedListOfUid;
 }
 
 export interface DataValue {

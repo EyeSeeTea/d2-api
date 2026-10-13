@@ -102,9 +102,8 @@ type TrackerEnrollmentsParamsBase = {
     updatedWithin: IsoDate;
     enrolledAfter: IsoDate;
     enrolledBefore: IsoDate;
-    trackedEntityType: Id;
     trackedEntity: Id;
-    enrollment: CommaDelimitedListOfUid;
+    enrollments: CommaDelimitedListOfUid;
     includeDeleted: boolean;
     order: CommaDelimitedListOfUid;
     attributeOptionCombo?: Id;
