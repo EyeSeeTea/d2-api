@@ -36,7 +36,7 @@ describe("TrackerEnrollments.get against play.dhis2.org/43", () => {
                 program: playFixtures.program,
                 orgUnits: playFixtures.orgUnit,
                 orgUnitMode: "DESCENDANTS",
-                order: "enrolledAt:desc",
+                order: [{ field: "enrolledAt", direction: "desc" }],
                 pageSize: 5,
                 fields: { enrollment: true, enrolledAt: true },
             })
