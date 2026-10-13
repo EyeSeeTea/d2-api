@@ -1,11 +1,18 @@
 import { D2ApiGeneric } from "./d2Api";
+import { Maybe } from "../utils/types";
 import { Id, Selector, D2ApiResponse, SelectedPick } from "./base";
-import { Preset } from "../schemas";
-import { parseTrackerPager } from "./common";
+import { Preset, D2Geometry } from "../schemas";
 import { D2TrackerEvent, D2TrackerEventSchema, Note, D2TrackerEventToPost } from "./trackerEvents";
 import _ from "lodash";
 import { RequiredBy } from "../utils/types";
-import { TrackedPager } from "./trackerTrackedEntities";
+import {
+    Attribute,
+    OrgUnitMode,
+    Relationship,
+    SemiColonDelimitedListOfUid,
+    TrackedPager,
+    UserInfo,
+} from "./trackerTrackedEntities";
 import { getTrackerFieldsParam } from "./tracker";
 
 export class TrackerEnrollments {
@@ -14,18 +21,11 @@ export class TrackerEnrollments {
     get<Fields extends D2TrackerEnrollmentFields>(
         params: TrackerEnrollmentsParams<Fields>
     ): D2ApiResponse<TrackerEnrollmentsResponse<Fields>> {
-        return this.api
-            .get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
-                ..._.omit(params, ["fields"]),
-                fields: getTrackerFieldsParam(params.fields),
-            })
-            .map(({ data }) => {
-                return {
-                    ..._.omit(data, "enrollments"),
-                    pager: parseTrackerPager(data),
-                    instances: data.enrollments || data.instances || [],
-                };
-            });
+        return this.api.get<EnrollmentResponse<Fields>>("/tracker/enrollments", {
+            ..._.omit(params, ["fields", "order"]),
+            fields: getTrackerFieldsParam(params.fields),
+            order: getTrackerOrderParam(params.order),
+        });
     }
 }
 
@@ -49,11 +49,17 @@ export interface D2TrackerEnrollment {
     orgUnitName: string;
     enrolledAt: IsoDate;
     occurredAt: IsoDate;
+    completedAt?: IsoDate;
+    completedBy?: string;
     followUp: boolean;
     deleted: boolean;
     storedBy: Username;
+    createdBy?: UserInfo;
+    updatedBy?: UserInfo;
+    geometry?: Extract<D2Geometry, { type: "Point" }> | Extract<D2Geometry, { type: "Polygon" }>;
     events: D2TrackerEvent[];
-    attributes: D2TrackerEnrollmentAttribute[];
+    attributes: Attribute[];
+    relationships?: Relationship[];
     notes: Note[];
 }
 
@@ -68,9 +74,10 @@ type RequiredFieldsOnPost =
 
 export type D2TrackerEnrollmentToPost = Omit<
     RequiredBy<D2TrackerEnrollment, RequiredFieldsOnPost>,
-    "events"
+    "events" | "attributes"
 > & {
     events: D2TrackerEventToPost[];
+    attributes: D2TrackerEnrollmentAttribute[];
 };
 
 export interface D2TrackerEnrollmentAttribute {
@@ -83,13 +90,17 @@ type TrackerEnrollmentsParams<Fields> = Params & { fields: Fields } & Partial<{
         page: number;
         pageSize: number;
         skipPaging: boolean;
+        paging: boolean;
     }>;
 
-type Params = RequiredBy<TrackerEnrollmentsParamsBase, "ouMode">;
+// TODO: in v40 ?orgUnit=[ID] is required
+type Params = Partial<TrackerEnrollmentsParamsBase>;
 
 type TrackerEnrollmentsParamsBase = {
+    orgUnits: CommaDelimitedListOfUid;
     orgUnit: SemiColonDelimitedListOfUid;
-    ouMode: "SELECTED" | "CHILDREN" | "DESCENDANTS" | "ACCESSIBLE" | "CAPTURE" | "ALL";
+    ouMode: OrgUnitMode;
+    orgUnitMode: OrgUnitMode;
     program: Id;
     programStatus: ProgramStatus;
     followUp: boolean;
@@ -99,17 +110,32 @@ type TrackerEnrollmentsParamsBase = {
     enrolledBefore: IsoDate;
     trackedEntityType: Id;
     trackedEntity: Id;
-    enrollment: CommaDelimitedListOfUid;
+    enrollments: CommaDelimitedListOfUid;
+    enrollment: SemiColonDelimitedListOfUid;
     includeDeleted: boolean;
+    order: TrackerEnrollmentOrder[];
 };
 
-type SemiColonDelimitedListOfUid = string;
+/**
+ * Ordering by tracked entity attribute is not supported for enrollments.
+ * DHIS2 2.41 respond 409 ("column reference is ambiguous") for createdAt and updatedAt.
+ */
+export type TrackerEnrollmentOrderField =
+    | "completedAt"
+    | "createdAt"
+    | "createdAtClient"
+    | "enrolledAt"
+    | "updatedAt"
+    | "updatedAtClient";
+
+export type TrackerEnrollmentOrder = TrackerOrder<TrackerEnrollmentOrderField>;
+
 type CommaDelimitedListOfUid = string;
 
-export interface TrackerEnrollmentsResponse<Fields> extends TrackedPager {
-    pager?: TrackedPager;
-    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
-}
+export type TrackerEnrollmentsResponse<Fields> = TrackedPager & {
+    pager: TrackedPager;
+    enrollments: SelectedPick<D2TrackerEnrollmentSchema, Fields>[];
+};
 
 export interface D2TrackerEnrollmentSchema {
     name: "D2TrackerEnrollment";
@@ -130,7 +156,17 @@ export interface D2TrackerEnrollmentSchema {
 
 type D2TrackerEnrollmentFields = Selector<D2TrackerEnrollmentSchema>;
 
-type EnrollmentResponse<Fields> = Omit<TrackerEnrollmentsResponse<Fields>, "instances"> & {
-    instances: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
-    enrollments: SelectedPick<D2TrackerEnrollmentSchema, Fields>[] | undefined;
+type EnrollmentResponse<Fields> = TrackerEnrollmentsResponse<Fields>;
+
+export type TrackerOrder<Field extends string> = {
+    field: Field;
+    direction: "asc" | "desc";
 };
+
+export function getTrackerOrderParam<Field extends string>(
+    order: Maybe<TrackerOrder<Field>[]>
+): Maybe<string> {
+    if (!order || order.length === 0) return undefined;
+
+    return order.map(({ field, direction }) => `${field}:${direction}`).join(",");
+}

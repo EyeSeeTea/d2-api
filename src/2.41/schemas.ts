@@ -2164,6 +2164,7 @@ export type D2ExternalMapLayer = {
 
 export type D2FileResource = {
     access: D2Access;
+    assigned: boolean;
     attributeValues: D2AttributeValue[];
     code: Id;
     contentLength: number;
@@ -2464,6 +2465,7 @@ export type D2JobConfiguration = {
         | "DATA_SET_NOTIFICATION"
         | "DATA_STATISTICS"
         | "DATA_SYNC"
+        | "DATA_VALUE_TRIM"
         | "DISABLE_INACTIVE_USERS"
         | "ENROLLMENT_IMPORT"
         | "EVENT_IMPORT"
@@ -4478,6 +4480,7 @@ export type D2Route = {
     lastUpdated: string;
     lastUpdatedBy: D2User;
     name: string;
+    responseTimeoutSeconds: number;
     sharing: D2Sharing;
     translations: D2Translation[];
     url: string;
@@ -9650,6 +9653,7 @@ export interface D2FileResourceSchema {
     model: D2FileResource;
     fields: {
         access: D2AccessSchema;
+        assigned: boolean;
         attributeValues: D2AttributeValueSchema[];
         code: Id;
         contentLength: number;
@@ -9686,6 +9690,7 @@ export interface D2FileResourceSchema {
         $nameable: Preset<D2FileResource, FieldPresets["nameable"]>;
         $persisted: Preset<
             D2FileResource,
+            | "assigned"
             | "code"
             | "contentLength"
             | "contentMd5"
@@ -9701,6 +9706,7 @@ export interface D2FileResourceSchema {
         >;
         $owner: Preset<
             D2FileResource,
+            | "assigned"
             | "code"
             | "contentLength"
             | "contentMd5"
@@ -10257,6 +10263,7 @@ export interface D2JobConfigurationSchema {
             | "DATA_SET_NOTIFICATION"
             | "DATA_STATISTICS"
             | "DATA_SYNC"
+            | "DATA_VALUE_TRIM"
             | "DISABLE_INACTIVE_USERS"
             | "ENROLLMENT_IMPORT"
             | "EVENT_IMPORT"
@@ -14266,6 +14273,7 @@ export interface D2RouteSchema {
         lastUpdated: string;
         lastUpdatedBy: D2UserSchema;
         name: string;
+        responseTimeoutSeconds: number;
         sharing: D2SharingSchema;
         translations: D2Translation[];
         url: string;
@@ -14290,6 +14298,7 @@ export interface D2RouteSchema {
             | "lastUpdated"
             | "lastUpdatedBy"
             | "name"
+            | "responseTimeoutSeconds"
             | "sharing"
             | "translations"
             | "url"
@@ -14309,6 +14318,7 @@ export interface D2RouteSchema {
             | "lastUpdated"
             | "lastUpdatedBy"
             | "name"
+            | "responseTimeoutSeconds"
             | "sharing"
             | "translations"
             | "url"
@@ -24820,6 +24830,12 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 klass: "org.hisp.dhis.security.acl.Access",
             },
             {
+                name: "assigned",
+                fieldName: "assigned",
+                propertyType: "BOOLEAN",
+                klass: "java.lang.Boolean",
+            },
+            {
                 name: "attributeValue",
                 fieldName: "attributeValues",
                 propertyType: "COLLECTION",
@@ -34173,6 +34189,12 @@ export const models: Record<keyof D2ModelSchemas, D2SchemaProperties> = {
                 klass: "org.hisp.dhis.user.User",
             },
             { name: "name", fieldName: "name", propertyType: "TEXT", klass: "java.lang.String" },
+            {
+                name: "responseTimeoutSeconds",
+                fieldName: "responseTimeoutSeconds",
+                propertyType: "INTEGER",
+                klass: "java.lang.Integer",
+            },
             {
                 name: "sharing",
                 fieldName: "sharing",

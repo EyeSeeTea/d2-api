@@ -37,7 +37,7 @@ $ yarn publish [--tag beta] [--patch | --minor | --major]
 ### Create an API instance
 
 ```ts
-import { D2Api } from "d2-api/2.36";
+import { D2Api } from "@eyeseetea/d2-api";
 
 // Basic access authentication
 const api = new D2Api({
@@ -52,7 +52,7 @@ const api = new D2Api({
 });
 ```
 
-Learn more about [PAT authentication here](https://docs.dhis2.org/en/full/develop/dhis-core-version-240/developer-manual.html#webapi_pat_authentication)
+Learn more about [PAT authentication here](https://docs.dhis2.org/en/full/develop/dhis-core-version-241/developer-manual.html#webapi_pat_authentication)
 
 ### Metadata models
 
@@ -444,7 +444,7 @@ await api.email
 
 ## Using type helpers
 
-_d2-api_ exposes some type helpers that you may need in your app. Some examples:
+_@eyeseetea/d2-api_ exposes some type helpers that you may need in your app. Some examples:
 
 -   `SelectedPick`: Get model from a selector:
 
@@ -486,8 +486,8 @@ console.log(res.data);
 ## Testing
 
 ```ts
-import { D2Api } from "d2-api/2.36";
-import { getMockApiFromClass } from "d2-api";
+import { D2Api } from "@eyeseetea/d2-api";
+import { getMockApiFromClass } from "@eyeseetea/d2-api";
 
 const currentUserMock = {
     id: "xE7jOejl9FI",
